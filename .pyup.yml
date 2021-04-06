@@ -1,0 +1,20 @@
+# set the default branch
+# default: empty, the default branch on GitHub
+branch: main
+
+# set a global prefix for PRs
+# default: empty
+pr_prefix: "PyUp"
+
+# Specify requirement files by hand, default is empty
+# default: empty
+# allowed: list
+requirements:
+  - docs/requirements.txt:
+      update: False
+  - requirements.txt:
+      update: True
+      pin: True
+  - requirements_install.txt:
+      update: True
+      pin: True
