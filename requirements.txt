@@ -1,0 +1,13 @@
+# Used by this library
+pendulum<3.0.0
+astral==2.2
+
+# Testing
+pytest
+pytest-asyncio
+mock;python_version<'3.8'
+
+# Docs
+sphinx
+sphinx_autodoc_typehints
+sphinx_rtd_theme
