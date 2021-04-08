@@ -1,7 +1,7 @@
 from datetime import time, datetime, date
-from pendulum import UTC, from_timestamp
 
 import pytest
+from pendulum import from_timestamp
 
 from eascheduler import set_location
 from eascheduler.const import SKIP_EXECUTION
