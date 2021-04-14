@@ -27,8 +27,12 @@ async def test_at(view: SchedulerView):
 
     view.at(time(11), lambda x: x)
     assert s.jobs[0].get_next_run() == datetime(2001, 1, 2, 11)
+
     view.at(time(13), lambda x: x)
     assert s.jobs[0].get_next_run() == datetime(2001, 1, 1, 13)
+
+    view.at(5, lambda x: x)
+    assert s.jobs[0].get_next_run() == datetime(2001, 1, 1, 12, 0, 5)
 
 
 @pytest.mark.asyncio
@@ -76,6 +80,10 @@ async def test_job_insert_on_day_of_week(view: SchedulerView):
     j = view.on_day_of_week(time(5), 'Mon', lambda x: 1 / 0)
     assert j is view._scheduler.jobs[0]
     assert j in view._scheduler.job_objs
+
+    # Test helper functions, too!
+    view.on_weekends(time(5), lambda x: 1 / 0)
+    view.on_workdays(time(5), lambda x: 1 / 0)
 
 
 @pytest.mark.parametrize('name', ('on_sun_dawn', 'on_sunrise', 'on_sunset', 'on_sun_dusk'))

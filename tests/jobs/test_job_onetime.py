@@ -1,9 +1,10 @@
 import asyncio
+import time
 
 import pytest
 
 from eascheduler.const import SKIP_EXECUTION
-from eascheduler.errors import OneTimeJobCanNotBeSkipped, JobAlreadyCanceledException
+from eascheduler.errors import JobAlreadyCanceledException, OneTimeJobCanNotBeSkipped
 from eascheduler.jobs.job_one_time import OneTimeJob
 from eascheduler.schedulers import AsyncScheduler
 from tests.helper import mocked_executor, set_now
@@ -43,3 +44,15 @@ async def test_remove():
 
     with pytest.raises(JobAlreadyCanceledException):
         j.cancel()
+
+
+@pytest.mark.asyncio
+async def test_init():
+    s = AsyncScheduler()
+    j = OneTimeJob(s, lambda x: x)
+
+    j._initialize_base_time(None)
+    assert j._next_base <= round(time.time(), 3) + 0.01
+
+    j._initialize_base_time(3)
+    assert j._next_base <= round(time.time() + 3, 3) + 0.01

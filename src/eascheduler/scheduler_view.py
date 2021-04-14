@@ -97,7 +97,7 @@ class SchedulerView:
         :param kwargs: |param_scheduled_cb_kwargs|
         :return: Created job
         """
-        return self.on_day_of_week(time, 'workday', callback, *args, **kwargs)
+        return self.on_day_of_week(time, 'workdays', callback, *args, **kwargs)
 
     def on_sunrise(self, callback, *args, **kwargs) -> SunriseJob:
         """Create a job that will run on sunrise, requires a location to be set
