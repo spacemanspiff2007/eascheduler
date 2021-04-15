@@ -58,7 +58,9 @@ class SunJobBase(DateTimeJobBase):
 
         # Allow skipping certain occurrences
         dt_next = dt_start if dt_start is not None else get_now(tz=local_tz)
-        next_run = update_run_time(dt_next)
+        next_run = pd_instance(self._sun_func(OBSERVER, dt_next.date(), tzinfo=local_tz))
+        next_run = update_run_time(next_run.set(microsecond=0))
+
         while next_run is SKIP_EXECUTION:
             dt_next = dt_next.add(days=1)
             next_run = pd_instance(self._sun_func(OBSERVER, dt_next.add(days=1).date(), tzinfo=local_tz))

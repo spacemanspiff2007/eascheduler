@@ -4,7 +4,7 @@ import pytest
 from pendulum import from_timestamp
 
 from eascheduler import set_location
-from eascheduler.const import SKIP_EXECUTION
+from eascheduler.const import SKIP_EXECUTION, local_tz
 from eascheduler.executors import SyncExecutor
 from eascheduler.jobs import SunriseJob, SunsetJob, DawnJob, DuskJob
 from eascheduler.schedulers import AsyncScheduler
@@ -63,3 +63,26 @@ async def test_sunrise_skip():
     assert from_timestamp(j._next_run).naive() == datetime(2001, 1, 3, 7, 15, 16)
 
     s.cancel_all()
+
+
+@pytest.mark.asyncio
+async def test_calc_advance():
+    set_location(52.5185537, 13.3758636, 43)
+    set_now(2001, 1, 1, 12)
+    s = AsyncScheduler()
+
+    j = SunriseJob(s, SyncExecutor(lambda x: 1 / 0))
+    s.add_job(j)
+    j._update_base_time()
+    assert from_timestamp(j._next_run).naive() == datetime(2001, 1, 2, 7, 15, 29)
+    j.cancel()
+
+    j = SunsetJob(s, SyncExecutor(lambda x: 1 / 0))
+    s.add_job(j)
+    j._update_base_time()
+    assert from_timestamp(j._next_run).naive() == datetime(2001, 1, 1, 15, 4, 48)
+
+    j.latest(time(15))
+    assert from_timestamp(j._next_run).in_tz(local_tz).naive() == datetime(2001, 1, 1, 15, 0, 0)
+
+    j.cancel()
