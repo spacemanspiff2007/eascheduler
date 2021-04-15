@@ -1,3 +1,4 @@
+import asyncio
 from datetime import time, datetime
 from functools import partial
 
@@ -5,8 +6,8 @@ import pytest
 
 from eascheduler import SchedulerView
 from eascheduler import set_location
-from eascheduler.executors import SyncExecutor
-from eascheduler.schedulers import AsyncScheduler
+from eascheduler.executors import SyncExecutor, AsyncExecutor
+from eascheduler.schedulers import AsyncScheduler, ThreadSafeAsyncScheduler
 from tests.helper import set_now
 
 
@@ -93,3 +94,24 @@ async def test_job_insert_on_sunrise(view: SchedulerView, name: str):
     j = getattr(view, name)(lambda x: 1 / 0)
     assert j is view._scheduler.jobs[0]
     assert j in view._scheduler.job_objs
+
+
+@pytest.mark.parametrize('scheduler_cls', (AsyncScheduler, ThreadSafeAsyncScheduler))
+@pytest.mark.asyncio
+async def test_execution(view: SchedulerView, scheduler_cls):
+    ThreadSafeAsyncScheduler.LOOP = asyncio.get_event_loop()
+    calls = []
+
+    async def cb():
+        calls.append(datetime.now())
+
+    scheduler = scheduler_cls()
+    view = SchedulerView(scheduler, AsyncExecutor)
+
+    view.every(0.2, 0.1, cb)
+    await asyncio.sleep(0.6)
+
+    assert len(calls) >= 3, calls
+
+    scheduler.cancel_all()
+    calls.clear()

@@ -165,7 +165,7 @@ class DateTimeJobBase(ScheduledJobBase):
         self._set_next_run(next_run.timestamp())
         return next_run
 
-    def _initialize_base_time(self, base_time: Union[None, datetime, timedelta, time, int]) -> DateTime:
+    def _initialize_base_time(self, base_time: Union[None, datetime, timedelta, time, int, float]) -> DateTime:
         now = get_now(tz=local_tz)
         new_base: DateTime
         if base_time is None:
@@ -174,7 +174,7 @@ class DateTimeJobBase(ScheduledJobBase):
         elif isinstance(base_time, timedelta):
             # if it is a timedelta add it to now to easily specify points in the future
             new_base = now + base_time
-        elif isinstance(base_time, int):
+        elif isinstance(base_time, (int, float)):
             new_base = now + timedelta(seconds=base_time)
         elif isinstance(base_time, time):
             # if it is a time object it specifies a time of day.

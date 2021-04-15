@@ -14,7 +14,8 @@ class SchedulerView:
         self._scheduler: AsyncScheduler = scheduler
         self._executor: Type[ExecutorBase] = executor
 
-    def at(self, time: Union[None, dt_datetime, dt_timedelta, dt_time, int], callback, *args, **kwargs) -> OneTimeJob:
+    def at(self, time: Union[None, dt_datetime, dt_timedelta, dt_time, int, float],
+           callback, *args, **kwargs) -> OneTimeJob:
         """Create a a job that will run at a specified time.
 
         :param time:
@@ -43,7 +44,7 @@ class SchedulerView:
         self._scheduler.add_job(job)
         return job
 
-    def every(self, start_time: Union[None, dt_datetime, dt_timedelta, dt_time, int],
+    def every(self, start_time: Union[None, dt_datetime, dt_timedelta, dt_time, int, float],
               interval: Union[int, float, dt_timedelta], callback, *args, **kwargs) -> ReoccurringJob:
         """Create a job that will run at a specific interval.
 
