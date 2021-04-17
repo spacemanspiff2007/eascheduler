@@ -1,12 +1,12 @@
-from datetime import time, datetime, date
+from datetime import date, datetime, time
 
 import pytest
-from pendulum import from_timestamp
+from pendulum import from_timestamp, UTC
 
 from eascheduler import set_location
 from eascheduler.const import SKIP_EXECUTION, local_tz
 from eascheduler.executors import SyncExecutor
-from eascheduler.jobs import SunriseJob, SunsetJob, DawnJob, DuskJob
+from eascheduler.jobs import DawnJob, DuskJob, SunriseJob, SunsetJob
 from eascheduler.schedulers import AsyncScheduler
 from tests.helper import set_now
 
@@ -68,21 +68,22 @@ async def test_sunrise_skip():
 @pytest.mark.asyncio
 async def test_calc_advance():
     set_location(52.5185537, 13.3758636, 43)
-    set_now(2001, 1, 1, 12)
+    set_now(2001, 1, 1, 7, 10)
     s = AsyncScheduler()
 
     j = SunriseJob(s, SyncExecutor(lambda x: 1 / 0))
     s.add_job(j)
     j._update_base_time()
-    assert from_timestamp(j._next_run).naive() == datetime(2001, 1, 2, 7, 15, 29)
-    j.cancel()
+    assert from_timestamp(j._next_run).naive() == datetime(2001, 1, 1, 7, 15, 39)
 
-    j = SunsetJob(s, SyncExecutor(lambda x: 1 / 0))
-    s.add_job(j)
+    j.latest(time(7, 5))
+    assert from_timestamp(j._next_run).in_tz(local_tz).naive() == datetime(2001, 1, 2, 7, 5, 0)
+
+    j.latest(None)
+    assert from_timestamp(j._next_run).naive() == datetime(2001, 1, 1, 7, 15, 39)
+
+    set_now(2001, 1, 1, 7, 15, 39, tz=UTC)
     j._update_base_time()
-    assert from_timestamp(j._next_run).naive() == datetime(2001, 1, 1, 15, 4, 48)
-
-    j.latest(time(15))
-    assert from_timestamp(j._next_run).in_tz(local_tz).naive() == datetime(2001, 1, 1, 15, 0, 0)
+    assert from_timestamp(j._next_run).naive() == datetime(2001, 1, 2, 7, 15, 29)
 
     j.cancel()

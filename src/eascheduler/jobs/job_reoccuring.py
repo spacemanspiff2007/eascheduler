@@ -1,12 +1,13 @@
 from __future__ import annotations
 
 from datetime import timedelta
-from typing import Union, Optional
+from typing import Optional, Union
 
 from pendulum import DateTime, from_timestamp
+from pendulum import UTC
 from pendulum import now as get_now
 
-from eascheduler.const import FAR_FUTURE, local_tz, SKIP_EXECUTION
+from eascheduler.const import FAR_FUTURE, SKIP_EXECUTION
 from eascheduler.errors import JobAlreadyCanceledException
 from eascheduler.executors import ExecutorBase
 from eascheduler.schedulers import AsyncScheduler
@@ -19,7 +20,7 @@ class ReoccurringJob(DateTimeJobBase):
         self._interval: Union[float, int] = FAR_FUTURE
 
     def _update_base_time(self):
-        now = get_now(tz=local_tz).timestamp()
+        now = get_now(UTC).timestamp()
 
         while self._next_base < now:
             self._next_base += self._interval

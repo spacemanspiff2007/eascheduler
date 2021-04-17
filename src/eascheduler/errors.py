@@ -9,3 +9,7 @@ class OneTimeJobCanNotBeSkipped(Exception):
 
 class UnknownWeekdayError(Exception):
     pass
+
+
+class FirstRunNotInTheFutureError(Exception):
+    pass

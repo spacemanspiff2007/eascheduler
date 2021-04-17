@@ -9,7 +9,7 @@ from pendulum import now as get_now
 
 from eascheduler.const import SKIP_EXECUTION, _Execution
 from eascheduler.const import local_tz, FAR_FUTURE
-from eascheduler.errors import JobAlreadyCanceledException
+from eascheduler.errors import JobAlreadyCanceledException, FirstRunNotInTheFutureError
 from eascheduler.executors.executor import ExecutorBase
 from eascheduler.jobs.job_base import ScheduledJobBase
 from eascheduler.schedulers import AsyncScheduler
@@ -129,6 +129,8 @@ class DateTimeJobBase(ScheduledJobBase):
         return self
 
     def _update_run_time(self, dt_start: Optional[DateTime] = None) -> Union[DateTime, Literal[_Execution.SKIP]]:
+        assert dt_start is None or dt_start.timezone is UTC, dt_start.timezone
+
         # Starting point is always the next call from UTC
         next_run: DateTime = from_timestamp(self._next_base) if dt_start is None else dt_start
 
@@ -165,9 +167,14 @@ class DateTimeJobBase(ScheduledJobBase):
         self._set_next_run(next_run.timestamp())
         return next_run
 
-    def _initialize_base_time(self, base_time: Union[None, datetime, timedelta, time, int, float]) -> DateTime:
-        now = get_now(tz=local_tz)
+    def _initialize_base_time(self, base_time: Union[None, int, float, timedelta, time, datetime],
+                              now: Optional[DateTime] = None) -> DateTime:
+        assert now is None or now.timezone is local_tz, now.timezone
+
+        # since this is specified by the user its in the local timezone
+        now = get_now(tz=local_tz) if now is None else now
         new_base: DateTime
+
         if base_time is None:
             # If we don't specify a datetime we start it now
             new_base = now.add(microseconds=1)
@@ -187,7 +194,9 @@ class DateTimeJobBase(ScheduledJobBase):
             new_base = instance(base_time).astimezone(local_tz)
 
         assert isinstance(new_base, DateTime), type(new_base)
-        assert new_base > now, f'Run time must be in the future:\nNow: {now}\nRun: {new_base}'
-        self._next_base = new_base.in_timezone('UTC').timestamp()
+        if new_base <= now:
+            raise FirstRunNotInTheFutureError(f'First run must be in the future! Now: {now}, run: {new_base}')
 
+        new_base = new_base.in_timezone(UTC)
+        self._next_base = new_base.timestamp()
         return new_base

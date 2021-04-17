@@ -15,8 +15,10 @@ def utc_ts(year: int, month: int, day: int,
     return datetime(year, month, day, hour, minute, second, microsecond, tz=local_tz).in_timezone('UTC').timestamp()
 
 
-def set_now(year: int, month: int, day: int, hour: int = 0, minute: int = 0, second: int = 0, microsecond: int = 0):
-    obj = datetime(year, month, day, hour, minute, second, microsecond=microsecond, tz=local_tz)
+def set_now(year: int, month: int, day: int,
+            hour: int = 0, minute: int = 0, second: int = 0, microsecond: int = 0,
+            tz=local_tz):
+    obj = datetime(year, month, day, hour, minute, second, microsecond=microsecond, tz=tz)
     __set_test_now(obj)
 
 

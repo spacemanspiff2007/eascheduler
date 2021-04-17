@@ -18,5 +18,9 @@ Easy Async Scheduler (or EAScheduler) is a asyncio scheduler with a nice and eas
 [The documentation can be found at here](https://eascheduler.readthedocs.io)
 
 ## Changelog
-#### 0.0.6 (15.04.2021)
-- Fixes for ThreadSafeAsyncScheduler
+#### 0.0.8 (17.04.2021)
+- Fixes for SunJob, ReoccurringJob
+- Added tests
+
+#### 0.0.7 (15.04.2021)
+- Fixes for Sunrise/Sunset
