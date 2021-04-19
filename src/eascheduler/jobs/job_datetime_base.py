@@ -9,7 +9,7 @@ from pendulum import now as get_now
 
 from eascheduler.const import SKIP_EXECUTION, _Execution
 from eascheduler.const import local_tz, FAR_FUTURE
-from eascheduler.errors import JobAlreadyCanceledException, FirstRunNotInTheFutureError
+from eascheduler.errors import JobAlreadyCanceledException, FirstRunInThePastError
 from eascheduler.executors.executor import ExecutorBase
 from eascheduler.jobs.job_base import ScheduledJobBase
 from eascheduler.schedulers import AsyncScheduler
@@ -140,7 +140,7 @@ class DateTimeJobBase(ScheduledJobBase):
             custom_obj = self._boundary_func(next_run)
             if custom_obj is SKIP_EXECUTION:
                 return SKIP_EXECUTION
-            next_run = instance(custom_obj).astimezone(local_tz).in_timezone(UTC)
+            next_run = instance(custom_obj, local_tz).astimezone(local_tz).in_timezone(UTC)
 
         if self._offset is not None:
             next_run += self._offset  # offset doesn't have to be localized
@@ -191,11 +191,11 @@ class DateTimeJobBase(ScheduledJobBase):
                 new_base = new_base.add(days=1)
         else:
             assert isinstance(base_time, datetime)
-            new_base = instance(base_time).astimezone(local_tz)
+            new_base = instance(base_time, tz=local_tz).astimezone(local_tz)
 
         assert isinstance(new_base, DateTime), type(new_base)
         if new_base <= now:
-            raise FirstRunNotInTheFutureError(f'First run must be in the future! Now: {now}, run: {new_base}')
+            raise FirstRunInThePastError(f'First run must be in the future! Now: {now}, run: {new_base}')
 
         new_base = new_base.in_timezone(UTC)
         self._next_base = new_base.timestamp()

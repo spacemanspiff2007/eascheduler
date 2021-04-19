@@ -1,6 +1,7 @@
 import logging
 from asyncio import AbstractEventLoop, run_coroutine_threadsafe
-from threading import _MainThread, current_thread
+from threading import current_thread
+from threading import _MainThread   # type: ignore
 
 from eascheduler.jobs.job_base import ScheduledJobBase
 from eascheduler.schedulers import AsyncScheduler

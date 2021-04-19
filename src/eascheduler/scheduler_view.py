@@ -40,7 +40,7 @@ class SchedulerView:
         :return: Created job
         """
         job = CountdownJob(self._scheduler, self._executor(callback, *args, **kwargs))
-        job.expire(expire_time)
+        job.countdown(expire_time)
         self._scheduler.add_job(job)
         return job
 

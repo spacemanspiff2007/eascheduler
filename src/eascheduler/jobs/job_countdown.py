@@ -17,15 +17,15 @@ class CountdownJob(ScheduledJobBase):
         super().__init__(parent, func)
         self._expire: float = 0.0
 
-    def expire(self, expire_time: Union[timedelta, float, int]) -> CountdownJob:
+    def countdown(self, time: Union[timedelta, float, int]) -> CountdownJob:
         """Set the time after which the job will be executed.
 
-        :param expire_time: time
+        :param time: time
         """
         if self._parent is None:
             raise JobAlreadyCanceledException()
 
-        secs = expire_time.total_seconds() if isinstance(expire_time, timedelta) else expire_time
+        secs = time.total_seconds() if isinstance(time, timedelta) else time
         assert secs > 0, secs
 
         self._expire = float(secs)

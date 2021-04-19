@@ -1,9 +1,12 @@
+from typing import Union
+
 try:
     from unittest.mock import AsyncMock
 except ImportError:
     from mock import AsyncMock
 
-from pendulum import datetime
+from datetime import datetime as dt_datetime
+from pendulum import datetime, instance, from_timestamp, UTC, DateTime
 from pendulum import set_test_now as __set_test_now
 
 from eascheduler.const import local_tz
@@ -30,3 +33,25 @@ class MockedAsyncExecutor(AsyncExecutor):
 
 def mocked_executor(*args, **kwargs) -> MockedAsyncExecutor:
     return MockedAsyncExecutor(AsyncMock(*args, **kwargs))
+
+
+def cmp_local(obj: Union[float, int, dt_datetime], local_dt: dt_datetime):
+    if isinstance(obj, DateTime):
+        assert obj.timezone
+        cmp_dt = obj.in_tz(local_tz).naive()
+    elif isinstance(obj, dt_datetime):
+        cmp_dt = instance(obj, local_tz).astimezone(local_tz).naive()
+    else:
+        cmp_dt = from_timestamp(obj, tz=local_tz).naive()
+    assert cmp_dt == local_dt, f'\n{cmp_dt}\n{local_dt}'
+
+
+def cmp_utc(obj: Union[float, int, dt_datetime], local_dt: dt_datetime):
+    if isinstance(obj, DateTime):
+        assert obj.timezone
+        cmp_dt = obj.in_tz(UTC).naive()
+    elif isinstance(obj, dt_datetime):
+        cmp_dt = instance(obj, local_tz).astimezone(local_tz).in_tz(UTC).naive()
+    else:
+        cmp_dt = from_timestamp(obj, tz=UTC).naive()
+    assert cmp_dt == local_dt, f'\n{cmp_dt}\n{local_dt}'

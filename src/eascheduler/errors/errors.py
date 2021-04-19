@@ -11,5 +11,5 @@ class UnknownWeekdayError(Exception):
     pass
 
 
-class FirstRunNotInTheFutureError(Exception):
+class FirstRunInThePastError(Exception):
     pass

@@ -17,7 +17,7 @@ async def test_expire():
         calls.append(time.time())
 
     j1 = CountdownJob(s, AsyncExecutor(a_dummy))
-    j1.expire(0.2)
+    j1.countdown(0.2)
     s.add_job(j1)
     # check that adding the trigger doesn't execute the job
     await asyncio.sleep(0.25)

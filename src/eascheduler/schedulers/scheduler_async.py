@@ -3,11 +3,14 @@ from asyncio import Future
 from asyncio import create_task
 from bisect import insort
 from collections import deque
-from typing import Optional, Deque, Set
+from typing import Deque, Optional, Set
 
+from pendulum import UTC
 from pendulum import now as get_now
 
+from eascheduler.const import FAR_FUTURE
 from eascheduler.jobs.job_base import ScheduledJobBase
+from eascheduler.errors.handler import process_exception
 
 
 class AsyncScheduler:
@@ -61,29 +64,40 @@ class AsyncScheduler:
             job._parent = None
 
     async def __run_next(self):
-        while self.jobs:
-            job = self.jobs[0]
+        try:
+            while self.jobs:
+                job = self.jobs[0]
 
-            now = get_now().timestamp()
+                # Don't schedule these jobs
+                if job._next_run >= FAR_FUTURE:
+                    break
 
-            diff = job._next_run - now
-            while diff > 0:
-                await asyncio.sleep(diff)
-                now = get_now().timestamp()
+                now = get_now(UTC).timestamp()
                 diff = job._next_run - now
 
-            old_job = job
-            assert old_job is job, 'Job changed unexpectedly'
+                while diff > 0:
+                    await asyncio.sleep(diff)
+                    now = get_now(UTC).timestamp()
+                    diff = job._next_run - now
 
-            job = self.jobs.popleft()
-            self.job_objs.remove(job)
+                old_job = job
+                assert old_job is job, 'Job changed unexpectedly'
 
-            # If it's a reoccurring job it has this function
-            if hasattr(job, '_update_base_time'):
-                job._update_base_time()
-            else:
-                job._parent = None
+                job = self.jobs.popleft()
+                self.job_objs.remove(job)
 
-            job._func.execute()
+                try:
+                    # If it's a reoccurring job it has this function
+                    if hasattr(job, '_update_base_time'):
+                        job._update_base_time()
+                    else:
+                        job._parent = None
 
-        self.worker = None
+                    job._func.execute()
+                except Exception as e:
+                    process_exception(e)
+
+        except Exception as e:
+            process_exception(e)
+        finally:
+            self.worker = None

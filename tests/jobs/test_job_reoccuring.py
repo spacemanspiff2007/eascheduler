@@ -1,3 +1,4 @@
+from asyncio import sleep
 from datetime import datetime
 from functools import partial
 
@@ -6,8 +7,7 @@ import pytest
 from eascheduler.const import SKIP_EXECUTION
 from eascheduler.jobs import ReoccurringJob
 from eascheduler.schedulers import AsyncScheduler
-from tests.helper import set_now
-from tests.helper import utc_ts
+from tests.helper import cmp_local, set_now, utc_ts
 
 
 @pytest.mark.asyncio
@@ -25,15 +25,15 @@ async def test_remove():
 
     now(11)
     j._update_base_time()
-    assert j.get_next_run() == datetime(2001, 1, 1, 12)
+    cmp_local(j._next_run, datetime(2001, 1, 1, 12))
 
     now(12)
     j._update_base_time()
-    assert j.get_next_run() == datetime(2001, 1, 1, 12, 0, 5)
+    cmp_local(j._next_run, datetime(2001, 1, 1, 12, 0, 5))
     now(12, 0, 5)
 
     j._update_base_time()
-    assert j.get_next_run() == datetime(2001, 1, 1, 12, 0, 10)
+    cmp_local(j._next_run, datetime(2001, 1, 1, 12, 0, 10))
 
     s.cancel_all()
 
@@ -59,18 +59,59 @@ async def test_skip():
 
     now(11)
     j._update_base_time()
-    assert j.get_next_run() == datetime(2001, 1, 1, 12)
+    cmp_local(j._next_run, datetime(2001, 1, 1, 12))
 
     now(12)
     j._update_base_time()
-    assert j.get_next_run() == datetime(2001, 1, 1, 12, 0, 5)
+    cmp_local(j._next_run, datetime(2001, 1, 1, 12, 0, 5))
     now(12, 0, 5)
 
     j._update_base_time()
-    assert j.get_next_run() == datetime(2001, 1, 1, 12, 0, 15)
+    cmp_local(j._next_run, datetime(2001, 1, 1, 12, 0, 15))
     now(12, 0, 15)
 
     j._update_base_time()
-    assert j.get_next_run() == datetime(2001, 1, 1, 12, 0, 20)
+    cmp_local(j._next_run, datetime(2001, 1, 1, 12, 0, 20))
+
+    s.cancel_all()
+
+
+@pytest.mark.asyncio
+async def test_func_exception(caplog):
+    async def bla():
+        pass
+
+    calls = 0
+
+    def func(arg):
+        nonlocal calls
+        if calls:
+            1 / 0
+        calls += 1
+        return arg
+
+    set_now(2001, 1, 1, 7, 10)
+
+    s = AsyncScheduler()
+    j1 = ReoccurringJob(s, lambda x: x)
+    j1._interval = 999
+    j1._initialize_base_time(999)
+    j1._update_run_time()
+    s.add_job(j1)
+
+    j = ReoccurringJob(s, lambda x: x)
+    j._interval = 999
+    s.add_job(j)
+
+    j._initialize_base_time(None)
+    j.boundary_func(func)
+
+    await sleep(0.3)
+
+    # ensure that the worker is still running
+    assert s.worker is not None
+
+    # ensure that the exception got caught
+    assert caplog.records[0].message == 'division by zero'
 
     s.cancel_all()

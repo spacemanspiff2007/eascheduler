@@ -1,5 +1,5 @@
 # Used by this library
-pendulum<3.0.0
+pendulum==2.1.2
 astral==2.2
 
 # Testing

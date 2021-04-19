@@ -1,10 +1,9 @@
-
 from datetime import datetime
 from typing import Optional, TYPE_CHECKING
 
 from pendulum import from_timestamp
 
-from eascheduler.const import local_tz, FAR_FUTURE
+from eascheduler.const import FAR_FUTURE, local_tz
 from eascheduler.errors import JobAlreadyCanceledException
 from eascheduler.executors import ExecutorBase
 
@@ -24,8 +23,9 @@ class ScheduledJobBase:
 
     def _set_next_run(self, next_run: float):
         assert isinstance(next_run, (float, int))
-        next_run = round(next_run, 3)   # ms accuracy
-        if self._next_run == next_run:
+
+        next_run = round(next_run, 3)   # ms accuracy is enough
+        if self._next_run == next_run:  # only set and subsequently reschedule if the timestamp changed
             return None
 
         self._next_run = next_run
@@ -50,4 +50,4 @@ class ScheduledJobBase:
 
     def get_next_run(self) -> datetime:
         """Return the next execution timestamp."""
-        return from_timestamp(self._next_run).in_timezone(local_tz).naive()
+        return from_timestamp(self._next_run, local_tz).naive()

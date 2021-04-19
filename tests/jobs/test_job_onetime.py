@@ -1,5 +1,5 @@
 import asyncio
-import time
+from datetime import datetime
 
 import pytest
 
@@ -7,14 +7,15 @@ from eascheduler.const import SKIP_EXECUTION
 from eascheduler.errors import JobAlreadyCanceledException, OneTimeJobCanNotBeSkipped
 from eascheduler.jobs.job_one_time import OneTimeJob
 from eascheduler.schedulers import AsyncScheduler
+from tests.helper import cmp_local, utc_ts
 from tests.helper import mocked_executor, set_now
-from tests.helper import utc_ts
 
 
 def test_exception():
     s = AsyncScheduler()
     j = OneTimeJob(s, lambda x: x)
     j._next_base = utc_ts(2001, 1, 1, 12)
+
     with pytest.raises(OneTimeJobCanNotBeSkipped):
         j.boundary_func(lambda x: SKIP_EXECUTION)
 
@@ -48,11 +49,20 @@ async def test_remove():
 
 @pytest.mark.asyncio
 async def test_init():
+    set_now(2001, 1, 1, 12, 0, 0)
+
     s = AsyncScheduler()
     j = OneTimeJob(s, lambda x: x)
 
     j._initialize_base_time(None)
-    assert j._next_base <= round(time.time(), 3) + 0.01
+    j._update_run_time()
+
+    cmp_local(j._next_base, datetime(2001, 1, 1, 12, 0, 0, 1))
+    cmp_local(j._next_run,  datetime(2001, 1, 1, 12, 0, 0))
 
     j._initialize_base_time(3)
-    assert j._next_base <= round(time.time() + 3, 3) + 0.01
+    j._update_run_time()
+    cmp_local(j._next_base, datetime(2001, 1, 1, 12, 0, 3))
+    cmp_local(j._next_run,  datetime(2001, 1, 1, 12, 0, 3))
+
+    j.cancel()

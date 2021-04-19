@@ -4,7 +4,7 @@ from datetime import date, datetime
 from datetime import time as dt_time
 from typing import Union, Set, Iterable, Optional, Dict
 
-from pendulum import DateTime, from_timestamp
+from pendulum import DateTime, from_timestamp, UTC
 from pendulum import now as get_now
 
 from eascheduler.const import SKIP_EXECUTION, local_tz
@@ -44,7 +44,7 @@ class DayOfWeekJob(DateTimeJobBase):
 
             while not next_run.isoweekday() in self._weekdays:
                 next_run = next_run.add(days=1)
-            next_run = next_run.in_timezone('UTC')
+            next_run = next_run.in_timezone(UTC)
 
             res = update_run_time(next_run)
         return next_run
@@ -56,10 +56,10 @@ class DayOfWeekJob(DateTimeJobBase):
         while next_run < now:
             next_run = next_run.add(days=1)
 
-        while not next_run.isoweekday() in self._weekdays:
+        while next_run.isoweekday() not in self._weekdays:
             next_run = next_run.add(days=1)
 
-        next_run = next_run.in_timezone('UTC')
+        next_run = next_run.in_timezone(UTC)
         self._next_base = next_run.timestamp()
         self._update_run_time(next_run)
         return self
