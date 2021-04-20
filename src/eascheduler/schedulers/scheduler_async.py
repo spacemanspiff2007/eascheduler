@@ -1,6 +1,5 @@
 import asyncio
-from asyncio import Future
-from asyncio import create_task
+from asyncio import Future, CancelledError, create_task
 from bisect import insort
 from collections import deque
 from typing import Deque, Optional, Set
@@ -22,7 +21,7 @@ class AsyncScheduler:
 
     def add_job(self, job: ScheduledJobBase):
         # cancel task if the new job is earlier than the next one or if it is the next one
-        first_job = self.jobs and (job is self.jobs or job._next_run <= self.jobs[0]._next_run)
+        first_job = self.jobs and (job is self.jobs[0] or job._next_run <= self.jobs[0]._next_run)
         if first_job and self.worker is not None:
             self.worker.cancel()
             self.worker = None
@@ -81,10 +80,10 @@ class AsyncScheduler:
                     diff = job._next_run - now
 
                 old_job = job
-                assert old_job is job, 'Job changed unexpectedly'
-
                 job = self.jobs.popleft()
                 self.job_objs.remove(job)
+
+                assert old_job is job, f'Job changed unexpectedly\n{old_job}\n{job}'
 
                 try:
                     # If it's a reoccurring job it has this function
@@ -98,6 +97,14 @@ class AsyncScheduler:
                     process_exception(e)
 
         except Exception as e:
+            # Todo: remove this once we go >= 3.8
+            # With python 3.7 this will also catch the CancelledError
+            if isinstance(e, CancelledError):
+                raise
+
+            # callback for normal exceptions
             process_exception(e)
-        finally:
-            self.worker = None
+
+        # Never ever put this in a finally block!
+        # We will get a race condition if we cancel the task!
+        self.worker = None

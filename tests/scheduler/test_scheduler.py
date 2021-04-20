@@ -1,5 +1,6 @@
-import pytest
 from collections import deque
+
+import pytest
 
 from eascheduler.jobs.job_base import ScheduledJobBase
 from eascheduler.schedulers import AsyncScheduler

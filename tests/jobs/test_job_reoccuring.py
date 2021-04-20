@@ -77,7 +77,7 @@ async def test_skip():
 
 
 @pytest.mark.asyncio
-async def test_func_exception(caplog):
+async def test_func_exception(caught_exceptions):
     async def bla():
         pass
 
@@ -112,6 +112,8 @@ async def test_func_exception(caplog):
     assert s.worker is not None
 
     # ensure that the exception got caught
-    assert caplog.records[0].message == 'division by zero'
+    assert len(caught_exceptions) == 1
+    assert str(caught_exceptions[0]) == 'division by zero'
+    caught_exceptions.clear()
 
     s.cancel_all()
