@@ -81,10 +81,10 @@ class AsyncScheduler:
                     diff = job._next_run - now
 
                 old_job = job
-                assert old_job is job, 'Job changed unexpectedly'
-
                 job = self.jobs.popleft()
                 self.job_objs.remove(job)
+
+                assert old_job is job, f'Job changed unexpectedly\n{old_job}\n{job}'
 
                 try:
                     # If it's a reoccurring job it has this function
