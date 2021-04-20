@@ -26,13 +26,13 @@ async def test_at(view: SchedulerView):
     now = partial(set_now, 2001, 1, 1)
     now(12)
 
-    view.at(time(11), lambda x: x)
+    view.at(time(11), lambda: 1)
     assert s.jobs[0].get_next_run() == datetime(2001, 1, 2, 11)
 
-    view.at(time(13), lambda x: x)
+    view.at(time(13), lambda: 1)
     assert s.jobs[0].get_next_run() == datetime(2001, 1, 1, 13)
 
-    view.at(5, lambda x: x)
+    view.at(5, lambda: 1)
     assert s.jobs[0].get_next_run() == datetime(2001, 1, 1, 12, 0, 5)
 
 
@@ -43,7 +43,7 @@ async def test_every(view: SchedulerView):
     now = partial(set_now, 2001, 1, 1)
     now(12)
 
-    view.every(5, 15, lambda x: x)
+    view.every(5, 15, lambda: 1)
     assert s.jobs[0].get_next_run() == datetime(2001, 1, 1, 12, 0, 5)
 
     now(12, 0, 6)
@@ -57,23 +57,25 @@ async def test_every(view: SchedulerView):
 
 @pytest.mark.asyncio
 async def test_job_insert_at(view: SchedulerView):
-    j = view.at(None, lambda x: 1 / 0)
+    j = view.at(None, lambda: 1 / 0)
     assert j is view._scheduler.jobs[0]
     assert j in view._scheduler.job_objs
+    j.cancel()
 
 
 @pytest.mark.asyncio
 async def test_job_insert_countdown(view: SchedulerView):
-    j = view.countdown(5, lambda x: 1 / 0)
+    j = view.countdown(5, lambda: 1 / 0)
     assert j is view._scheduler.jobs[0]
     assert j in view._scheduler.job_objs
 
 
 @pytest.mark.asyncio
 async def test_job_insert_every(view: SchedulerView):
-    j = view.every(None, 5, lambda x: 1 / 0)
+    j = view.every(None, 5, lambda: 1 / 0)
     assert j is view._scheduler.jobs[0]
     assert j in view._scheduler.job_objs
+    j.cancel()
 
 
 @pytest.mark.asyncio

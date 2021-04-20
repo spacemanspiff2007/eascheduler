@@ -22,7 +22,7 @@ class AsyncScheduler:
 
     def add_job(self, job: ScheduledJobBase):
         # cancel task if the new job is earlier than the next one or if it is the next one
-        first_job = self.jobs and (job is self.jobs or job._next_run <= self.jobs[0]._next_run)
+        first_job = self.jobs and (job is self.jobs[0] or job._next_run <= self.jobs[0]._next_run)
         if first_job and self.worker is not None:
             self.worker.cancel()
             self.worker = None
