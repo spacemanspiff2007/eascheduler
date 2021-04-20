@@ -1,5 +1,6 @@
 import pendulum
 import pytest
+from asyncio import CancelledError
 
 from eascheduler.errors import handler
 from eascheduler.jobs import job_sun
@@ -20,7 +21,8 @@ def caught_exceptions(monkeypatch):
     exceptions = []
 
     def proc_exception(e: Exception):
-        exceptions.append(e)
+        if not isinstance(e, CancelledError):
+            exceptions.append(e)
 
     monkeypatch.setattr(handler, 'HANDLER', proc_exception)
 
