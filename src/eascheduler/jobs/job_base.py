@@ -1,10 +1,12 @@
-from datetime import datetime
-from typing import Optional, TYPE_CHECKING
+from datetime import datetime, timedelta
+from datetime import time as dt_time
+from typing import Optional, TYPE_CHECKING, Union
 
-from pendulum import from_timestamp
+from pendulum import from_timestamp, DateTime, instance
+from pendulum import now as get_now
 
 from eascheduler.const import FAR_FUTURE, local_tz
-from eascheduler.errors import JobAlreadyCanceledException
+from eascheduler.errors import JobAlreadyCanceledException, FirstRunInThePastError
 from eascheduler.executors import ExecutorBase
 
 if TYPE_CHECKING:
@@ -20,6 +22,16 @@ class ScheduledJobBase:
 
         # If parent is set it's also the indication that the job is scheduled
         self._parent: Optional['AsyncScheduler'] = parent
+
+    def _execute(self):
+        self._schedule_next_run()
+        self._func.execute()
+
+    def _schedule_first_run(self, first_run: Union[None, int, float, timedelta, dt_time, datetime]):
+        raise NotImplementedError()
+
+    def _schedule_next_run(self):
+        raise NotImplementedError()
 
     def _set_next_run(self, next_run: float):
         assert isinstance(next_run, (float, int))
@@ -51,3 +63,36 @@ class ScheduledJobBase:
     def get_next_run(self) -> datetime:
         """Return the next execution timestamp."""
         return from_timestamp(self._next_run, local_tz).naive()
+
+
+def get_first_timestamp(base_time: Union[None, int, float, timedelta, dt_time, datetime],
+                        now: Optional[DateTime] = None) -> float:
+    assert now is None or now.timezone is local_tz, now.timezone
+
+    # since this is specified by the user its in the local timezone
+    now = get_now(tz=local_tz) if now is None else now
+    new_base: DateTime
+
+    if base_time is None:
+        # If we don't specify a datetime we start it now
+        new_base = now.add(microseconds=1000)
+    elif isinstance(base_time, timedelta):
+        # if it is a timedelta add it to now to easily specify points in the future
+        new_base = now + base_time
+    elif isinstance(base_time, (int, float)):
+        new_base = now + timedelta(seconds=base_time)
+    elif isinstance(base_time, dt_time):
+        # if it is a time object it specifies a time of day.
+        new_base = now.set(hour=base_time.hour, minute=base_time.minute,
+                           second=base_time.second, microsecond=base_time.microsecond)
+        if new_base < now:
+            new_base = new_base.add(days=1)
+    else:
+        assert isinstance(base_time, datetime)
+        new_base = instance(base_time, tz=local_tz).astimezone(local_tz)
+
+    assert isinstance(new_base, DateTime), type(new_base)
+    if new_base <= now:
+        raise FirstRunInThePastError(f'First run must be in the future! Now: {now}, run: {new_base}')
+
+    return new_base.timestamp()

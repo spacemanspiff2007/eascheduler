@@ -42,7 +42,7 @@ async def test_workdays():
             days.remove(4)
 
         for day in days:
-            j._update_base_time()
+            j._schedule_next_run()
             assert j.get_next_run() == datetime(2001, 1, day, 11)
             now(day)
 
@@ -79,7 +79,7 @@ async def test_weekends():
             days.remove(13)
 
         for day in days:
-            j._update_base_time()
+            j._schedule_next_run()
             assert j.get_next_run() == datetime(2001, 1, day, 11)
             now(day)
 
@@ -96,27 +96,28 @@ async def test_day():
     s.add_job(j)
 
     now = partial(set_now, 2001, 1, hour=12, microsecond=1)
+    j.time(time(12))
     j.weekdays('mo')
 
     now(1, hour=11)
-    j._update_base_time()
+    j._schedule_next_run()
     assert j.get_next_run() == datetime(2001, 1, 1, 12)
     now(1)
-    j._update_base_time()
+    j._schedule_next_run()
     assert j.get_next_run() == datetime(2001, 1, 8, 12)
     now(8)
-    j._update_base_time()
+    j._schedule_next_run()
     assert j.get_next_run() == datetime(2001, 1, 15, 12)
 
     j.weekdays(['mo', 'di'])
 
     now(1, hour=11)
-    j._update_base_time()
+    j._schedule_next_run()
 
     for d in (1, 2, 8, 9, 15, 16):
         assert j.get_next_run() == datetime(2001, 1, d, 12)
         now(d)
-        j._update_base_time()
+        j._schedule_next_run()
 
     j.cancel()
 

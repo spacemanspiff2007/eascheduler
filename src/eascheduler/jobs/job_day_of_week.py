@@ -2,16 +2,17 @@ from __future__ import annotations
 
 from datetime import date, datetime
 from datetime import time as dt_time
-from typing import Union, Set, Iterable, Optional, Dict
+from typing import Union, Set, Iterable, Dict
 
-from pendulum import DateTime, from_timestamp, UTC
+from pendulum import DateTime
 from pendulum import now as get_now
 
-from eascheduler.const import SKIP_EXECUTION, local_tz
+from eascheduler.const import local_tz
 from eascheduler.errors import UnknownWeekdayError, JobAlreadyCanceledException
 from eascheduler.executors.executor import ExecutorBase
 from eascheduler.schedulers import AsyncScheduler
-from .job_datetime_base import DateTimeJobBase
+from .job_base_datetime import DateTimeJobBase
+
 
 # names of weekdays in local language
 day_names: Dict[str, int] = {date(2001, 1, i).strftime('%A'): i for i in range(1, 8)}
@@ -26,43 +27,26 @@ day_names = {k.lower(): v for k, v in day_names.items()}
 class DayOfWeekJob(DateTimeJobBase):
     def __init__(self, parent: AsyncScheduler, func: ExecutorBase):
         super().__init__(parent, func)
-        self._time: dt_time = dt_time(hour=12)
+        self._time: dt_time = dt_time(hour=23, minute=59, second=59)
         self._weekdays: Set[int] = {1, 2, 3, 4, 5, 6, 7}
 
-    def _update_run_time(self, next_run: Optional[DateTime] = None) -> DateTime:
-        update_run_time = super()._update_run_time
-        # Starting point is always the next call from UTC
-        if next_run is None:
-            next_run = from_timestamp(self._next_base)
-
-        # Allow skipping certain occurrences
-        res = update_run_time(next_run)
-        while res is SKIP_EXECUTION:
-            # The day check has to be in the local timezone
-            next_run = next_run.in_timezone(local_tz)
+    def _advance_time(self, utc_dt: DateTime) -> DateTime:
+        next_run = utc_dt.add(days=1)
+        while next_run.isoweekday() not in self._weekdays:
             next_run = next_run.add(days=1)
-
-            while not next_run.isoweekday() in self._weekdays:
-                next_run = next_run.add(days=1)
-            next_run = next_run.in_timezone(UTC)
-
-            res = update_run_time(next_run)
         return next_run
 
-    def _update_base_time(self):
+    def _schedule_next_run(self):
         now = get_now(tz=local_tz)
         next_run = now.set(hour=self._time.hour, minute=self._time.minute,
                            second=self._time.second, microsecond=self._time.microsecond)
         while next_run < now:
             next_run = next_run.add(days=1)
-
         while next_run.isoweekday() not in self._weekdays:
             next_run = next_run.add(days=1)
 
-        next_run = next_run.in_timezone(UTC)
-        self._next_base = next_run.timestamp()
-        self._update_run_time(next_run)
-        return self
+        self._next_run_base = next_run.timestamp()
+        self._apply_boundaries()
 
     def time(self, time: Union[dt_time, datetime]) -> DayOfWeekJob:
         """Set a time of day when the job will run.
@@ -74,7 +58,7 @@ class DayOfWeekJob(DateTimeJobBase):
 
         self._time = time if isinstance(time, dt_time) else time.time()
 
-        self._update_base_time()
+        self._schedule_next_run()
         return self
 
     def weekdays(self, weekdays: Union[str, Iterable[Union[str, int]]]) -> DayOfWeekJob:
@@ -109,5 +93,5 @@ class DayOfWeekJob(DateTimeJobBase):
             assert 1 <= k <= 7, k
         self._weekdays = int_days
 
-        self._update_base_time()
+        self._schedule_next_run()
         return self
