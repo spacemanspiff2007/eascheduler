@@ -1,4 +1,7 @@
+import asyncio
+from asyncio import create_task
 from datetime import datetime, time, timedelta
+from typing import List
 
 import pytest
 from pendulum import from_timestamp
@@ -8,7 +11,8 @@ from eascheduler.errors import FirstRunInThePastError
 from eascheduler.executors import AsyncExecutor
 from eascheduler.jobs.job_datetime_base import DateTimeJobBase
 from eascheduler.schedulers import AsyncScheduler
-from tests.helper import set_now, utc_ts, cmp_local
+from eascheduler.schedulers import scheduler_async
+from tests.helper import cmp_local, set_now, utc_ts
 
 
 @pytest.mark.asyncio
@@ -160,3 +164,33 @@ async def test_initialize():
     )
 
     j.cancel()
+
+
+@pytest.mark.asyncio
+async def test_worker_cancel(monkeypatch):
+    all_tasks: List[asyncio.Future] = []
+
+    def create_collect_task(coro):
+        t = create_task(coro)
+        all_tasks.append(t)
+        return t
+
+    monkeypatch.setattr(scheduler_async, 'create_task', create_collect_task)
+
+    s = AsyncScheduler()
+    j = DateTimeJobBase(s, lambda: 1 / 0)
+
+    set_now(2001, 1, 1, 12, 0, 0)
+
+    j._initialize_base_time(datetime(2020, 1, 1, 12, 30))
+    for i in range(10):
+        await asyncio.sleep(0.001)
+        j.offset(timedelta(minutes=i))
+    j.cancel()
+
+    assert s.worker is None
+
+    await asyncio.sleep(0.02)
+
+    for task in all_tasks:
+        assert task.cancelled(), task
