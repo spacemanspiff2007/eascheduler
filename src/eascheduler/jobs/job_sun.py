@@ -1,15 +1,15 @@
 from __future__ import annotations
 
+from datetime import timedelta, datetime, time as dt_time
 from typing import Optional, Union
 
 from astral import Observer, sun  # type: ignore
-from pendulum import DateTime, from_timestamp, UTC
+from pendulum import DateTime, UTC
 from pendulum import instance as pd_instance
 from pendulum import now as get_now
 
-from eascheduler.const import SKIP_EXECUTION
 from eascheduler.executors import ExecutorBase
-from eascheduler.jobs.job_datetime_base import DateTimeJobBase
+from eascheduler.jobs.job_base_datetime import DateTimeJobBase
 from eascheduler.schedulers import AsyncScheduler
 
 OBSERVER: Optional[Observer] = None
@@ -41,32 +41,21 @@ class SunJobBase(DateTimeJobBase):
         super().__init__(parent, func)
         self._sun_func = sun_func
 
-    def _update_base_time(self):
+    def _schedule_first_run(self, first_run: Union[None, int, float, timedelta, dt_time, datetime]):
+        raise NotImplementedError()
+
+    def _advance_time(self, utc_dt: DateTime) -> DateTime:
+        return pd_instance(self._sun_func(OBSERVER, utc_dt.add(days=1).date(), tzinfo=UTC)).set(microsecond=0)
+
+    def _schedule_next_run(self):
         dt_next = get_now(UTC)
         next_run = pd_instance(self._sun_func(OBSERVER, dt_next.date(), tzinfo=UTC)).set(microsecond=0)
 
         while next_run <= get_now(UTC):
-            dt_next = dt_next.add(days=1)
-            next_run = pd_instance(self._sun_func(OBSERVER, dt_next.date(), tzinfo=UTC)).set(microsecond=0)
+            next_run = self._advance_time(next_run)
 
-        self._next_base = next_run.timestamp()
-        self._update_run_time(next_run)
-
-    def _update_run_time(self, dt_start: Optional[DateTime] = None) -> DateTime:
-        update_run_time = super()._update_run_time
-
-        # initialize next run
-        dt_next = from_timestamp(self._next_base) if dt_start is None else dt_start
-
-        # Allow skipping certain occurrences
-        next_run = update_run_time(dt_next)
-        while next_run is SKIP_EXECUTION or next_run <= get_now(UTC):
-            dt_next = dt_next.add(days=1)
-            next_run = update_run_time(
-                pd_instance(self._sun_func(OBSERVER, dt_next.date(), tzinfo=UTC)).set(microsecond=0)
-            )
-
-        return next_run
+        self._next_run_base = next_run.timestamp()
+        self._apply_boundaries()
 
 
 class SunriseJob(SunJobBase):

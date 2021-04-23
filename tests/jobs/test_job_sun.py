@@ -28,12 +28,12 @@ async def test_calc(cls, jan_1: time, jan_30: time):
     s.add_job(j)
 
     set_now(2001, 1, 1, 1)
-    j._update_base_time()
+    j._schedule_next_run()
     # important - compare UTC timestamps!
     assert from_timestamp(j._next_run).naive() == datetime.combine(date(2001, 1, 1), jan_1)
 
     set_now(2001, 1, 30, 1)
-    j._update_base_time()
+    j._schedule_next_run()
     assert from_timestamp(j._next_run).naive() == datetime.combine(date(2001, 1, 30), jan_30)
 
     s.cancel_all()
@@ -47,7 +47,7 @@ async def test_sunrise_skip():
     s.add_job(j)
 
     set_now(2001, 1, 1, 1)
-    j._update_base_time()
+    j._schedule_next_run()
     assert from_timestamp(j._next_run).naive() == datetime(2001, 1, 1, 7, 15, 39)
 
     def skip_func(dt: datetime):
@@ -59,7 +59,7 @@ async def test_sunrise_skip():
     assert from_timestamp(j._next_run).naive() == datetime(2001, 1, 3, 7, 15, 16)
 
     set_now(2001, 1, 1, 2)
-    j._update_base_time()
+    j._schedule_next_run()
     assert from_timestamp(j._next_run).naive() == datetime(2001, 1, 3, 7, 15, 16)
 
     s.cancel_all()
@@ -73,7 +73,7 @@ async def test_calc_advance():
 
     j = SunriseJob(s, SyncExecutor(lambda x: 1 / 0))
     s.add_job(j)
-    j._update_base_time()
+    j._schedule_next_run()
     assert from_timestamp(j._next_run).naive() == datetime(2001, 1, 1, 7, 15, 39)
 
     j.latest(time(7, 5))
@@ -83,7 +83,7 @@ async def test_calc_advance():
     assert from_timestamp(j._next_run).naive() == datetime(2001, 1, 1, 7, 15, 39)
 
     set_now(2001, 1, 1, 7, 15, 39, tz=UTC)
-    j._update_base_time()
+    j._schedule_next_run()
     assert from_timestamp(j._next_run).naive() == datetime(2001, 1, 2, 7, 15, 29)
 
     j.cancel()

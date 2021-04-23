@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from datetime import datetime, timedelta
+from datetime import time as dt_time
 from typing import Union
 
 from pendulum import UTC
@@ -39,5 +40,8 @@ class CountdownJob(ScheduledJobBase):
         self._set_next_run(now + self._expire)
         self._parent.add_job(self)
 
-    def _update_base_time(self):
+    def _schedule_next_run(self):
         self._set_next_run(FAR_FUTURE)
+
+    def _schedule_first_run(self, first_run: Union[None, int, float, timedelta, dt_time, datetime]):
+        pass
