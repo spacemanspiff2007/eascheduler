@@ -47,11 +47,11 @@ async def test_every(view: SchedulerView):
     assert s.jobs[0].get_next_run() == datetime(2001, 1, 1, 12, 0, 5)
 
     now(12, 0, 6)
-    s.jobs[0]._update_base_time()
+    s.jobs[0]._schedule_next_run()
     assert s.jobs[0].get_next_run() == datetime(2001, 1, 1, 12, 0, 20)
 
     now(12, 0, 21)
-    s.jobs[0]._update_base_time()
+    s.jobs[0]._schedule_next_run()
     assert s.jobs[0].get_next_run() == datetime(2001, 1, 1, 12, 0, 35)
 
 

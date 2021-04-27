@@ -9,7 +9,7 @@ from pendulum import from_timestamp
 from eascheduler.const import local_tz
 from eascheduler.errors import FirstRunInThePastError
 from eascheduler.executors import AsyncExecutor
-from eascheduler.jobs.job_datetime_base import DateTimeJobBase
+from eascheduler.jobs.job_base_datetime import DateTimeJobBase
 from eascheduler.schedulers import AsyncScheduler
 from eascheduler.schedulers import scheduler_async
 from tests.helper import cmp_local, set_now, utc_ts
@@ -20,12 +20,14 @@ async def test_boundary():
     async def bla():
         pass
 
+    set_now(2001, 1, 1, 1)
+
     s = AsyncScheduler()
     j = DateTimeJobBase(s, AsyncExecutor(bla))
     s.add_job(j)
 
-    j._next_base = utc_ts(2001, 1, 1, 12)
-    j._update_run_time()
+    j._next_run_base = utc_ts(2001, 1, 1, 12)
+    j._apply_boundaries()
     assert j.get_next_run() == datetime(2001, 1, 1, 12, 0)
 
     # Latest modifier
@@ -84,8 +86,8 @@ async def test_func_boundary_changes_self():
     s.add_job(j)
 
     set_now(2001, 1, 1, 7, 10)
-    j._initialize_base_time(None)
-    assert from_timestamp(j._next_base).in_tz(local_tz).naive() == datetime(2001, 1, 1, 7, 10, 0, 1)
+    j._schedule_first_run(None)
+    assert from_timestamp(j._next_run_base).in_tz(local_tz).naive() == datetime(2001, 1, 1, 7, 10, 0, 1000)
 
     # Boundary function test
     def test_func(obj):
@@ -96,7 +98,7 @@ async def test_func_boundary_changes_self():
         return obj
 
     j.boundary_func(test_func)
-    assert from_timestamp(j._next_run).in_tz(local_tz).naive() == datetime(2001, 1, 1, 8, 10)
+    assert from_timestamp(j._next_run).in_tz(local_tz).naive() == datetime(2001, 1, 1, 8, 10, 0, 1000)
 
     j.cancel()
 
@@ -111,18 +113,17 @@ async def test_func_boundary():
     s.add_job(j)
 
     set_now(2001, 1, 1, 7, 10)
-    j._initialize_base_time(None)
+    j._schedule_first_run(None)
 
     # Boundary function test
     def test_func(obj):
-        assert obj == datetime(2001, 1, 1, 7, 10, 0, 1)
+        assert obj == datetime(2001, 1, 1, 7, 10, 0, 1000)
         return obj
 
     j.boundary_func(test_func)
-    assert j.get_next_run() == datetime(2001, 1, 1, 7, 10)
+    assert j.get_next_run() == datetime(2001, 1, 1, 7, 10, 0, 1000)
 
     j.cancel()
-
 
 
 @pytest.mark.asyncio
@@ -133,37 +134,33 @@ async def test_initialize():
     set_now(2001, 1, 1, 12, 0, 0)
 
     # Now
-    j._initialize_base_time(None)
-    cmp_local(j._next_base, datetime(2001, 1, 1, 12, 0, 0, 1))
+    j._schedule_first_run(None)
+    cmp_local(j._next_run_base, datetime(2001, 1, 1, 12, 0, 0, 1000))
 
     # Diff from now
-    j._initialize_base_time(timedelta(days=1, minutes=30))
-    cmp_local(j._next_base, datetime(2001, 1, 2, 12, 30))
+    j._schedule_first_run(timedelta(days=1, minutes=30))
+    cmp_local(j._next_run_base, datetime(2001, 1, 2, 12, 30))
 
-    j._initialize_base_time(120)
-    cmp_local(j._next_base, datetime(2001, 1, 1, 12, 2))
+    j._schedule_first_run(120)
+    cmp_local(j._next_run_base, datetime(2001, 1, 1, 12, 2))
 
-    j._initialize_base_time(181.5)
-    cmp_local(j._next_base, datetime(2001, 1, 1, 12, 3, 1, 500_000))
-
-    # Specified time
-    j._initialize_base_time(time(1, 20, 30))
-    cmp_local(j._next_base, datetime(2001, 1, 2, 1, 20, 30))
+    j._schedule_first_run(181.5)
+    cmp_local(j._next_run_base, datetime(2001, 1, 1, 12, 3, 1, 500_000))
 
     # Specified time
-    j._initialize_base_time(datetime(2001, 1, 1, 12, 20, 30))
-    j._update_run_time()
-    cmp_local(j._next_base, datetime(2001, 1, 1, 12, 20, 30))
-    assert j.get_next_run() == datetime(2001, 1, 1, 12, 20, 30)
+    j._schedule_first_run(time(1, 20, 30))
+    cmp_local(j._next_run_base, datetime(2001, 1, 2, 1, 20, 30))
+
+    # Specified time
+    j._schedule_first_run(datetime(2001, 1, 1, 12, 20, 30))
+    cmp_local(j._next_run_base, datetime(2001, 1, 1, 12, 20, 30))
 
     with pytest.raises(FirstRunInThePastError) as e:
-        j._initialize_base_time(datetime(2001, 1, 1, 1, 20, 30))
+        j._schedule_first_run(datetime(2001, 1, 1, 1, 20, 30))
     assert str(e.value) in (
         'First run must be in the future! Now: 2001-01-01T12:00:00+01:00, run: 2001-01-01T01:20:30+01:00',
         'First run must be in the future! Now: 2001-01-01T12:00:00+00:00, run: 2001-01-01T01:20:30+00:00',
     )
-
-    j.cancel()
 
 
 @pytest.mark.asyncio
@@ -182,7 +179,7 @@ async def test_worker_cancel(monkeypatch):
 
     set_now(2001, 1, 1, 12, 0, 0)
 
-    j._initialize_base_time(datetime(2020, 1, 1, 12, 30))
+    j._schedule_first_run(datetime(2020, 1, 1, 12, 30))
     for i in range(10):
         await asyncio.sleep(0.001)
         j.offset(timedelta(minutes=i))

@@ -25,8 +25,7 @@ class SchedulerView:
         :return: Created job
         """
         job = OneTimeJob(self._scheduler, self._executor(callback, *args, **kwargs))
-        job._initialize_base_time(time)
-        job._update_run_time()
+        job._schedule_first_run(time)
         return job
 
     def countdown(self, expire_time: Union[dt_timedelta, float, int], callback, *args, **kwargs) -> CountdownJob:
@@ -56,7 +55,7 @@ class SchedulerView:
         :return: Created job
         """
         job = ReoccurringJob(self._scheduler, self._executor(callback, *args, **kwargs))
-        job._initialize_base_time(start_time)
+        job._schedule_first_run(start_time)
         job.interval(interval)
         return job
 
@@ -74,6 +73,7 @@ class SchedulerView:
         :return: Created job
         """
         job = DayOfWeekJob(self._scheduler, self._executor(callback, *args, **kwargs))
+        job._schedule_first_run(time)
         job.time(time)
         job.weekdays(weekdays)
         return job
@@ -109,7 +109,7 @@ class SchedulerView:
         :return: Created job
         """
         job = SunriseJob(self._scheduler, self._executor(callback, *args, **kwargs))
-        job._update_base_time()
+        job._schedule_next_run()
         return job
 
     def on_sunset(self, callback, *args, **kwargs) -> SunsetJob:
@@ -121,7 +121,7 @@ class SchedulerView:
         :return: Created job
         """
         job = SunsetJob(self._scheduler, self._executor(callback, *args, **kwargs))
-        job._update_base_time()
+        job._schedule_next_run()
         return job
 
     def on_sun_dawn(self, callback, *args, **kwargs) -> DawnJob:
@@ -133,7 +133,7 @@ class SchedulerView:
         :return: Created job
         """
         job = DawnJob(self._scheduler, self._executor(callback, *args, **kwargs))
-        job._update_base_time()
+        job._schedule_next_run()
         return job
 
     def on_sun_dusk(self, callback, *args, **kwargs) -> DuskJob:
@@ -145,5 +145,5 @@ class SchedulerView:
         :return: Created job
         """
         job = DuskJob(self._scheduler, self._executor(callback, *args, **kwargs))
-        job._update_base_time()
+        job._schedule_next_run()
         return job

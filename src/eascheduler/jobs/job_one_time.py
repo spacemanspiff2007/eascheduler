@@ -1,16 +1,13 @@
-from typing import Optional
+from datetime import timedelta, time as dt_time, datetime
+from typing import Union
 
-from pendulum import DateTime
-
-from eascheduler.errors import OneTimeJobCanNotBeSkipped
-from .job_datetime_base import DateTimeJobBase
-from eascheduler.const import SKIP_EXECUTION
+from eascheduler.jobs.job_base import ScheduledJobBase, get_first_timestamp
 
 
-class OneTimeJob(DateTimeJobBase):
+class OneTimeJob(ScheduledJobBase):
 
-    def _update_run_time(self, next_run: Optional[DateTime] = None) -> DateTime:
-        res = super()._update_run_time()
-        if res is SKIP_EXECUTION:
-            raise OneTimeJobCanNotBeSkipped()
-        return res
+    def _schedule_first_run(self, first_run: Union[None, int, float, timedelta, dt_time, datetime]):
+        self._set_next_run(get_first_timestamp(first_run))
+
+    def _schedule_next_run(self):
+        self._parent = None

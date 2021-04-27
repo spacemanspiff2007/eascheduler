@@ -86,13 +86,7 @@ class AsyncScheduler:
                 assert old_job is job, f'Job changed unexpectedly\n{old_job}\n{job}'
 
                 try:
-                    # If it's a reoccurring job it has this function
-                    if hasattr(job, '_update_base_time'):
-                        job._update_base_time()
-                    else:
-                        job._parent = None
-
-                    job._func.execute()
+                    job._execute()
                 except Exception as e:
                     process_exception(e)
 

@@ -1,1 +1,1 @@
-from .errors import FirstRunInThePastError, JobAlreadyCanceledException, OneTimeJobCanNotBeSkipped, UnknownWeekdayError
+from .errors import FirstRunInThePastError, JobAlreadyCanceledException, UnknownWeekdayError, BoundaryFunctionError
