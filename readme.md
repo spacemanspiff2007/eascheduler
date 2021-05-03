@@ -19,6 +19,9 @@ Easy Async Scheduler (or EAScheduler) is a asyncio scheduler with a nice and eas
 
 ## Changelog
 
+#### 0.1.1 (02.05.2021)
+- Implemented a much nicer API and fixed some bugs
+
 #### 0.1.0 (21.04.2021)
 - Fixed a race condition
 - Added tests
