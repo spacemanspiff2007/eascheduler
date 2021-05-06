@@ -12,7 +12,7 @@
 _Easy async task scheduling_
 
 
-Easy Async Scheduler (or EAScheduler) is a asyncio scheduler with a nice and easy to use interface. 
+Easy Async Scheduler (or EAScheduler) is a asyncio scheduler with a nice and easy to use interface.
 
 ## Documentation
 [The documentation can be found at here](https://eascheduler.readthedocs.io)

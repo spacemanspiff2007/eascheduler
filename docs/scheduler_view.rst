@@ -47,4 +47,3 @@ ReoccurringJob
 .. autoclass:: eascheduler.jobs.ReoccurringJob
    :members:
    :inherited-members:
-
