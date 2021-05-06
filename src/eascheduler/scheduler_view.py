@@ -55,8 +55,8 @@ class SchedulerView:
         :return: Created job
         """
         job = ReoccurringJob(self._scheduler, self._executor(callback, *args, **kwargs))
-        job._schedule_first_run(start_time)
         job.interval(interval)
+        job._schedule_first_run(start_time)
         return job
 
     def on_day_of_week(self, time: Union[dt_time, dt_datetime], weekdays: Union[str, Iterable[Union[str, int]]],
@@ -73,7 +73,6 @@ class SchedulerView:
         :return: Created job
         """
         job = DayOfWeekJob(self._scheduler, self._executor(callback, *args, **kwargs))
-        job._schedule_first_run(time)
         job.time(time)
         job.weekdays(weekdays)
         return job

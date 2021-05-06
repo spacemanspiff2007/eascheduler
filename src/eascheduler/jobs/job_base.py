@@ -65,12 +65,10 @@ class ScheduledJobBase:
         return from_timestamp(self._next_run, local_tz).naive()
 
 
-def get_first_timestamp(base_time: Union[None, int, float, timedelta, dt_time, datetime],
-                        now: Optional[DateTime] = None) -> float:
-    assert now is None or now.timezone is local_tz, now.timezone
+def get_first_timestamp(base_time: Union[None, int, float, timedelta, dt_time, datetime]) -> float:
 
     # since this is specified by the user its in the local timezone
-    now = get_now(tz=local_tz) if now is None else now
+    now = get_now(tz=local_tz)
     new_base: DateTime
 
     if base_time is None:

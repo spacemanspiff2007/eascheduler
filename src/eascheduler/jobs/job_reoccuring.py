@@ -42,5 +42,7 @@ class ReoccurringJob(DateTimeJobBase):
         assert interval > 0, interval
 
         self._interval = interval
-        self._schedule_next_run()
+
+        if self._next_run_base < FAR_FUTURE:
+            self._schedule_next_run()
         return self
