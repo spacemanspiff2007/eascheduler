@@ -15,6 +15,7 @@ from eascheduler.executors.executor import ExecutorBase
 from eascheduler.jobs.job_base import ScheduledJobBase, get_first_timestamp
 from eascheduler.schedulers import AsyncScheduler
 
+
 try:
     from typing import Literal
 except ImportError:
@@ -28,6 +29,7 @@ class DateTimeJobBase(ScheduledJobBase):
 
         # base time when the job gets executed
         self._next_run_base: float = FAR_FUTURE
+        self._last_run_base: float = 0
 
         # adjusting of the boundaries is running
         self._adjusting: bool = False
@@ -45,6 +47,10 @@ class DateTimeJobBase(ScheduledJobBase):
 
     def _advance_time(self, utc_dt: DateTime) -> DateTime:
         raise NotImplementedError()
+
+    def _execute(self):
+        self._last_run_base = self._next_run_base
+        super()._execute()
 
     def earliest(self, time_obj: Optional[dt_time]) -> DateTimeJobBase:
         """Set earliest boundary as time of day. ``None`` will disable boundary.

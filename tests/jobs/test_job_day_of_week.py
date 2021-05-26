@@ -1,24 +1,24 @@
-from datetime import time, datetime
+from datetime import time, datetime, timedelta
 from functools import partial
 
 import pytest
 
 from eascheduler.const import SKIP_EXECUTION
+from eascheduler.errors import UnknownWeekdayError
+from eascheduler.executors import SyncExecutor
 from eascheduler.jobs.job_day_of_week import DayOfWeekJob
 from eascheduler.schedulers import AsyncScheduler
-from eascheduler.errors import UnknownWeekdayError
-from tests.helper import set_now
+from tests.helper import set_now, utc_ts
 
 
 @pytest.mark.asyncio
-async def test_workdays():
+async def test_workdays(async_scheduler: AsyncScheduler):
     dummy = DayOfWeekJob(None, lambda x: x)
     dummy._next_run = 0
 
-    s = AsyncScheduler()
-    j = DayOfWeekJob(s, lambda x: x)
-    s.add_job(j)
-    s.add_job(dummy)
+    j = DayOfWeekJob(async_scheduler, lambda x: x)
+    async_scheduler.add_job(j)
+    async_scheduler.add_job(dummy)
 
     j.time(time(11))
     j.weekdays('workdays')
@@ -46,18 +46,17 @@ async def test_workdays():
             assert j.get_next_run() == datetime(2001, 1, day, 11)
             now(day)
 
-    s.cancel_all()
+    async_scheduler.cancel_all()
 
 
 @pytest.mark.asyncio
-async def test_weekends():
+async def test_weekends(async_scheduler: AsyncScheduler):
     dummy = DayOfWeekJob(None, lambda x: x)
     dummy._next_run = 0
 
-    s = AsyncScheduler()
-    j = DayOfWeekJob(s, lambda x: x)
-    s.add_job(j)
-    s.add_job(dummy)
+    j = DayOfWeekJob(async_scheduler, lambda x: x)
+    async_scheduler.add_job(j)
+    async_scheduler.add_job(dummy)
 
     j.time(time(11))
     j.weekdays('weekend')
@@ -83,17 +82,16 @@ async def test_weekends():
             assert j.get_next_run() == datetime(2001, 1, day, 11)
             now(day)
 
-    s.cancel_all()
+    async_scheduler.cancel_all()
 
 
 @pytest.mark.asyncio
-async def test_day():
+async def test_day(async_scheduler: AsyncScheduler):
     dummy = DayOfWeekJob(None, lambda x: x)
     dummy._next_run = 0
 
-    s = AsyncScheduler()
-    j = DayOfWeekJob(s, lambda x: x)
-    s.add_job(j)
+    j = DayOfWeekJob(async_scheduler, lambda x: x)
+    async_scheduler.add_job(j)
 
     now = partial(set_now, 2001, 1, hour=12, microsecond=1)
     j.time(time(12))
@@ -123,9 +121,26 @@ async def test_day():
 
 
 @pytest.mark.asyncio
-async def test_day_exception():
-    s = AsyncScheduler()
-    dummy = DayOfWeekJob(s, lambda x: x)
+async def test_day_exception(async_scheduler: AsyncScheduler):
+    dummy = DayOfWeekJob(async_scheduler, lambda x: x)
     with pytest.raises(UnknownWeekdayError) as e:
         dummy.weekdays('asdf')
     assert str(e.value).startswith('Unknown day "asdf"!')
+
+
+@pytest.mark.asyncio
+async def test_negative_offset(async_scheduler: AsyncScheduler):
+
+    j = DayOfWeekJob(async_scheduler, SyncExecutor(lambda: 1))
+    j.time(time(12))
+    j.offset(timedelta(minutes=-30))
+    j._next_run_base = utc_ts(2001, 1, 1, 12)
+    j._next_run      = utc_ts(2001, 1, 1, 11, 30)
+
+    now = partial(set_now, 2001, 1, 1, microsecond=1)
+    now(11, 30)
+
+    j._execute()
+
+    assert j._next_run_base == utc_ts(2001, 1, 2, 12)
+    assert j._next_run      == utc_ts(2001, 1, 2, 11, 30)

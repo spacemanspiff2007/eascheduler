@@ -22,6 +22,8 @@ def set_now(year: int, month: int, day: int,
             hour: int = 0, minute: int = 0, second: int = 0, microsecond: int = 0,
             tz=local_tz):
     obj = datetime(year, month, day, hour, minute, second, microsecond=microsecond, tz=tz)
+    if tz is not local_tz:
+        obj = obj.in_timezone(local_tz)
     __set_test_now(obj)
 
 

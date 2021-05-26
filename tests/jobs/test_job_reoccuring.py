@@ -1,5 +1,5 @@
 from asyncio import sleep
-from datetime import datetime
+from datetime import datetime, timedelta
 from functools import partial
 
 import pytest
@@ -12,16 +12,15 @@ from tests.helper import cmp_local, set_now, utc_ts
 
 
 @pytest.mark.asyncio
-async def test_remove():
+async def test_remove(async_scheduler: AsyncScheduler):
 
-    s = AsyncScheduler()
-    j = ReoccurringJob(s, lambda x: x)
+    j = ReoccurringJob(async_scheduler, lambda x: x)
     j._next_run_base = utc_ts(2001, 1, 1, 12, microsecond=0)
 
     now = partial(set_now, 2001, 1, 1, microsecond=1)
     now(1, microsecond=0)
 
-    s.add_job(j)
+    async_scheduler.add_job(j)
     j.interval(5)
 
     now(11)
@@ -36,14 +35,12 @@ async def test_remove():
     j._schedule_next_run()
     cmp_local(j._next_run, datetime(2001, 1, 1, 12, 0, 10))
 
-    s.cancel_all()
 
 
 @pytest.mark.asyncio
-async def test_skip():
+async def test_skip(async_scheduler: AsyncScheduler):
 
-    s = AsyncScheduler()
-    j = ReoccurringJob(s, lambda x: x)
+    j = ReoccurringJob(async_scheduler, lambda x: x)
     j._next_run_base = utc_ts(2001, 1, 1, 12, microsecond=0)
 
     now = partial(set_now, 2001, 1, 1, microsecond=1)
@@ -54,7 +51,7 @@ async def test_skip():
             return SKIP_EXECUTION
         return dt
 
-    s.add_job(j)
+    async_scheduler.add_job(j)
     j.interval(5)
     j.boundary_func(skip_func)
 
@@ -74,11 +71,9 @@ async def test_skip():
     j._schedule_next_run()
     cmp_local(j._next_run, datetime(2001, 1, 1, 12, 0, 20))
 
-    s.cancel_all()
-
 
 @pytest.mark.asyncio
-async def test_func_exception(caught_exceptions):
+async def test_func_exception(async_scheduler: AsyncScheduler, caught_exceptions):
     async def bla():
         pass
 
@@ -93,12 +88,11 @@ async def test_func_exception(caught_exceptions):
 
     set_now(2001, 1, 1, 7, 10)
 
-    s = AsyncScheduler()
-    j1 = ReoccurringJob(s, SyncExecutor(lambda: 1))
+    j1 = ReoccurringJob(async_scheduler, SyncExecutor(lambda: 1))
     j1._schedule_first_run(999)
     j1.interval(999)
 
-    j = ReoccurringJob(s, SyncExecutor(lambda: 1))
+    j = ReoccurringJob(async_scheduler, SyncExecutor(lambda: 1))
     j._schedule_first_run(None)
     j.interval(999)
 
@@ -108,11 +102,27 @@ async def test_func_exception(caught_exceptions):
     await sleep(0.3)
 
     # ensure that the worker is still running
-    assert s.worker is not None
+    assert async_scheduler.worker is not None
 
     # ensure that the exception got caught
     assert len(caught_exceptions) == 1
     assert str(caught_exceptions[0]) == 'division by zero'
     caught_exceptions.clear()
 
-    s.cancel_all()
+
+@pytest.mark.asyncio
+async def test_negative_offset(async_scheduler: AsyncScheduler):
+
+    j = ReoccurringJob(async_scheduler, SyncExecutor(lambda: 1))
+    j.interval(3600)
+    j.offset(timedelta(minutes=-30))
+    j._next_run_base = utc_ts(2001, 1, 1, 12)
+    j._next_run      = utc_ts(2001, 1, 1, 11, 30)
+
+    now = partial(set_now, 2001, 1, 1, microsecond=1)
+    now(11, 30)
+
+    j._execute()
+
+    assert j._next_run_base == utc_ts(2001, 1, 1, 13)
+    assert j._next_run      == utc_ts(2001, 1, 1, 12, 30)

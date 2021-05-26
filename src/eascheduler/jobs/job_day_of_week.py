@@ -4,7 +4,7 @@ from datetime import date, datetime
 from datetime import time as dt_time
 from typing import Union, Set, Iterable, Dict
 
-from pendulum import DateTime
+from pendulum import DateTime, from_timestamp
 from pendulum import now as get_now
 
 from eascheduler.const import local_tz
@@ -37,9 +37,11 @@ class DayOfWeekJob(DateTimeJobBase):
 
     def _schedule_next_run(self):
         now = get_now(tz=local_tz)
+        last_run = from_timestamp(self._last_run_base, tz=local_tz)
         next_run = now.set(hour=self._time.hour, minute=self._time.minute,
                            second=self._time.second, microsecond=self._time.microsecond)
-        while next_run < now:
+
+        while next_run < now or next_run <= last_run:
             next_run = next_run.add(days=1)
         while next_run.isoweekday() not in self._weekdays:
             next_run = next_run.add(days=1)

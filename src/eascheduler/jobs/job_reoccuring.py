@@ -21,7 +21,7 @@ class ReoccurringJob(DateTimeJobBase):
 
     def _schedule_next_run(self):
         now = get_now(UTC).timestamp()
-        while self._next_run_base < now:
+        while self._next_run_base < now or self._next_run_base <= self._last_run_base:
             self._next_run_base += self._interval
 
         self._apply_boundaries()

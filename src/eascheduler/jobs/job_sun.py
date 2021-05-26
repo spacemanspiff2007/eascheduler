@@ -4,7 +4,7 @@ from datetime import timedelta, datetime, time as dt_time
 from typing import Optional, Union
 
 from astral import Observer, sun  # type: ignore
-from pendulum import DateTime, UTC
+from pendulum import DateTime, UTC, from_timestamp
 from pendulum import instance as pd_instance
 from pendulum import now as get_now
 
@@ -49,9 +49,10 @@ class SunJobBase(DateTimeJobBase):
 
     def _schedule_next_run(self):
         dt_next = get_now(UTC)
+        last_run = from_timestamp(self._last_run_base)
         next_run = pd_instance(self._sun_func(OBSERVER, dt_next.date(), tzinfo=UTC)).set(microsecond=0)
 
-        while next_run <= get_now(UTC):
+        while next_run <= get_now(UTC) or next_run <= last_run:
             next_run = self._advance_time(next_run)
 
         self._next_run_base = next_run.timestamp()
