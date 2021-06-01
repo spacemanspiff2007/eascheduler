@@ -93,7 +93,7 @@ async def test_func_exception(async_scheduler: AsyncScheduler, caught_exceptions
     j1.interval(999)
 
     j = ReoccurringJob(async_scheduler, SyncExecutor(lambda: 1))
-    j._schedule_first_run(None)
+    j._schedule_first_run(0.00001)
     j.interval(999)
 
     j.boundary_func(func)

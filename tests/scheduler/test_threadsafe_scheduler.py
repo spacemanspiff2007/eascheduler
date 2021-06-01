@@ -1,4 +1,4 @@
-from asyncio import sleep, get_event_loop
+from asyncio import get_event_loop, sleep
 from concurrent.futures import ThreadPoolExecutor
 
 import pytest

@@ -1,15 +1,15 @@
 import asyncio
-from asyncio import Future, CancelledError, create_task
+from asyncio import CancelledError, create_task, Future
 from bisect import insort
 from collections import deque
 from typing import Deque, Optional, Set
 
-from pendulum import UTC
 from pendulum import now as get_now
+from pendulum import UTC
 
 from eascheduler.const import FAR_FUTURE
-from eascheduler.jobs.job_base import ScheduledJobBase
 from eascheduler.errors.handler import process_exception
+from eascheduler.jobs.job_base import ScheduledJobBase
 
 
 class AsyncScheduler:
@@ -18,6 +18,22 @@ class AsyncScheduler:
         self.job_objs: Set[ScheduledJobBase] = set()
 
         self.worker: Optional[Future] = None
+        self.worker_paused: bool = False
+
+    def pause(self):
+        assert not self.worker_paused
+
+        self.worker_paused = True
+        if self.worker is not None:
+            self.worker.cancel()
+            self.worker = None
+
+    def resume(self):
+        assert self.worker_paused
+
+        if self.jobs:
+            self.worker = create_task(self._run_next())
+        self.worker_paused = False
 
     def add_job(self, job: ScheduledJobBase):
         # cancel task if the new job is earlier than the next one or if it is the next one
@@ -33,8 +49,8 @@ class AsyncScheduler:
             self.jobs.remove(job)
             insort(self.jobs, job)
 
-        if self.worker is None:
-            self.worker = create_task(self.__run_next())
+        if self.worker is None and not self.worker_paused:
+            self.worker = create_task(self._run_next())
 
     def remove_job(self, job: ScheduledJobBase):
         if self.jobs and job is self.jobs[0]:
@@ -46,8 +62,8 @@ class AsyncScheduler:
             self.jobs.popleft()
             self.job_objs.remove(job)
 
-            if self.jobs:
-                self.worker = create_task(self.__run_next())
+            if self.jobs and not self.worker_paused:
+                self.worker = create_task(self._run_next())
         else:
             self.jobs.remove(job)
             self.job_objs.remove(job)
@@ -62,7 +78,7 @@ class AsyncScheduler:
             self.job_objs.remove(job)
             job._parent = None
 
-    async def __run_next(self):
+    async def _run_next(self):
         try:
             while self.jobs:
                 job = self.jobs[0]

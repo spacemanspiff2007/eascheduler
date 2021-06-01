@@ -19,6 +19,11 @@ Easy Async Scheduler (or EAScheduler) is a asyncio scheduler with a nice and eas
 
 ## Changelog
 
+#### 0.1.4 (01.06.2021)
+- Added option to pause and resume the scheduler
+- Jobs don't have to be in the future any more 
+- Sorted imports with isort
+
 #### 0.1.3 (06.05.2021)
 - Fixed a bug where a negative offset/jitter could result in multiple executions
 

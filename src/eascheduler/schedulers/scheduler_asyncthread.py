@@ -1,7 +1,7 @@
 import logging
 from asyncio import AbstractEventLoop, run_coroutine_threadsafe
+from threading import _MainThread  # type: ignore
 from threading import current_thread
-from threading import _MainThread   # type: ignore
 
 from eascheduler.jobs.job_base import ScheduledJobBase
 from eascheduler.schedulers import AsyncScheduler
@@ -11,6 +11,26 @@ log = logging.getLogger('AsyncScheduler')
 
 class ThreadSafeAsyncScheduler(AsyncScheduler):
     LOOP: AbstractEventLoop
+
+    async def __pause(self):
+        super().pause()
+
+    def pause(self):
+        if not isinstance(current_thread(), _MainThread):
+            run_coroutine_threadsafe(self.__pause(), self.LOOP).result()
+        else:
+            super().pause()
+        return None
+
+    async def __resume(self):
+        super().pause()
+
+    def resume(self):
+        if not isinstance(current_thread(), _MainThread):
+            run_coroutine_threadsafe(self.__resume(), self.LOOP).result()
+        else:
+            super().resume()
+        return None
 
     async def __add_job(self, job: ScheduledJobBase):
         super().add_job(job)

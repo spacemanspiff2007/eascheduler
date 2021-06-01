@@ -1,7 +1,9 @@
-from datetime import timedelta, time as dt_time, datetime
+from datetime import datetime
+from datetime import time as dt_time
+from datetime import timedelta
 from typing import Union
 
-from eascheduler.jobs.job_base import ScheduledJobBase, get_first_timestamp
+from eascheduler.jobs.job_base import get_first_timestamp, ScheduledJobBase
 
 
 class OneTimeJob(ScheduledJobBase):

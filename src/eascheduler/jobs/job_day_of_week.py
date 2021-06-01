@@ -2,13 +2,13 @@ from __future__ import annotations
 
 from datetime import date, datetime
 from datetime import time as dt_time
-from typing import Union, Set, Iterable, Dict
+from typing import Dict, Iterable, Set, Union
 
 from pendulum import DateTime, from_timestamp
 from pendulum import now as get_now
 
 from eascheduler.const import local_tz
-from eascheduler.errors import UnknownWeekdayError, JobAlreadyCanceledException
+from eascheduler.errors import JobAlreadyCanceledException, UnknownWeekdayError
 from eascheduler.executors.executor import ExecutorBase
 from eascheduler.jobs.job_base_datetime import DateTimeJobBase
 from eascheduler.schedulers import AsyncScheduler

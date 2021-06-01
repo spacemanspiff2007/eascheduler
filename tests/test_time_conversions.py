@@ -1,7 +1,7 @@
-import pytest
 from datetime import datetime
 
-from pendulum import DateTime, UTC, from_timestamp, instance
+import pytest
+from pendulum import DateTime, from_timestamp, instance, UTC
 
 from eascheduler.const import local_tz
 

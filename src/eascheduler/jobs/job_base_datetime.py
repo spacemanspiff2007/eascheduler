@@ -1,20 +1,20 @@
 from __future__ import annotations
 
-from datetime import datetime, timedelta
+from datetime import datetime
 from datetime import time as dt_time
+from datetime import timedelta
 from random import uniform
 from typing import Callable, Optional, Tuple, Union
 
-from pendulum import UTC, from_timestamp, instance, DateTime
+from pendulum import DateTime, from_timestamp, instance
 from pendulum import now as get_now
+from pendulum import UTC
 
-from eascheduler.const import SKIP_EXECUTION
-from eascheduler.const import local_tz, FAR_FUTURE
-from eascheduler.errors import JobAlreadyCanceledException, BoundaryFunctionError
+from eascheduler.const import FAR_FUTURE, local_tz, SKIP_EXECUTION
+from eascheduler.errors import BoundaryFunctionError, JobAlreadyCanceledException
 from eascheduler.executors.executor import ExecutorBase
-from eascheduler.jobs.job_base import ScheduledJobBase, get_first_timestamp
+from eascheduler.jobs.job_base import get_first_timestamp, ScheduledJobBase
 from eascheduler.schedulers import AsyncScheduler
-
 
 try:
     from typing import Literal

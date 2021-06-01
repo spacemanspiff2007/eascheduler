@@ -1,12 +1,13 @@
-from datetime import datetime, timedelta
+from datetime import datetime
 from datetime import time as dt_time
+from datetime import timedelta
 from typing import Optional, TYPE_CHECKING, Union
 
-from pendulum import from_timestamp, DateTime, instance
+from pendulum import DateTime, from_timestamp, instance
 from pendulum import now as get_now
 
 from eascheduler.const import FAR_FUTURE, local_tz
-from eascheduler.errors import JobAlreadyCanceledException, FirstRunInThePastError
+from eascheduler.errors import FirstRunInThePastError, JobAlreadyCanceledException
 from eascheduler.executors import ExecutorBase
 
 if TYPE_CHECKING:
@@ -73,7 +74,7 @@ def get_first_timestamp(base_time: Union[None, int, float, timedelta, dt_time, d
 
     if base_time is None:
         # If we don't specify a datetime we start it now
-        new_base = now.add(microseconds=1000)
+        new_base = now
     elif isinstance(base_time, timedelta):
         # if it is a timedelta add it to now to easily specify points in the future
         new_base = now + base_time
@@ -90,7 +91,7 @@ def get_first_timestamp(base_time: Union[None, int, float, timedelta, dt_time, d
         new_base = instance(base_time, tz=local_tz).astimezone(local_tz)
 
     assert isinstance(new_base, DateTime), type(new_base)
-    if new_base <= now:
-        raise FirstRunInThePastError(f'First run must be in the future! Now: {now}, run: {new_base}')
+    if new_base < now:
+        raise FirstRunInThePastError(f'First run can not be in the past! Now: {now}, run: {new_base}')
 
     return new_base.timestamp()

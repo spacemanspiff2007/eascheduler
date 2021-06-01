@@ -6,8 +6,10 @@ except ImportError:
     from mock import AsyncMock
 
 from datetime import datetime as dt_datetime
-from pendulum import datetime, instance, from_timestamp, UTC, DateTime
+
+from pendulum import datetime, DateTime, from_timestamp, instance
 from pendulum import set_test_now as __set_test_now
+from pendulum import UTC
 
 from eascheduler.const import local_tz
 from eascheduler.executors import AsyncExecutor

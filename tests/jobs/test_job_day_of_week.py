@@ -1,4 +1,4 @@
-from datetime import time, datetime, timedelta
+from datetime import datetime, time, timedelta
 from functools import partial
 
 import pytest

@@ -1,3 +1,4 @@
+# isort: skip_file
 from eascheduler.__version__ import __version__
 
 from eascheduler.const import SKIP_EXECUTION

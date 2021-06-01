@@ -1,11 +1,12 @@
 from datetime import datetime as dt_datetime
 from datetime import time as dt_time
 from datetime import timedelta as dt_timedelta
-from typing import Union, Type, Iterable
+from typing import Iterable, Type, Union
 
 from eascheduler.executors import ExecutorBase
-from eascheduler.jobs import OneTimeJob, CountdownJob, ReoccurringJob, DayOfWeekJob, \
-    SunriseJob, SunsetJob, DuskJob, DawnJob
+from eascheduler.jobs import (
+    CountdownJob, DawnJob, DayOfWeekJob, DuskJob, OneTimeJob, ReoccurringJob, SunriseJob, SunsetJob
+)
 from eascheduler.schedulers import AsyncScheduler
 
 

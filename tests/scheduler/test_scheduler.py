@@ -43,3 +43,42 @@ async def test_sort():
     s.remove_job(second)
     assert s.jobs == deque()
     assert s.job_objs == set()
+
+
+@pytest.mark.asyncio
+async def test_pause_resume():
+    async def a_dummy():
+        pass
+
+    s = AsyncScheduler()
+    s.pause()
+
+    def job(time):
+        obj = ScheduledJobBase(s, a_dummy)
+        obj._next_run = time
+        s.add_job(obj)
+        return obj
+
+    first = job(1.1)
+    third = job(1.3)
+    fourth = job(1.4)
+    second = job(1.2)
+
+    assert s.jobs == deque((first, second, third, fourth))
+    assert s.worker_paused
+    assert s.worker is None
+
+    s.resume()
+    assert s.worker is not None
+    assert not s.worker_paused
+
+    s.pause()
+    assert s.worker is None
+    assert s.worker_paused
+
+    s.cancel_all()
+
+    # without jobs we skip starting the worker
+    s.resume()
+    assert s.worker is None
+    assert not s.worker_paused

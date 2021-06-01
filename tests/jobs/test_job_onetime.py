@@ -7,8 +7,7 @@ from eascheduler.errors import JobAlreadyCanceledException
 from eascheduler.executors import SyncExecutor
 from eascheduler.jobs.job_one_time import OneTimeJob
 from eascheduler.schedulers import AsyncScheduler
-from tests.helper import cmp_local, utc_ts
-from tests.helper import mocked_executor, set_now
+from tests.helper import cmp_local, mocked_executor, set_now, utc_ts
 
 
 @pytest.mark.asyncio
@@ -45,7 +44,7 @@ async def test_init():
     j = OneTimeJob(s, SyncExecutor(lambda: 1 / 0))
 
     j._schedule_first_run(None)
-    cmp_local(j._next_run,  datetime(2001, 1, 1, 12, 0, 0, 1000))
+    cmp_local(j._next_run,  datetime(2001, 1, 1, 12, 0, 0))
 
     j._schedule_first_run(3)
     cmp_local(j._next_run,  datetime(2001, 1, 1, 12, 0, 3))

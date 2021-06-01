@@ -3,9 +3,9 @@ import time
 
 import pytest
 
+from eascheduler.executors import AsyncExecutor
 from eascheduler.jobs import CountdownJob
 from eascheduler.schedulers import AsyncScheduler
-from eascheduler.executors import AsyncExecutor
 
 
 @pytest.mark.asyncio

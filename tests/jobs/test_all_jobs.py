@@ -3,8 +3,9 @@ from inspect import getargs
 import pytest
 
 from eascheduler.errors import JobAlreadyCanceledException
-from eascheduler.jobs import ReoccurringJob, DayOfWeekJob, CountdownJob, OneTimeJob, \
-    SunsetJob, SunriseJob, DuskJob, DawnJob
+from eascheduler.jobs import (
+    CountdownJob, DawnJob, DayOfWeekJob, DuskJob, OneTimeJob, ReoccurringJob, SunriseJob, SunsetJob
+)
 
 
 @pytest.mark.parametrize(

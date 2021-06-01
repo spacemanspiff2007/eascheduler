@@ -1,12 +1,15 @@
 from __future__ import annotations
 
-from datetime import timedelta, datetime, time as dt_time
+from datetime import datetime
+from datetime import time as dt_time
+from datetime import timedelta
 from typing import Optional, Union
 
 from astral import Observer, sun  # type: ignore
-from pendulum import DateTime, UTC, from_timestamp
+from pendulum import DateTime, from_timestamp
 from pendulum import instance as pd_instance
 from pendulum import now as get_now
+from pendulum import UTC
 
 from eascheduler.executors import ExecutorBase
 from eascheduler.jobs.job_base_datetime import DateTimeJobBase

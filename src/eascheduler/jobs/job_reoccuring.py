@@ -4,8 +4,8 @@ from datetime import timedelta
 from typing import Union
 
 from pendulum import DateTime
-from pendulum import UTC
 from pendulum import now as get_now
+from pendulum import UTC
 
 from eascheduler.const import FAR_FUTURE
 from eascheduler.errors import JobAlreadyCanceledException

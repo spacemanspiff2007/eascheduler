@@ -1,7 +1,8 @@
-import pendulum
-import pytest
 from asyncio import CancelledError
 from traceback import format_exc
+
+import pendulum
+import pytest
 
 from eascheduler.errors import handler
 from eascheduler.jobs import job_sun

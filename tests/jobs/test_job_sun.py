@@ -1,5 +1,4 @@
-from datetime import date, datetime, time
-from datetime import timedelta
+from datetime import date, datetime, time, timedelta
 
 import pytest
 from pendulum import UTC
@@ -9,7 +8,7 @@ from eascheduler.const import SKIP_EXECUTION
 from eascheduler.executors import SyncExecutor
 from eascheduler.jobs import DawnJob, DuskJob, SunriseJob, SunsetJob
 from eascheduler.schedulers import AsyncScheduler
-from tests.helper import cmp_utc, cmp_local, set_now
+from tests.helper import cmp_local, cmp_utc, set_now
 
 
 @pytest.mark.parametrize(

@@ -10,8 +10,7 @@ from eascheduler.const import local_tz
 from eascheduler.errors import FirstRunInThePastError
 from eascheduler.executors import AsyncExecutor
 from eascheduler.jobs.job_base_datetime import DateTimeJobBase
-from eascheduler.schedulers import AsyncScheduler
-from eascheduler.schedulers import scheduler_async
+from eascheduler.schedulers import AsyncScheduler, scheduler_async
 from tests.helper import cmp_local, set_now, utc_ts
 
 
@@ -87,7 +86,7 @@ async def test_func_boundary_changes_self():
 
     set_now(2001, 1, 1, 7, 10)
     j._schedule_first_run(None)
-    assert from_timestamp(j._next_run_base).in_tz(local_tz).naive() == datetime(2001, 1, 1, 7, 10, 0, 1000)
+    assert from_timestamp(j._next_run_base).in_tz(local_tz).naive() == datetime(2001, 1, 1, 7, 10, 0)
 
     # Boundary function test
     def test_func(obj):
@@ -98,7 +97,7 @@ async def test_func_boundary_changes_self():
         return obj
 
     j.boundary_func(test_func)
-    assert from_timestamp(j._next_run).in_tz(local_tz).naive() == datetime(2001, 1, 1, 8, 10, 0, 1000)
+    assert from_timestamp(j._next_run).in_tz(local_tz).naive() == datetime(2001, 1, 1, 8, 10, 0)
 
     j.cancel()
 
@@ -113,15 +112,15 @@ async def test_func_boundary():
     s.add_job(j)
 
     set_now(2001, 1, 1, 7, 10)
-    j._schedule_first_run(None)
+    j._schedule_first_run(1)
 
     # Boundary function test
     def test_func(obj):
-        assert obj == datetime(2001, 1, 1, 7, 10, 0, 1000)
+        assert obj == datetime(2001, 1, 1, 7, 10, 1)
         return obj
 
     j.boundary_func(test_func)
-    assert j.get_next_run() == datetime(2001, 1, 1, 7, 10, 0, 1000)
+    assert j.get_next_run() == datetime(2001, 1, 1, 7, 10, 1)
 
     j.cancel()
 
@@ -135,7 +134,7 @@ async def test_initialize():
 
     # Now
     j._schedule_first_run(None)
-    cmp_local(j._next_run_base, datetime(2001, 1, 1, 12, 0, 0, 1000))
+    cmp_local(j._next_run_base, datetime(2001, 1, 1, 12, 0, 0))
 
     # Diff from now
     j._schedule_first_run(timedelta(days=1, minutes=30))
@@ -158,8 +157,8 @@ async def test_initialize():
     with pytest.raises(FirstRunInThePastError) as e:
         j._schedule_first_run(datetime(2001, 1, 1, 1, 20, 30))
     assert str(e.value) in (
-        'First run must be in the future! Now: 2001-01-01T12:00:00+01:00, run: 2001-01-01T01:20:30+01:00',
-        'First run must be in the future! Now: 2001-01-01T12:00:00+00:00, run: 2001-01-01T01:20:30+00:00',
+        'First run can not be in the past! Now: 2001-01-01T12:00:00+01:00, run: 2001-01-01T01:20:30+01:00',
+        'First run can not be in the past! Now: 2001-01-01T12:00:00+00:00, run: 2001-01-01T01:20:30+00:00',
     )
 
 

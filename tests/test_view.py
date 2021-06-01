@@ -1,12 +1,11 @@
 import asyncio
-from datetime import time, datetime
+from datetime import datetime, time
 from functools import partial
 
 import pytest
 
-from eascheduler import SchedulerView
-from eascheduler import set_location
-from eascheduler.executors import SyncExecutor, AsyncExecutor
+from eascheduler import SchedulerView, set_location
+from eascheduler.executors import AsyncExecutor, SyncExecutor
 from eascheduler.schedulers import AsyncScheduler, ThreadSafeAsyncScheduler
 from tests.helper import set_now
 
