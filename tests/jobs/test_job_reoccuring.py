@@ -2,8 +2,6 @@ from asyncio import sleep
 from datetime import datetime, timedelta
 from functools import partial
 
-import pytest
-
 from eascheduler.const import SKIP_EXECUTION
 from eascheduler.executors import SyncExecutor
 from eascheduler.jobs import ReoccurringJob
@@ -11,7 +9,6 @@ from eascheduler.schedulers import AsyncScheduler
 from tests.helper import cmp_local, set_now, utc_ts
 
 
-@pytest.mark.asyncio
 async def test_remove(async_scheduler: AsyncScheduler):
 
     j = ReoccurringJob(async_scheduler, lambda x: x)
@@ -36,8 +33,6 @@ async def test_remove(async_scheduler: AsyncScheduler):
     cmp_local(j._next_run, datetime(2001, 1, 1, 12, 0, 10))
 
 
-
-@pytest.mark.asyncio
 async def test_skip(async_scheduler: AsyncScheduler):
 
     j = ReoccurringJob(async_scheduler, lambda x: x)
@@ -72,7 +67,6 @@ async def test_skip(async_scheduler: AsyncScheduler):
     cmp_local(j._next_run, datetime(2001, 1, 1, 12, 0, 20))
 
 
-@pytest.mark.asyncio
 async def test_func_exception(async_scheduler: AsyncScheduler, caught_exceptions):
     async def bla():
         pass
@@ -110,7 +104,6 @@ async def test_func_exception(async_scheduler: AsyncScheduler, caught_exceptions
     caught_exceptions.clear()
 
 
-@pytest.mark.asyncio
 async def test_negative_offset(async_scheduler: AsyncScheduler):
 
     j = ReoccurringJob(async_scheduler, SyncExecutor(lambda: 1))

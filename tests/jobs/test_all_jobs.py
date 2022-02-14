@@ -12,7 +12,7 @@ from eascheduler.jobs import (
     'cls,name',
     [(cls, name) for cls in (ReoccurringJob, DayOfWeekJob, CountdownJob, OneTimeJob,
                              SunsetJob, SunriseJob, DuskJob, DawnJob)
-     for name in dir(cls) if not name.startswith('_') and name not in ('get_next_run', )]
+     for name in dir(cls) if not name.startswith('_') and name not in ('get_next_run', 'remaining')]
 )
 def test_job_canceled(cls, name: str):
 

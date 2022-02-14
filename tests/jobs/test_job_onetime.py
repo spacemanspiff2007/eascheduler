@@ -1,5 +1,5 @@
 import asyncio
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import pytest
 
@@ -10,7 +10,6 @@ from eascheduler.schedulers import AsyncScheduler
 from tests.helper import cmp_local, mocked_executor, set_now, utc_ts
 
 
-@pytest.mark.asyncio
 async def test_remove():
 
     s = AsyncScheduler()
@@ -36,7 +35,6 @@ async def test_remove():
         j.cancel()
 
 
-@pytest.mark.asyncio
 async def test_init():
     set_now(2001, 1, 1, 12, 0, 0)
 
@@ -48,5 +46,26 @@ async def test_init():
 
     j._schedule_first_run(3)
     cmp_local(j._next_run,  datetime(2001, 1, 1, 12, 0, 3))
+
+    j.cancel()
+
+
+async def test_func_remaining():
+    set_now(2001, 1, 1, 12, 0, 0)
+
+    s = AsyncScheduler()
+    j = OneTimeJob(s, SyncExecutor(lambda: 1 / 0))
+
+    j._schedule_first_run(None)
+    cmp_local(j._next_run,  datetime(2001, 1, 1, 12, 0, 0))
+    assert j.remaining() == timedelta()
+
+    j._schedule_first_run(3)
+    cmp_local(j._next_run,  datetime(2001, 1, 1, 12, 0, 3))
+    assert j.remaining() == timedelta(seconds=3)
+
+    j._schedule_first_run(7200)
+    cmp_local(j._next_run,  datetime(2001, 1, 1, 14, 0, 0))
+    assert j.remaining() == timedelta(hours=2)
 
     j.cancel()

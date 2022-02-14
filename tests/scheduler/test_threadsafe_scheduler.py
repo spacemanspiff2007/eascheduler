@@ -1,14 +1,11 @@
 from asyncio import get_event_loop, sleep
 from concurrent.futures import ThreadPoolExecutor
 
-import pytest
-
 from eascheduler.executors import SyncExecutor
 from eascheduler.scheduler_view import SchedulerView
 from eascheduler.schedulers import ThreadSafeAsyncScheduler
 
 
-@pytest.mark.asyncio
 async def test_sort():
     async def a_dummy():
         pass

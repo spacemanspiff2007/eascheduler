@@ -11,7 +11,6 @@ from eascheduler.schedulers import AsyncScheduler
 from tests.helper import set_now, utc_ts
 
 
-@pytest.mark.asyncio
 async def test_workdays(async_scheduler: AsyncScheduler):
     dummy = DayOfWeekJob(None, lambda x: x)
     dummy._next_run = 0
@@ -49,7 +48,6 @@ async def test_workdays(async_scheduler: AsyncScheduler):
     async_scheduler.cancel_all()
 
 
-@pytest.mark.asyncio
 async def test_weekends(async_scheduler: AsyncScheduler):
     dummy = DayOfWeekJob(None, lambda x: x)
     dummy._next_run = 0
@@ -85,7 +83,6 @@ async def test_weekends(async_scheduler: AsyncScheduler):
     async_scheduler.cancel_all()
 
 
-@pytest.mark.asyncio
 async def test_day(async_scheduler: AsyncScheduler):
     dummy = DayOfWeekJob(None, lambda x: x)
     dummy._next_run = 0
@@ -120,7 +117,6 @@ async def test_day(async_scheduler: AsyncScheduler):
     j.cancel()
 
 
-@pytest.mark.asyncio
 async def test_day_exception(async_scheduler: AsyncScheduler):
     dummy = DayOfWeekJob(async_scheduler, lambda x: x)
     with pytest.raises(UnknownWeekdayError) as e:
@@ -128,7 +124,6 @@ async def test_day_exception(async_scheduler: AsyncScheduler):
     assert str(e.value).startswith('Unknown day "asdf"!')
 
 
-@pytest.mark.asyncio
 async def test_negative_offset(async_scheduler: AsyncScheduler):
 
     j = DayOfWeekJob(async_scheduler, SyncExecutor(lambda: 1))

@@ -3,11 +3,11 @@ pendulum==2.1.2
 astral==2.2
 
 # Testing
-pytest
-pytest-asyncio
+pytest==7.0.1
+pytest-asyncio==0.18.1
 mock;python_version<'3.8'
 
 # Docs
-sphinx
-sphinx_autodoc_typehints
-sphinx_rtd_theme
+sphinx==4.4.0
+sphinx_autodoc_typehints==1.17.0
+sphinx_rtd_theme==1.0.0

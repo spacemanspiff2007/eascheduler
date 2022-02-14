@@ -5,6 +5,7 @@ from typing import Optional, TYPE_CHECKING, Union
 
 from pendulum import DateTime, from_timestamp, instance
 from pendulum import now as get_now
+from pendulum import UTC
 
 from eascheduler.const import FAR_FUTURE, local_tz
 from eascheduler.errors import FirstRunInThePastError, JobAlreadyCanceledException
@@ -36,6 +37,8 @@ class ScheduledJobBase:
 
     def _set_next_run(self, next_run: float):
         assert isinstance(next_run, (float, int))
+        if self._parent is None:
+            raise JobAlreadyCanceledException()
 
         next_run = round(next_run, 3)   # ms accuracy is enough
         if self._next_run == next_run:  # only set and subsequently reschedule if the timestamp changed
@@ -49,10 +52,26 @@ class ScheduledJobBase:
         if self._parent is None:
             raise JobAlreadyCanceledException()
 
-        # remove only once!
+        # Indicate that the job is canceled
+        self._next_run = FAR_FUTURE
+
+        # remove only once from parent!
         parent = self._parent
         self._parent = None
         parent.remove_job(self)
+
+    def get_next_run(self) -> datetime:
+        """Return the next execution timestamp."""
+        return from_timestamp(self._next_run, local_tz).naive()
+
+    def remaining(self) -> Optional[timedelta]:
+        """Returns the remaining time to the next run or None if the job is not scheduled
+
+        :return: remaining time as a timedelta or None
+        """
+        if self._next_run >= FAR_FUTURE:
+            return None
+        return timedelta(seconds=self._next_run - get_now(UTC).timestamp())
 
     def __lt__(self, other):
         """Instances of ScheduledJobBase are sortable based on the scheduled time they run next."""
@@ -60,10 +79,6 @@ class ScheduledJobBase:
 
     def __repr__(self):
         return f'<{self.__class__.__name__} next_run: {self.get_next_run()}>'
-
-    def get_next_run(self) -> datetime:
-        """Return the next execution timestamp."""
-        return from_timestamp(self._next_run, local_tz).naive()
 
 
 def get_first_timestamp(base_time: Union[None, int, float, timedelta, dt_time, datetime]) -> float:

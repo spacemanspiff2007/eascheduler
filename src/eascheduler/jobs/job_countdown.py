@@ -5,6 +5,7 @@ from datetime import time as dt_time
 from datetime import timedelta
 from typing import Union
 
+from pendulum import now as get_now
 from pendulum import UTC
 
 from eascheduler.const import FAR_FUTURE
@@ -37,9 +38,15 @@ class CountdownJob(ScheduledJobBase):
         if self._parent is None:
             raise JobAlreadyCanceledException()
 
-        now = datetime.now(UTC).timestamp()
+        now = get_now(UTC).timestamp()
         self._set_next_run(now + self._expire)
         self._parent.add_job(self)
+
+    def stop(self):
+        """Stops the countdown so it can be started again with a call to reset"""
+        if self._parent is None:
+            raise JobAlreadyCanceledException()
+        self._set_next_run(FAR_FUTURE)
 
     def _schedule_next_run(self):
         self._set_next_run(FAR_FUTURE)

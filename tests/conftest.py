@@ -33,7 +33,8 @@ def caught_exceptions(monkeypatch):
 
     yield exceptions
 
-    if traceback:
+    # in case we clear the exceptions (if we expected one)
+    if exceptions and traceback:
         for t in traceback:
             print('')
             print(t)

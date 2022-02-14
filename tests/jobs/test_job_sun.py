@@ -20,7 +20,6 @@ from tests.helper import cmp_local, cmp_utc, set_now
         (DuskJob,    time(15, 46, 23), time(16, 28, 14)),
     ]
 )
-@pytest.mark.asyncio
 async def test_calc(async_scheduler: AsyncScheduler, cls, jan_1: time, jan_30: time):
     set_location(52.5185537, 13.3758636, 43)
 
@@ -37,7 +36,6 @@ async def test_calc(async_scheduler: AsyncScheduler, cls, jan_1: time, jan_30: t
     cmp_utc(j._next_run, datetime.combine(date(2001, 1, 30), jan_30))
 
 
-@pytest.mark.asyncio
 async def test_sunrise_skip(async_scheduler: AsyncScheduler):
     set_location(52.5185537, 13.3758636, 43)
 
@@ -61,7 +59,6 @@ async def test_sunrise_skip(async_scheduler: AsyncScheduler):
     cmp_utc(j._next_run, datetime(2001, 1, 3, 7, 15, 16))
 
 
-@pytest.mark.asyncio
 async def test_calc_advance(async_scheduler: AsyncScheduler):
     set_location(52.5185537, 13.3758636, 43)
     set_now(2001, 1, 1, 7, 10)
@@ -84,7 +81,6 @@ async def test_calc_advance(async_scheduler: AsyncScheduler):
     j.cancel()
 
 
-@pytest.mark.asyncio
 async def test_negative_offset(async_scheduler: AsyncScheduler):
 
     set_location(52.5185537, 13.3758636, 43)

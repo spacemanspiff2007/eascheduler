@@ -14,7 +14,6 @@ from eascheduler.schedulers import AsyncScheduler, scheduler_async
 from tests.helper import cmp_local, set_now, utc_ts
 
 
-@pytest.mark.asyncio
 async def test_boundary():
     async def bla():
         pass
@@ -75,7 +74,6 @@ async def test_boundary():
     s.cancel_all()
 
 
-@pytest.mark.asyncio
 async def test_func_boundary_changes_self():
     async def bla():
         pass
@@ -102,7 +100,6 @@ async def test_func_boundary_changes_self():
     j.cancel()
 
 
-@pytest.mark.asyncio
 async def test_func_boundary():
     async def bla():
         pass
@@ -125,7 +122,6 @@ async def test_func_boundary():
     j.cancel()
 
 
-@pytest.mark.asyncio
 async def test_initialize():
     s = AsyncScheduler()
     j = DateTimeJobBase(s, lambda x: x)
@@ -162,7 +158,6 @@ async def test_initialize():
     )
 
 
-@pytest.mark.asyncio
 async def test_worker_cancel(monkeypatch):
     all_tasks: List[asyncio.Future] = []
 

@@ -1,12 +1,9 @@
 from collections import deque
 
-import pytest
-
 from eascheduler.jobs.job_base import ScheduledJobBase
 from eascheduler.schedulers import AsyncScheduler
 
 
-@pytest.mark.asyncio
 async def test_sort():
     async def a_dummy():
         pass
@@ -45,7 +42,6 @@ async def test_sort():
     assert s.job_objs == set()
 
 
-@pytest.mark.asyncio
 async def test_pause_resume():
     async def a_dummy():
         pass
