@@ -14,10 +14,7 @@ def load_version() -> str:
 
 
 def load_req() -> typing.List[str]:
-    # When we run tox tests we don't have this file available so we skip them
     req_file = Path(__file__).with_name('requirements_setup.txt')
-    if not req_file.is_file():
-        return ['']
 
     with req_file.open() as f:
         return f.readlines()
@@ -61,9 +58,9 @@ setup(
         "Framework :: AsyncIO",
         "License :: OSI Approved :: Apache Software License",
         "Operating System :: OS Independent",
-        "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3 :: Only",
         "Topic :: Office/Business :: Scheduling"
     ],

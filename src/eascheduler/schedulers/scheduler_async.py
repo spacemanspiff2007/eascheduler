@@ -1,5 +1,5 @@
 import asyncio
-from asyncio import CancelledError, create_task, Future
+from asyncio import create_task, Future
 from bisect import insort
 from collections import deque
 from typing import Deque, Optional, Set
@@ -107,14 +107,10 @@ class AsyncScheduler:
                     process_exception(e)
 
         except Exception as e:
-            # Todo: remove this once we go >= 3.8
-            # With python 3.7 this will also catch the CancelledError
-            if isinstance(e, CancelledError):
-                raise
 
             # callback for normal exceptions
             process_exception(e)
 
-        # Never ever put this in a finally block!
+        # Never ever put this in a "finally" block!
         # We will get a race condition if we cancel the task!
         self.worker = None
