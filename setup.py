@@ -50,6 +50,7 @@ setup(
         'GitHub': 'https://github.com/spacemanspiff2007/eascheduler',
     },
     package_dir={'': 'src'},
+    package_data={'eascheduler': ['py.typed']},
     packages=find_packages('src', exclude=['tests*']),
     python_requires='>=3.7',
     install_requires=load_req(),
