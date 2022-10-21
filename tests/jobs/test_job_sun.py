@@ -16,7 +16,7 @@ from tests.helper import cmp_local, cmp_utc, set_now
     [
         (DawnJob,    time( 6, 34,  4), time( 6, 12,  6)),
         (SunriseJob, time( 7, 15, 39), time( 6, 49, 53)),
-        (SunsetJob,  time(15,  4, 48), time(15, 50, 24)),
+        (SunsetJob,  time(15,  4, 49), time(15, 50, 25)),
         (DuskJob,    time(15, 46, 23), time(16, 28, 14)),
     ]
 )
