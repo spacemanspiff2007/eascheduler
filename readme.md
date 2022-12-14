@@ -5,7 +5,7 @@
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/eascheduler)
 
 [![PyPI](https://img.shields.io/pypi/v/eascheduler)]((https://pypi.org/project/EAScheduler/))
-[![Downloads](https://pepy.tech/badge/eascheduler/month)](https://pepy.tech/project/eascheduler/month)
+[![Downloads](https://pepy.tech/badge/eascheduler/month)](https://pepy.tech/project/eascheduler)
 
 
 
@@ -18,6 +18,10 @@ Easy Async Scheduler (or EAScheduler) is a lightweight asyncio scheduler with a 
 [The documentation can be found at here](https://eascheduler.readthedocs.io)
 
 ## Changelog
+
+#### 0.18 (14.12.2022)
+- Fix for OneTimeJOb incorrectly showing a remaining time after the execution
+- Dependency update
 
 #### 0.1.7 (27.07.2022)
 - Added py.typed

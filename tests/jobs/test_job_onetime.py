@@ -50,6 +50,23 @@ async def test_init():
     j.cancel()
 
 
+async def test_next_run():
+    set_now(2001, 1, 1, 12, 0, 0)
+
+    s = AsyncScheduler()
+    j = OneTimeJob(s, SyncExecutor(lambda: 1 / 0))
+
+    j._schedule_first_run(None)
+
+    assert j.remaining() is not None
+    assert j._parent is not None
+    cmp_local(j._next_run,  datetime(2001, 1, 1, 12, 0, 0))
+
+    j._schedule_next_run()
+    assert j._parent is None
+    assert j.remaining() is None
+
+
 async def test_func_remaining():
     set_now(2001, 1, 1, 12, 0, 0)
 
@@ -69,3 +86,5 @@ async def test_func_remaining():
     assert j.remaining() == timedelta(hours=2)
 
     j.cancel()
+
+    assert j.remaining() is None
