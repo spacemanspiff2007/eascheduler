@@ -2,13 +2,13 @@
 -r requirements_setup.txt
 
 # Testing
-pytest          >= 7.2,   < 7.3
-pytest-asyncio  >= 0.20 , < 0.21
+pytest          >= 7.4,   < 7.5
+pytest-asyncio  >= 0.21 , < 0.22
 
 # Docs
-sphinx                      >= 5.3,     < 5.4
-sphinx_autodoc_typehints    >= 1.19,    < 1.20
-sphinx_rtd_theme            == 1.1.1
+sphinx                      == 6.2.1
+sphinx-autodoc-typehints    == 1.23.0
+sphinx_rtd_theme            == 1.2.2
 
 # static checker
 mypy >= 0.991
