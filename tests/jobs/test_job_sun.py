@@ -36,6 +36,17 @@ async def test_calc(async_scheduler: AsyncScheduler, cls, jan_1: time, jan_30: t
     cmp_utc(j._next_run, datetime.combine(date(2001, 1, 30), jan_30))
 
 
+async def test_no_sunset(async_scheduler: AsyncScheduler):
+    set_location(69.6, 18.9, 10)
+    set_now(2023, 7, 10, 12)
+
+    j = SunsetJob(async_scheduler, SyncExecutor(lambda x: 1 / 0))
+    async_scheduler.add_job(j)
+    j._schedule_next_run()
+
+    cmp_utc(j._next_run, datetime(2023, 7, 27, 22, 4, 22))
+
+
 async def test_sunrise_skip(async_scheduler: AsyncScheduler):
     set_location(52.5185537, 13.3758636, 43)
 

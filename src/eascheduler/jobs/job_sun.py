@@ -53,8 +53,17 @@ class SunJobBase(DateTimeJobBase):
     def _schedule_next_run(self):
         dt_next = get_now(UTC)
         last_run = from_timestamp(self._last_run_base)
-        next_run = pd_instance(self._sun_func(OBSERVER, dt_next.date(), tzinfo=UTC)).set(microsecond=0)
+        next_run = None
 
+        # If we are very far north or very far south it's possible that we don't have a sunrise at all
+        # If that's the case we advance and schedule for the next date that actually has a sunrise
+        while next_run is None:
+            try:
+                next_run = self._sun_func(OBSERVER, dt_next.date(), tzinfo=UTC)
+            except ValueError:
+                dt_next += timedelta(days=1)
+
+        next_run = pd_instance(next_run).set(microsecond=0)
         while next_run <= get_now(UTC) or next_run <= last_run:
             next_run = self._advance_time(next_run)
 
