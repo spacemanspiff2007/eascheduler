@@ -1,4 +1,5 @@
 from inspect import getargs
+from unittest.mock import Mock
 
 import pytest
 
@@ -6,6 +7,7 @@ from eascheduler.errors import JobAlreadyCanceledException
 from eascheduler.jobs import (
     CountdownJob, DawnJob, DayOfWeekJob, DuskJob, OneTimeJob, ReoccurringJob, SunriseJob, SunsetJob
 )
+from eascheduler.schedulers import AsyncScheduler
 
 
 @pytest.mark.parametrize(
@@ -29,3 +31,20 @@ def test_job_canceled(cls, name: str):
             func(None)
         else:
             func()
+
+
+@pytest.mark.parametrize(
+    'cls', (ReoccurringJob, DayOfWeekJob, CountdownJob, OneTimeJob, SunsetJob, SunriseJob, DuskJob, DawnJob))
+async def test_callback(cls, async_scheduler: AsyncScheduler):
+
+    job = cls(async_scheduler, None)
+    job._next_run_callback = m = Mock()
+
+    m.assert_not_called()
+    job._set_next_run(300)
+    m.assert_called_with(job)
+
+    m.reset_mock()
+    m.assert_not_called()
+    job.cancel()
+    m.assert_called_with(job)

@@ -40,7 +40,6 @@ class CountdownJob(ScheduledJobBase):
 
         now = get_now(UTC).timestamp()
         self._set_next_run(now + self._expire)
-        self._parent.add_job(self)
 
     def stop(self):
         """Stops the countdown so it can be started again with a call to reset"""

@@ -1,7 +1,7 @@
 from datetime import datetime
 from datetime import time as dt_time
 from datetime import timedelta
-from typing import Optional, TYPE_CHECKING, Union
+from typing import Optional, TYPE_CHECKING, Union, Callable, Any
 
 from pendulum import DateTime, from_timestamp, instance
 from pendulum import now as get_now
@@ -17,10 +17,15 @@ if TYPE_CHECKING:
 
 class ScheduledJobBase:
     def __init__(self, parent: 'AsyncScheduler', func: ExecutorBase):
+        super().__init__()
+
         self._func: ExecutorBase = func
 
         # time when we run as a UTC timestamp
         self._next_run: float = FAR_FUTURE
+
+        # callback that gets executed when the next run changes
+        self._next_run_callback: Optional[Callable[[ScheduledJobBase], Any]] = None
 
         # If parent is set it's also the indication that the job is scheduled
         self._parent: Optional['AsyncScheduler'] = parent
@@ -47,6 +52,10 @@ class ScheduledJobBase:
         self._next_run = next_run
         self._parent.add_job(self)
 
+        # callback when we have a new timestamp
+        if (cb := self._next_run_callback) is not None:
+            cb(self)
+
     def cancel(self):
         """Cancel the job."""
         if self._parent is None:
@@ -59,6 +68,10 @@ class ScheduledJobBase:
         parent = self._parent
         self._parent = None
         parent.remove_job(self)
+
+        # callback when we have a new timestamp
+        if (cb := self._next_run_callback) is not None:
+            cb(self)
 
     def get_next_run(self) -> datetime:
         """Return the next execution timestamp."""

@@ -19,6 +19,9 @@ Easy Async Scheduler (or EAScheduler) is a lightweight asyncio scheduler with a 
 
 ## Changelog
 
+#### 0.1.10 (2023-08-24)
+- Added option to add a callback to the job when the execution time changes
+
 #### 0.1.9 (2023-07-19)
 - Fix for days when the sun doesn't rise or set.
   In that case the next date with a sunrise/sunset will be returned.

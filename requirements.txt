@@ -4,11 +4,3 @@
 # Testing
 pytest          >= 7.4,   < 7.5
 pytest-asyncio  >= 0.21 , < 0.22
-
-# Docs
-sphinx                      == 6.2.1
-sphinx-autodoc-typehints    == 1.23.0
-sphinx_rtd_theme            == 1.2.2
-
-# static checker
-mypy >= 0.991
