@@ -13,3 +13,7 @@ class FirstRunInThePastError(Exception):
 
 class BoundaryFunctionError(Exception):
     pass
+
+
+class InfiniteLoopDetectedError(Exception):
+    pass

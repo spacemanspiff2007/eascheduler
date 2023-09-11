@@ -1,12 +1,54 @@
 from asyncio import sleep
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, time
 from functools import partial
 
+import pytest
+
 from eascheduler.const import SKIP_EXECUTION
+from eascheduler.errors import InfiniteLoopDetectedError
 from eascheduler.executors import SyncExecutor
 from eascheduler.jobs import ReoccurringJob
 from eascheduler.schedulers import AsyncScheduler
 from tests.helper import cmp_local, set_now, utc_ts
+
+
+async def test_boundary_go_next_day(async_scheduler: AsyncScheduler):
+
+    now = partial(set_now, 2001, 1, 1, microsecond=1)
+    now(1, microsecond=0)
+
+    j = ReoccurringJob(async_scheduler, lambda x: x)
+    j._next_run_base = utc_ts(2001, 1, 1, 12, microsecond=0)
+
+    async_scheduler.add_job(j)
+    j.interval(60)
+    j.latest(time(12, 2))
+
+    j._schedule_next_run()
+    cmp_local(j._next_run, datetime(2001, 1, 1, 12))
+
+    now(12)
+    j._schedule_next_run()
+    cmp_local(j._next_run, datetime(2001, 1, 1, 12, 1))
+
+    now(12, 1)
+    j._schedule_next_run()
+    cmp_local(j._next_run, datetime(2001, 1, 1, 12, 2))
+
+    now(12, 2)
+    j._schedule_next_run()
+    cmp_local(j._next_run, datetime(2001, 1, 2, 0, 0))
+
+
+async def test_infinite_loop_detection(async_scheduler: AsyncScheduler):
+    now = partial(set_now, 2001, 1, 1, microsecond=1)
+    now(1, microsecond=0)
+
+    j = ReoccurringJob(async_scheduler, lambda x: x)
+    j.interval(0.01)
+    j._next_run_base = utc_ts(2001, 1, 1, 12, microsecond=0)
+    with pytest.raises(InfiniteLoopDetectedError):
+        j.boundary_func(lambda x: SKIP_EXECUTION)
 
 
 async def test_remove(async_scheduler: AsyncScheduler):
