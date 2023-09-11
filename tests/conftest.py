@@ -1,15 +1,15 @@
-import functools
+import inspect
 from asyncio import CancelledError
 from traceback import format_exc
 
 import pendulum
-import pytest, inspect
+import pytest
 from pendulum import DateTime, UTC
 
+from eascheduler import jobs as job_module
 from eascheduler.errors import handler
 from eascheduler.jobs import job_sun
 from eascheduler.schedulers import AsyncScheduler
-from eascheduler import jobs as job_module
 
 
 @pytest.fixture(autouse=True)
