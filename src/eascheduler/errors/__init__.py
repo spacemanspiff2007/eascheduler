@@ -1,1 +1,2 @@
-from .errors import BoundaryFunctionError, FirstRunInThePastError, JobAlreadyCanceledException, UnknownWeekdayError
+from .errors import BoundaryFunctionError, FirstRunInThePastError, JobAlreadyCanceledException, UnknownWeekdayError, \
+    InfiniteLoopDetectedError

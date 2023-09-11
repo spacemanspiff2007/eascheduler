@@ -19,6 +19,9 @@ Easy Async Scheduler (or EAScheduler) is a lightweight asyncio scheduler with a 
 
 ## Changelog
 
+#### 0.1.11 (2023-09-11)
+- Fixed an issue with a possible infinite loop
+
 #### 0.1.10 (2023-08-24)
 - Added option to add a callback to the job when the execution time changes
 

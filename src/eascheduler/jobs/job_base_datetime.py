@@ -7,11 +7,11 @@ from random import uniform
 from typing import Callable, Optional, Tuple, Union
 
 from pendulum import DateTime, from_timestamp, instance
-from pendulum import now as get_now
 from pendulum import UTC
+from pendulum import now as get_now
 
 from eascheduler.const import FAR_FUTURE, local_tz, SKIP_EXECUTION
-from eascheduler.errors import BoundaryFunctionError, JobAlreadyCanceledException
+from eascheduler.errors import BoundaryFunctionError, JobAlreadyCanceledException, InfiniteLoopDetectedError
 from eascheduler.executors.executor import ExecutorBase
 from eascheduler.jobs.job_base import get_first_timestamp, ScheduledJobBase
 from eascheduler.schedulers import AsyncScheduler
@@ -151,44 +151,53 @@ class DateTimeJobBase(ScheduledJobBase):
         self._adjusting = True
 
         # Starting point is always the next call in local time
-        next_run_local: DateTime = from_timestamp(self._next_run_base, local_tz)
+        next_run_utc: DateTime = from_timestamp(self._next_run_base, UTC)
+        new_local: Optional[DateTime] = None
+
+        loop_ctr = 0
 
         while True:
+            loop_ctr += 1
+            if loop_ctr > 100_000:
+                raise InfiniteLoopDetectedError()
+
+            # do not advance on first call (e.g. if we changed a boundary)
+            if new_local is not None:
+                next_run_utc = self._advance_time(next_run_utc)
+
+            new_local = next_run_utc.in_timezone(local_tz)
+
             # custom boundaries first
             if self._boundary_func is not None:
-                naive_obj = next_run_local.in_timezone(local_tz).naive()
+                naive_obj = new_local.naive()
                 custom_obj = self._boundary_func(naive_obj)
                 if custom_obj is SKIP_EXECUTION:
-                    next_run_local = self._advance_time(next_run_local.in_timezone(UTC)).in_timezone(local_tz)
                     continue
-                next_run_local = instance(custom_obj, local_tz).astimezone(local_tz)
+                new_local = instance(custom_obj, local_tz).astimezone(local_tz)
 
             if self._offset is not None:
-                next_run_local += self._offset  # offset doesn't have to be localized
+                new_local += self._offset  # offset doesn't have to be localized
 
             if self._jitter is not None:
-                next_run_local += timedelta(seconds=uniform(self._jitter[0], self._jitter[1]))
+                new_local += timedelta(seconds=uniform(self._jitter[0], self._jitter[1]))
 
             if self._earliest is not None:
-                earliest = next_run_local.set(hour=self._earliest.hour, minute=self._earliest.minute,
-                                              second=self._earliest.second, microsecond=self._earliest.microsecond)
-                if next_run_local < earliest:
-                    next_run_local = earliest
+                earliest = new_local.set(hour=self._earliest.hour, minute=self._earliest.minute,
+                                         second=self._earliest.second, microsecond=self._earliest.microsecond)
+                if new_local < earliest:
+                    new_local = earliest
 
             if self._latest is not None:
-                latest = next_run_local.set(hour=self._latest.hour, minute=self._latest.minute,
-                                            second=self._latest.second, microsecond=self._latest.microsecond)
-                if next_run_local > latest:
-                    next_run_local = latest
+                latest = new_local.set(hour=self._latest.hour, minute=self._latest.minute,
+                                       second=self._latest.second, microsecond=self._latest.microsecond)
+                if new_local > latest:
+                    new_local = latest
 
             # if we are in the future we have the next run
-            next_run = next_run_local.in_timezone(UTC)
-            if get_now(UTC) < next_run:
+            new_utc = new_local.in_timezone(UTC)
+            if get_now(UTC) < new_utc:
                 break
 
-            # Otherwise we advance a step in the future
-            next_run_local = self._advance_time(next_run).in_timezone(local_tz)
-
         self._adjusting = False
-        self._set_next_run(next_run.timestamp())
-        return next_run_local
+        self._set_next_run(new_utc.timestamp())
+        return new_local
