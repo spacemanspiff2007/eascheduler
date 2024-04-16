@@ -21,9 +21,9 @@ async def test_remove():
 
     e.mock.assert_not_called()
 
-    await asyncio.sleep(0.05)
+    await asyncio.sleep(0.01)
     set_now(2001, 1, 1, 12, microsecond=100_001)
-    await asyncio.sleep(0.1)
+    await asyncio.sleep(0.01)
 
     e.mock.assert_called_once()
 

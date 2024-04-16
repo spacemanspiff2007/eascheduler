@@ -1,18 +1,16 @@
+from datetime import datetime as dt_datetime
 from typing import Union
+
+from pendulum import UTC, DateTime, datetime, from_timestamp, instance, travel_to
+
+from eascheduler.const import local_tz
+from eascheduler.executors import AsyncExecutor
+
 
 try:
     from unittest.mock import AsyncMock
 except ImportError:
     from mock import AsyncMock
-
-from datetime import datetime as dt_datetime
-
-from pendulum import datetime, DateTime, from_timestamp, instance
-from pendulum import set_test_now as __set_test_now
-from pendulum import UTC
-
-from eascheduler.const import local_tz
-from eascheduler.executors import AsyncExecutor
 
 
 def utc_ts(year: int, month: int, day: int,
@@ -26,7 +24,8 @@ def set_now(year: int, month: int, day: int,
     obj = datetime(year, month, day, hour, minute, second, microsecond=microsecond, tz=tz)
     if tz is not local_tz:
         obj = obj.in_timezone(local_tz)
-    __set_test_now(obj)
+
+    travel_to(obj, freeze=True)
 
 
 class MockedAsyncExecutor(AsyncExecutor):

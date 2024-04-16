@@ -3,6 +3,7 @@ from enum import Enum
 from pendulum import now as __now
 from pendulum.tz.local_timezone import get_local_timezone as _local_timezone
 
+
 local_tz = _local_timezone()
 
 # Let's just hope they fixed the timestamp overflow till 2038 ;-)

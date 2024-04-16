@@ -2,5 +2,12 @@
 -r requirements_setup.txt
 
 # Testing
+pendulum[test]  == 3.0.0
 pytest          >= 7.4,   < 7.5
 pytest-asyncio  >= 0.21 , < 0.22
+
+# Ruff
+ruff == 0.3.7
+
+# Requests update
+pur == 7.3.1

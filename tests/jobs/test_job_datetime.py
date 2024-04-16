@@ -5,13 +5,13 @@ from typing import List
 
 import pytest
 from pendulum import from_timestamp
+from tests.helper import cmp_local, set_now, utc_ts
 
 from eascheduler.const import local_tz
 from eascheduler.errors import FirstRunInThePastError
 from eascheduler.executors import AsyncExecutor
 from eascheduler.jobs.job_base_datetime import DateTimeJobBase
 from eascheduler.schedulers import AsyncScheduler, scheduler_async
-from tests.helper import cmp_local, set_now, utc_ts
 
 
 async def test_boundary():
@@ -181,7 +181,7 @@ async def test_worker_cancel(monkeypatch):
 
     assert s.worker is None
 
-    await asyncio.sleep(0.02)
+    await asyncio.sleep(0.001)
 
     for task in all_tasks:
         assert task.cancelled(), task

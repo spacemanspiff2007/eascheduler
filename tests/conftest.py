@@ -13,9 +13,9 @@ from eascheduler.schedulers import AsyncScheduler
 
 
 @pytest.fixture(autouse=True)
-def reset_values():
+def _reset_values():
     # reset time
-    pendulum.set_test_now(None)
+    pendulum.travel_back()
 
     # remove location
     assert hasattr(job_sun, 'OBSERVER')
@@ -44,7 +44,7 @@ def caught_exceptions(monkeypatch):
     assert not exceptions
 
 
-@pytest.fixture
+@pytest.fixture()
 def async_scheduler():
     s = AsyncScheduler()
 
