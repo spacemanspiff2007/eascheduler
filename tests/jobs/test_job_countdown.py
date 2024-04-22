@@ -6,7 +6,7 @@ from eascheduler.const import FAR_FUTURE
 from eascheduler.executors import AsyncExecutor
 from eascheduler.jobs import CountdownJob
 from eascheduler.schedulers import AsyncScheduler
-from tests.helper import cmp_local, set_now
+from tests.helper import cmp_local, set_now, sleep
 
 
 async def test_expire():
@@ -19,18 +19,18 @@ async def test_expire():
     j1 = CountdownJob(s, AsyncExecutor(a_dummy))
     j1.countdown(0.2)
     s.add_job(j1)
-    # check that adding the trigger doesn't execute the job
-    await asyncio.sleep(0.25)
+    # check that adding the triggers doesn't execute the job
+    await sleep(0.25)
 
     for _ in range(6):
         j1.reset()
-        await asyncio.sleep(0.1)
+        await sleep(0.1)
 
-    await asyncio.sleep(0.15)
+    await sleep(0.15)
     assert len(calls) == 1, calls
     j1.reset()
 
-    await asyncio.sleep(0.25)
+    await sleep(0.25)
     assert len(calls) == 2, calls
     assert calls[1] - calls[0] <= 0.3
 
@@ -60,6 +60,6 @@ async def test_stop(async_scheduler: AsyncScheduler):
 
     # Assert that the callback really gets called
     set_now(2001, 1, 1, 12, 2, 0)
-    await asyncio.sleep(0.01)
+    await sleep(0.01)
 
     assert len(calls) == 1, calls

@@ -7,7 +7,7 @@ from eascheduler.errors import JobAlreadyCanceledException
 from eascheduler.executors import SyncExecutor
 from eascheduler.jobs.job_one_time import OneTimeJob
 from eascheduler.schedulers import AsyncScheduler
-from tests.helper import cmp_local, mocked_executor, set_now, utc_ts
+from tests.helper import cmp_local, mocked_executor, set_now, utc_ts, sleep
 
 
 async def test_remove():
@@ -21,9 +21,9 @@ async def test_remove():
 
     e.mock.assert_not_called()
 
-    await asyncio.sleep(0.01)
+    await sleep(0.05)
     set_now(2001, 1, 1, 12, microsecond=100_001)
-    await asyncio.sleep(0.01)
+    await sleep(0.01)
 
     e.mock.assert_called_once()
 

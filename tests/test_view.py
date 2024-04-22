@@ -7,7 +7,7 @@ import pytest
 from eascheduler import SchedulerView, set_location
 from eascheduler.executors import AsyncExecutor, SyncExecutor
 from eascheduler.schedulers import AsyncScheduler, ThreadSafeAsyncScheduler
-from tests.helper import set_now
+from tests.helper import set_now, sleep
 
 
 @pytest.fixture
@@ -102,7 +102,7 @@ async def test_execution(view: SchedulerView, scheduler_cls):
     view = SchedulerView(scheduler, AsyncExecutor)
 
     view.every(0.2, 0.1, cb)
-    await asyncio.sleep(0.6)
+    await sleep(0.6)
 
     assert len(calls) >= 3, calls
 

@@ -1,4 +1,3 @@
-from asyncio import sleep
 from datetime import datetime, timedelta, time
 from functools import partial
 
@@ -9,7 +8,7 @@ from eascheduler.errors import InfiniteLoopDetectedError
 from eascheduler.executors import SyncExecutor
 from eascheduler.jobs import ReoccurringJob
 from eascheduler.schedulers import AsyncScheduler
-from tests.helper import cmp_local, set_now, utc_ts
+from tests.helper import cmp_local, set_now, utc_ts, sleep
 
 
 async def test_boundary_go_next_day(async_scheduler: AsyncScheduler):
@@ -135,7 +134,7 @@ async def test_func_exception(async_scheduler: AsyncScheduler, caught_exceptions
     j.boundary_func(func)
 
     set_now(2001, 1, 1, 7, 10, 1)
-    await sleep(0.3)
+    await sleep(0.03)
 
     # ensure that the worker is still running
     assert async_scheduler.worker is not None

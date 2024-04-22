@@ -5,7 +5,7 @@ from typing import List
 
 import pytest
 from pendulum import from_timestamp
-from tests.helper import cmp_local, set_now, utc_ts
+from tests.helper import cmp_local, set_now, utc_ts, sleep
 
 from eascheduler.const import local_tz
 from eascheduler.errors import FirstRunInThePastError
@@ -175,13 +175,13 @@ async def test_worker_cancel(monkeypatch):
 
     j._schedule_first_run(datetime(2020, 1, 1, 12, 30))
     for i in range(10):
-        await asyncio.sleep(0.001)
+        await sleep(0.001)
         j.offset(timedelta(minutes=i))
     j.cancel()
 
     assert s.worker is None
 
-    await asyncio.sleep(0.001)
+    await sleep(0.02)
 
     for task in all_tasks:
         assert task.cancelled(), task

@@ -1,7 +1,8 @@
+from asyncio import sleep as async_sleep
 from datetime import datetime as dt_datetime
 from typing import Union
 
-from pendulum import UTC, DateTime, datetime, from_timestamp, instance, travel_to
+from pendulum import UTC, DateTime, datetime, freeze, from_timestamp, instance, travel, travel_to, travel_back
 
 from eascheduler.const import local_tz
 from eascheduler.executors import AsyncExecutor
@@ -26,6 +27,13 @@ def set_now(year: int, month: int, day: int,
         obj = obj.in_timezone(local_tz)
 
     travel_to(obj, freeze=True)
+
+
+async def sleep(s: float):
+    now = DateTime.now()
+    travel_back()
+    await async_sleep(s)
+    travel_to(now, freeze=True)
 
 
 class MockedAsyncExecutor(AsyncExecutor):

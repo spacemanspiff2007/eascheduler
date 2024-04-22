@@ -1,5 +1,7 @@
-from asyncio import get_event_loop, sleep
+from asyncio import get_event_loop
 from concurrent.futures import ThreadPoolExecutor
+
+from tests.helper import sleep
 
 from eascheduler.executors import SyncExecutor
 from eascheduler.scheduler_view import SchedulerView
