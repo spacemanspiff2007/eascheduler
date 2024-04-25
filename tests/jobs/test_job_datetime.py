@@ -10,7 +10,7 @@ from tests.helper import cmp_local, set_now, utc_ts, sleep
 from eascheduler.const import local_tz
 from eascheduler.errors import FirstRunInThePastError
 from eascheduler.executors import AsyncExecutor
-from eascheduler.jobs.job_base_datetime import DateTimeJobBase
+from eascheduler.jobs_old.job_base_datetime import DateTimeJobBase
 from eascheduler.schedulers import AsyncScheduler, scheduler_async
 
 

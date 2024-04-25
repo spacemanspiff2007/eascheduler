@@ -11,7 +11,7 @@ from pendulum import UTC
 from eascheduler.const import FAR_FUTURE
 from eascheduler.errors import JobAlreadyCanceledException
 from eascheduler.executors.executor import ExecutorBase
-from eascheduler.jobs.job_base import ScheduledJobBase
+from eascheduler.jobs_old.job_base import ScheduledJobBase
 from eascheduler.schedulers import AsyncScheduler
 
 

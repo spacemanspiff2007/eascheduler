@@ -12,7 +12,7 @@ from pendulum import now as get_now
 from pendulum import UTC
 
 from eascheduler.executors import ExecutorBase
-from eascheduler.jobs.job_base_datetime import DateTimeJobBase
+from eascheduler.jobs_old.job_base_datetime import DateTimeJobBase
 from eascheduler.schedulers import AsyncScheduler
 
 OBSERVER: Optional[Observer] = None

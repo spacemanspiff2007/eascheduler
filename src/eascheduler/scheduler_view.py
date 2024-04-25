@@ -4,7 +4,7 @@ from datetime import timedelta as dt_timedelta
 from typing import Iterable, Type, Union
 
 from eascheduler.executors import ExecutorBase
-from eascheduler.jobs import (
+from eascheduler.jobs_old import (
     CountdownJob, DawnJob, DayOfWeekJob, DuskJob, OneTimeJob, ReoccurringJob, SunriseJob, SunsetJob
 )
 from eascheduler.schedulers import AsyncScheduler

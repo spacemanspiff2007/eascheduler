@@ -10,7 +10,7 @@ from pendulum import now as get_now
 from eascheduler.const import local_tz
 from eascheduler.errors import JobAlreadyCanceledException, UnknownWeekdayError
 from eascheduler.executors.executor import ExecutorBase
-from eascheduler.jobs.job_base_datetime import DateTimeJobBase
+from eascheduler.jobs_old.job_base_datetime import DateTimeJobBase
 from eascheduler.schedulers import AsyncScheduler
 
 # names of weekdays in local language

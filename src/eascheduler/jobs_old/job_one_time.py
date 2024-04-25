@@ -4,7 +4,7 @@ from datetime import timedelta
 from typing import Union
 
 from eascheduler.const import FAR_FUTURE
-from eascheduler.jobs.job_base import get_first_timestamp, ScheduledJobBase
+from eascheduler.jobs_old.job_base import get_first_timestamp, ScheduledJobBase
 
 
 class OneTimeJob(ScheduledJobBase):

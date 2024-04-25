@@ -9,7 +9,7 @@ from pendulum import UTC
 
 from eascheduler.const import FAR_FUTURE
 from eascheduler.errors.handler import process_exception
-from eascheduler.jobs.job_base import ScheduledJobBase
+from eascheduler.jobs_old.job_base import ScheduledJobBase
 
 
 class AsyncScheduler:

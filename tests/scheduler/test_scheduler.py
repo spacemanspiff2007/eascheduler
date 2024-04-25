@@ -1,6 +1,6 @@
 from collections import deque
 
-from eascheduler.jobs.job_base import ScheduledJobBase
+from eascheduler.jobs_old.job_base import ScheduledJobBase
 from eascheduler.schedulers import AsyncScheduler
 
 

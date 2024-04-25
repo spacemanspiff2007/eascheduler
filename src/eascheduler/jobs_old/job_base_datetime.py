@@ -13,7 +13,7 @@ from pendulum import now as get_now
 from eascheduler.const import FAR_FUTURE, local_tz, SKIP_EXECUTION
 from eascheduler.errors import BoundaryFunctionError, JobAlreadyCanceledException, InfiniteLoopDetectedError
 from eascheduler.executors.executor import ExecutorBase
-from eascheduler.jobs.job_base import get_first_timestamp, ScheduledJobBase
+from eascheduler.jobs_old.job_base import get_first_timestamp, ScheduledJobBase
 from eascheduler.schedulers import AsyncScheduler
 
 try:

@@ -6,7 +6,7 @@ import pytest
 from eascheduler.const import SKIP_EXECUTION
 from eascheduler.errors import UnknownWeekdayError
 from eascheduler.executors import SyncExecutor
-from eascheduler.jobs.job_day_of_week import DayOfWeekJob
+from eascheduler.jobs_old.job_day_of_week import DayOfWeekJob
 from eascheduler.schedulers import AsyncScheduler
 from tests.helper import set_now, utc_ts
 
