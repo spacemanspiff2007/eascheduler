@@ -25,7 +25,6 @@ class BaseDateTimeOperation:
 
 
 def not_infinite_loop() -> Generator[Literal[True], None, None]:
-    for _ in range(100_000):
-        yield True
+    yield from range(1, 100_000)
 
     raise InfiniteLoopDetectedError()

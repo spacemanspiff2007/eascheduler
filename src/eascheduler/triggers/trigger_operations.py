@@ -2,9 +2,10 @@ from __future__ import annotations
 
 from datetime import datetime, time, timedelta
 from random import uniform
-from typing import TYPE_CHECKING, Callable, Final, override
+from typing import TYPE_CHECKING, Callable, Final
 
 from pendulum import instance
+from typing_extensions import override
 
 from eascheduler.const import local_tz
 

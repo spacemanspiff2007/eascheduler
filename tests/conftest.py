@@ -6,7 +6,7 @@ import pendulum
 import pytest
 from pendulum import DateTime, UTC
 
-from eascheduler import jobs as job_module
+from eascheduler import jobs as job_module, set_location
 from eascheduler.errors import handler
 from eascheduler.jobs import job_sun
 from eascheduler.schedulers import AsyncScheduler
@@ -14,6 +14,10 @@ from eascheduler.schedulers import AsyncScheduler
 
 @pytest.fixture(autouse=True)
 def _reset_values():
+    set_location(52.51870523376821, 13.376072914752532)
+
+    yield
+
     # reset time
     pendulum.travel_back()
 

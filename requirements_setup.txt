@@ -2,3 +2,5 @@
 pendulum == 3.0.0
 astral   == 3.2
 
+
+typing_extensions == 4.11.0

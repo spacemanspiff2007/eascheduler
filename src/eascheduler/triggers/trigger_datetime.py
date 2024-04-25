@@ -26,8 +26,9 @@ class DateTimeTrigger:
             next_dt = self.producer.get_next(now, dt)
 
             for b in self.operations:
-                if (next_dt := b.apply(next_dt)) is None:
+                if (op_dt := b.apply(next_dt)) is None:
                     break
+                next_dt = op_dt
             else:
                 # if we are in the future we have the next run
                 if next_dt > now:
