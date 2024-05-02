@@ -5,9 +5,9 @@ from pendulum import UTC
 
 from eascheduler import set_location
 from eascheduler.const import SKIP_EXECUTION
-from eascheduler.executors import SyncExecutor
-from eascheduler.jobs_old import DawnJob, DuskJob, SunriseJob, SunsetJob
-from eascheduler.schedulers import AsyncScheduler
+from eascheduler.old_executors import SyncExecutor
+from eascheduler.old_jobs import DawnJob, DuskJob, SunriseJob, SunsetJob
+from eascheduler.old_schedulers import AsyncScheduler
 from tests.helper import cmp_local, cmp_utc, set_now
 
 

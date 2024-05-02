@@ -3,9 +3,9 @@ from concurrent.futures import ThreadPoolExecutor
 
 from tests.helper import sleep
 
-from eascheduler.executors import SyncExecutor
+from eascheduler.old_executors import SyncExecutor
 from eascheduler.scheduler_view import SchedulerView
-from eascheduler.schedulers import ThreadSafeAsyncScheduler
+from eascheduler.old_schedulers import ThreadSafeAsyncScheduler
 
 
 async def test_sort():

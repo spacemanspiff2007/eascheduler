@@ -4,10 +4,10 @@ from unittest.mock import Mock
 import pytest
 
 from eascheduler.errors import JobAlreadyCanceledException
-from eascheduler.jobs_old import (
+from eascheduler.old_jobs import (
     CountdownJob, DawnJob, DayOfWeekJob, DuskJob, OneTimeJob, ReoccurringJob, SunriseJob, SunsetJob
 )
-from eascheduler.schedulers import AsyncScheduler
+from eascheduler.old_schedulers import AsyncScheduler
 
 
 @pytest.mark.parametrize(

@@ -9,7 +9,7 @@ from typing_extensions import override
 
 from eascheduler.const import local_tz
 
-from .base import BaseDateTimeOperation
+from .base import DateTimeOperationBase
 
 
 if TYPE_CHECKING:
@@ -18,11 +18,11 @@ if TYPE_CHECKING:
 SORT_ORDER: Final = ('func', 'offset', 'jitter', 'earliest', 'latest')
 
 
-def sort_trigger_operations(x: BaseDateTimeOperation):
+def sort_trigger_operations(x: DateTimeOperationBase):
     return SORT_ORDER.index(x.NAME)
 
 
-class OffsetDateTimeOperation(BaseDateTimeOperation):
+class OffsetDateTimeOperation(DateTimeOperationBase):
     NAME: Final = 'offset'
 
     def __init__(self, offset: timedelta):
@@ -38,7 +38,7 @@ class OffsetDateTimeOperation(BaseDateTimeOperation):
         return False
 
 
-class JitterDateTimeOperation(BaseDateTimeOperation):
+class JitterDateTimeOperation(DateTimeOperationBase):
     NAME: Final = 'jitter'
 
     def __init__(self, low: float, high: float | None = None):
@@ -62,7 +62,7 @@ class JitterDateTimeOperation(BaseDateTimeOperation):
         return False
 
 
-class EarliestDateTimeOperation(BaseDateTimeOperation):
+class EarliestDateTimeOperation(DateTimeOperationBase):
     NAME: Final = 'earliest'
 
     def __init__(self, earliest: time):
@@ -82,7 +82,7 @@ class EarliestDateTimeOperation(BaseDateTimeOperation):
         return False
 
 
-class LatestDateTimeOperation(BaseDateTimeOperation):
+class LatestDateTimeOperation(DateTimeOperationBase):
     NAME: Final = 'latest'
 
     def __init__(self, latest: time):
@@ -102,7 +102,7 @@ class LatestDateTimeOperation(BaseDateTimeOperation):
         return False
 
 
-class FunctionDateTimeOperation(BaseDateTimeOperation):
+class FunctionDateTimeOperation(DateTimeOperationBase):
     NAME: Final = 'func'
 
     def __init__(self, func: Callable[[datetime], datetime]):

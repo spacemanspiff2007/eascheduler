@@ -6,9 +6,9 @@ from eascheduler.const import SKIP_EXECUTION
 from eascheduler import errors
 from eascheduler.errors.handler import set_exception_handler
 
-from eascheduler import jobs_old, schedulers, executors
+from eascheduler import old_jobs, old_schedulers, old_executors
 from eascheduler.scheduler_view import SchedulerView
 
-from eascheduler.jobs_old.job_sun import set_location
+from eascheduler.old_jobs.job_sun import set_location
 
 from eascheduler.default import RUN

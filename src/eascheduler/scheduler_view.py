@@ -3,11 +3,11 @@ from datetime import time as dt_time
 from datetime import timedelta as dt_timedelta
 from typing import Iterable, Type, Union
 
-from eascheduler.executors import ExecutorBase
-from eascheduler.jobs_old import (
+from eascheduler.old_executors import ExecutorBase
+from eascheduler.old_jobs import (
     CountdownJob, DawnJob, DayOfWeekJob, DuskJob, OneTimeJob, ReoccurringJob, SunriseJob, SunsetJob
 )
-from eascheduler.schedulers import AsyncScheduler
+from eascheduler.old_schedulers import AsyncScheduler
 
 
 class SchedulerView:

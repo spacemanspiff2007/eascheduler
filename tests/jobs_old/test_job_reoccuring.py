@@ -5,9 +5,9 @@ import pytest
 
 from eascheduler.const import SKIP_EXECUTION
 from eascheduler.errors import InfiniteLoopDetectedError
-from eascheduler.executors import SyncExecutor
-from eascheduler.jobs_old import ReoccurringJob
-from eascheduler.schedulers import AsyncScheduler
+from eascheduler.old_executors import SyncExecutor
+from eascheduler.old_jobs import ReoccurringJob
+from eascheduler.old_schedulers import AsyncScheduler
 from tests.helper import cmp_local, set_now, utc_ts, sleep
 
 

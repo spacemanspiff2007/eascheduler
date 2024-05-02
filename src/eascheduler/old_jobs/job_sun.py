@@ -11,9 +11,9 @@ from pendulum import instance as pd_instance
 from pendulum import now as get_now
 from pendulum import UTC
 
-from eascheduler.executors import ExecutorBase
-from eascheduler.jobs_old.job_base_datetime import DateTimeJobBase
-from eascheduler.schedulers import AsyncScheduler
+from eascheduler.old_executors import ExecutorBase
+from eascheduler.old_jobs.job_base_datetime import DateTimeJobBase
+from eascheduler.old_schedulers import AsyncScheduler
 
 OBSERVER: Optional[Observer] = None
 

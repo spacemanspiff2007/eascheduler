@@ -4,9 +4,9 @@ from datetime import datetime, timedelta
 import pytest
 
 from eascheduler.errors import JobAlreadyCanceledException
-from eascheduler.executors import SyncExecutor
-from eascheduler.jobs_old.job_one_time import OneTimeJob
-from eascheduler.schedulers import AsyncScheduler
+from eascheduler.old_executors import SyncExecutor
+from eascheduler.old_jobs.job_one_time import OneTimeJob
+from eascheduler.old_schedulers import AsyncScheduler
 from tests.helper import cmp_local, mocked_executor, set_now, utc_ts, sleep
 
 

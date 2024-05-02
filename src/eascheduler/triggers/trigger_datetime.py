@@ -9,14 +9,14 @@ from .trigger_operations import sort_trigger_operations
 if TYPE_CHECKING:
     from pendulum import DateTime
 
-    from .base import BaseDateTimeOperation, DateTimeProducerBase
+    from .base import DateTimeOperationBase, DateTimeProducerBase
 
 
 class DateTimeTrigger:
     def __init__(self, producer: DateTimeProducerBase):
         super().__init__()
         self.producer: Final = producer
-        self.operations: tuple[BaseDateTimeOperation, ...] = ()
+        self.operations: tuple[DateTimeOperationBase, ...] = ()
 
     def get_next(self, now: DateTime, dt: DateTime) -> DateTime:
 
@@ -36,7 +36,7 @@ class DateTimeTrigger:
 
             dt = next_dt
 
-    def add(self, op: BaseDateTimeOperation) -> bool:
+    def add(self, op: DateTimeOperationBase) -> bool:
         operations = {o.NAME: o for o in self.operations}
 
         if (existing := operations.get(op.NAME)) is not None and existing == op:

@@ -3,9 +3,9 @@ import time
 from datetime import datetime
 
 from eascheduler.const import FAR_FUTURE
-from eascheduler.executors import AsyncExecutor
-from eascheduler.jobs_old import CountdownJob
-from eascheduler.schedulers import AsyncScheduler
+from eascheduler.old_executors import AsyncExecutor
+from eascheduler.old_jobs import CountdownJob
+from eascheduler.old_schedulers import AsyncScheduler
 from tests.helper import cmp_local, set_now, sleep
 
 

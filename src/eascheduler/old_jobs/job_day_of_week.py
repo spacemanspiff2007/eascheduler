@@ -9,9 +9,9 @@ from pendulum import now as get_now
 
 from eascheduler.const import local_tz
 from eascheduler.errors import JobAlreadyCanceledException, UnknownWeekdayError
-from eascheduler.executors.executor import ExecutorBase
-from eascheduler.jobs_old.job_base_datetime import DateTimeJobBase
-from eascheduler.schedulers import AsyncScheduler
+from eascheduler.old_executors.executor import ExecutorBase
+from eascheduler.old_jobs.job_base_datetime import DateTimeJobBase
+from eascheduler.old_schedulers import AsyncScheduler
 
 # names of weekdays in local language
 day_names: Dict[str, int] = {date(2001, 1, i).strftime('%A'): i for i in range(1, 8)}

@@ -9,9 +9,9 @@ from pendulum import UTC
 
 from eascheduler.const import FAR_FUTURE
 from eascheduler.errors import JobAlreadyCanceledException
-from eascheduler.executors import ExecutorBase
-from eascheduler.jobs_old.job_base_datetime import DateTimeJobBase
-from eascheduler.schedulers import AsyncScheduler
+from eascheduler.old_executors import ExecutorBase
+from eascheduler.old_jobs.job_base_datetime import DateTimeJobBase
+from eascheduler.old_schedulers import AsyncScheduler
 
 
 class ReoccurringJob(DateTimeJobBase):

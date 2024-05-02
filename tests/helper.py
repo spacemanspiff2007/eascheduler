@@ -5,7 +5,7 @@ from typing import Union
 from pendulum import UTC, DateTime, datetime, freeze, from_timestamp, instance, travel, travel_to, travel_back
 
 from eascheduler.const import local_tz
-from eascheduler.executors import AsyncExecutor
+from eascheduler.old_executors import AsyncExecutor
 
 
 try:

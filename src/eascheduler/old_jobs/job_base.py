@@ -9,15 +9,17 @@ from pendulum import UTC
 
 from eascheduler.const import FAR_FUTURE, local_tz
 from eascheduler.errors import FirstRunInThePastError, JobAlreadyCanceledException
-from eascheduler.executors import ExecutorBase
+from eascheduler.old_executors import ExecutorBase
 
 if TYPE_CHECKING:
-    from eascheduler.schedulers import AsyncScheduler
+    from eascheduler.old_schedulers import AsyncScheduler
 
 
 class ScheduledJobBase:
     def __init__(self, parent: 'AsyncScheduler', func: ExecutorBase):
         super().__init__()
+
+        self._job_id: Any = None
 
         self._func: ExecutorBase = func
 

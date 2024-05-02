@@ -5,8 +5,8 @@ from functools import partial
 import pytest
 
 from eascheduler import SchedulerView, set_location
-from eascheduler.executors import AsyncExecutor, SyncExecutor
-from eascheduler.schedulers import AsyncScheduler, ThreadSafeAsyncScheduler
+from eascheduler.old_executors import AsyncExecutor, SyncExecutor
+from eascheduler.old_schedulers import AsyncScheduler, ThreadSafeAsyncScheduler
 from tests.helper import set_now, sleep
 
 

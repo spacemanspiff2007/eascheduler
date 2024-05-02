@@ -1,7 +1,7 @@
 from collections import deque
 
-from eascheduler.jobs_old.job_base import ScheduledJobBase
-from eascheduler.schedulers import AsyncScheduler
+from eascheduler.old_jobs.job_base import ScheduledJobBase
+from eascheduler.old_schedulers import AsyncScheduler
 
 
 async def test_sort():

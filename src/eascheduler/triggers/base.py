@@ -14,7 +14,7 @@ class DateTimeProducerBase:
         raise NotImplementedError()
 
 
-class BaseDateTimeOperation:
+class DateTimeOperationBase:
     NAME: str
 
     def apply(self, dt: DateTime) -> DateTime | None:

@@ -9,9 +9,9 @@ from tests.helper import cmp_local, set_now, utc_ts, sleep
 
 from eascheduler.const import local_tz
 from eascheduler.errors import FirstRunInThePastError
-from eascheduler.executors import AsyncExecutor
-from eascheduler.jobs_old.job_base_datetime import DateTimeJobBase
-from eascheduler.schedulers import AsyncScheduler, scheduler_async
+from eascheduler.old_executors import AsyncExecutor
+from eascheduler.old_jobs.job_base_datetime import DateTimeJobBase
+from eascheduler.old_schedulers import AsyncScheduler, scheduler_async
 
 
 async def test_boundary():
