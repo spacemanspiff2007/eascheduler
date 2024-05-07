@@ -1,5 +1,6 @@
 
 from asyncio import Task, create_task
+from collections import deque
 from typing import Final, Literal
 
 from typing_extensions import override
@@ -32,7 +33,7 @@ class LimitingParallelTaskManager(TaskManagerBase):
         if parallel < 1:
             raise ValueError()
 
-        self.tasks: Final[list[Task]] = []
+        self.tasks: Final[deque[Task]] = deque()
         self.parallel: Final = parallel
         self.action: Final = action
 
@@ -54,9 +55,9 @@ class LimitingParallelTaskManager(TaskManagerBase):
                 return None
 
             if action == 'cancel_first':
-                self.tasks.pop(0).cancel()
+                self.tasks.popleft().cancel()
             elif action == 'cancel_last':
-                self.tasks.pop(-1).cancel()
+                self.tasks.pop().cancel()
             else:
                 raise ValueError()
 

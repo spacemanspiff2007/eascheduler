@@ -1,26 +1,37 @@
 from __future__ import annotations
 
+from bisect import insort
+from collections import deque
 from time import monotonic
 from typing import TYPE_CHECKING, Final
 
 from typing_extensions import override
 
-from .base import SchedulerBase
+from eascheduler.errors.handler import process_exception
+from eascheduler.schedulers.base import SchedulerBase
 
 
 if TYPE_CHECKING:
     import asyncio
 
+    from eascheduler.job_stores.base import JobStoreBase
     from eascheduler.jobs.base import JobBase
 
 
 class AsyncScheduler(SchedulerBase):
-    __slots__ = ('event_loop', 'jobs', 'timer')
+    __slots__ = ('event_loop', 'timer', 'view', 'jobs')
 
     def __init__(self, event_loop: asyncio.AbstractEventLoop):
         self.event_loop: Final = event_loop
-        self.jobs: Final[list[JobBase]] = []
+
         self.timer: asyncio.TimerHandle | None = None
+        self.view: JobStoreBase | None = None
+        self.jobs: deque[JobBase] = deque()
+
+    def set_view(self, view: JobStoreBase):
+        if self.view is not None:
+            raise ValueError()
+        self.view = view
 
     def timer_cancel(self):
         if (timer := self.timer) is not None:
@@ -33,35 +44,43 @@ class AsyncScheduler(SchedulerBase):
         self.timer = self.event_loop.call_later(secs, self.run_jobs) if secs is not None else None
 
     def timer_update(self):
-        self.timer_set(
-            min(((nt for job in self.jobs if (nt := job.next_time)) is not None), default=None)
-        )
+        self.timer_set(None if not self.jobs else self.jobs[0])
 
     def run_jobs(self):
         self.timer = None
 
-        next_time: float | None = None
+        jobs = self.jobs
+        view = self.view
 
-        remove = []
-        for job in self.jobs:
-            if (job_time := job.next_time) is None:
-                continue
+        try:
+            while jobs:
+                job = jobs[0]
+                if job.next_time > monotonic():
+                    break
 
-            if monotonic() >= job_time:
-                if job.execute() == 'finished':
-                    remove.append(job)
+                jobs.popleft()
 
-            next_time = job_time if next_time is None else min(next_time, job_time)
+                try:
+                    job.execute()
+                except Exception as e:
+                    process_exception(e)
 
-        if next_time is not None:
-            self.timer_set(monotonic() - next_time)
+                if job.status == 'running':
+                    insort(jobs, job)
+                    view.on_job_executed(job)
+                elif job.status == 'finished':
+                    jobs.remove(job)
+                    view.on_job_finished(job)
 
-        for job in remove:
-            self.jobs.remove(job)
+        except Exception as e:
+            process_exception(e)
+
+        if jobs:
+            self.timer_set(monotonic() - jobs[0].next_time)
 
     @override
     def add_job(self, job: JobBase):
-        self.jobs.append(job)
+        insort(self.jobs, job)
         self.timer_update()
 
     @override
@@ -70,5 +89,12 @@ class AsyncScheduler(SchedulerBase):
         self.timer_update()
 
     @override
-    def job_changed(self, job: JobBase):
+    def update_job(self, job: JobBase):
+        try:  # noqa: SIM105
+            self.jobs.remove(job)
+        except IndexError:
+            pass
+
+        if job.status == 'running':
+            insort(self.jobs, job)
         self.timer_update()

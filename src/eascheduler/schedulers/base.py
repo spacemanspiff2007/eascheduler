@@ -13,5 +13,5 @@ class SchedulerBase:
     def remove_job(self, job: JobBase):
         pass
 
-    def job_changed(self, job: JobBase):
+    def update_job(self, job: JobBase):
         pass

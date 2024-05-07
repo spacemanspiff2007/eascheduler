@@ -13,3 +13,12 @@ class JobStoreBase:
 
     def remove_job(self, job: JobBase):
         raise NotImplementedError()
+
+    def update_job(self, job: JobBase):
+        raise NotImplementedError()
+
+    def on_job_finished(self, job: JobBase):
+        raise NotImplementedError()
+
+    def on_job_executed(self, job: JobBase):
+        raise NotImplementedError()

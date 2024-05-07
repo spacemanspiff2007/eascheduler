@@ -37,6 +37,18 @@ class SimpleJobIdStore(JobStoreBase, Generic[KEY_TYPE, JOB_TYPE]):
         job = self._jobs.pop(job.job_id)
         self._scheduler.remove_job(job)
 
+    @override
+    def update_job(self, job: JobBase):
+        self._scheduler.update_job(job)
+
+    @override
+    def on_job_finished(self, job: JOB_TYPE):
+        self._jobs.pop(job.job_id)
+
+    @override
+    def on_job_executed(self, job: JobBase):
+        pass
+
     # noinspection PyShadowingBuiltins
     def pop(self, id: Any) -> None:
         return self.remove_job(self._jobs[id])
@@ -47,6 +59,9 @@ class SimpleJobIdStore(JobStoreBase, Generic[KEY_TYPE, JOB_TYPE]):
 
     def __getitem__(self, item: KEY_TYPE) -> JOB_TYPE:
         return self._jobs[item]
+
+    def __contains__(self, item: KEY_TYPE) -> bool:
+        return item in self._jobs
 
     def items(self):
         return self._jobs.items()
