@@ -23,7 +23,7 @@ class DateTimeJob(JobBase):
     def update_next(self):
         now = DateTime.now(tz=local_tz)
 
-        next_run = self.trigger.get_next(now, now)
+        next_run = self.trigger.get_next(now)
         next_time = next_run.diff(DateTime.now(tz=local_tz)).total_seconds() - monotonic()
 
         self.set_next_time(next_time, next_run)

@@ -12,6 +12,8 @@ if TYPE_CHECKING:
 
 
 class IntervalProducer(DateTimeProducerBase):
+    __slots__ = ('_interval', '_next', )
+
     def __init__(self, start: DateTime, interval: int):
         super().__init__()
 

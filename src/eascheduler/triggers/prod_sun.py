@@ -37,6 +37,8 @@ def set_location(latitude: float, longitude: float, elevation: float | int = 0.0
 
 
 class SunProducer(DateTimeProducerBase):
+    __slots__ = ('func', )
+
     def __init__(self, func):
         super().__init__()
 

@@ -18,12 +18,14 @@ class DateTimeTrigger:
         self.producer: Final = producer
         self.operations: tuple[DateTimeOperationBase, ...] = ()
 
-    def get_next(self, now: DateTime, dt: DateTime) -> DateTime:
+    def get_next(self, dt: DateTime) -> DateTime:
+
+        next_dt: DateTime = dt
 
         while not_infinite_loop():  # noqa: RET503
 
             # the producer should always return in local timezone!
-            next_dt = self.producer.get_next(now, dt)
+            next_dt = self.producer.get_next(next_dt)
 
             for b in self.operations:
                 if (op_dt := b.apply(next_dt)) is None:
@@ -31,7 +33,7 @@ class DateTimeTrigger:
                 next_dt = op_dt
             else:
                 # if we are in the future we have the next run
-                if next_dt > now:
+                if next_dt > dt:
                     return next_dt
 
             dt = next_dt

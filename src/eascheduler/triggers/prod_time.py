@@ -14,6 +14,8 @@ if TYPE_CHECKING:
 
 
 class TimeProducer(DateTimeProducerBase):
+    __slots__ = ('_time', )
+
     def __init__(self, time: dt_time):
         super().__init__()
 

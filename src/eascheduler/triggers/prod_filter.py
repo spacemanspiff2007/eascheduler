@@ -15,6 +15,8 @@ if TYPE_CHECKING:
 
 
 class ProducerFilterGroup(ProducerFilterBase):
+    __slots__ = ('_filters', )
+
     def __init__(self):
         self._filters: tuple[ProducerFilterBase, ...] = ()
 
