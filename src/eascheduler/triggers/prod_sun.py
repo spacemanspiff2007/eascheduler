@@ -6,6 +6,7 @@ from typing import Final
 from astral import Observer, sun
 from pendulum import DateTime
 from pendulum import instance as pd_instance
+from typing_extensions import override
 
 from .base import DateTimeProducerBase, not_infinite_loop
 
@@ -37,9 +38,14 @@ def set_location(latitude: float, longitude: float, elevation: float | int = 0.0
 
 class SunProducer(DateTimeProducerBase):
     def __init__(self, func):
+        super().__init__()
+
         self.func: Final = func
 
-    def get_next(self, now: DateTime, dt: DateTime) -> DateTime:
+    @override
+    def get_next(self, dt: DateTime) -> DateTime:
+
+        new_dt = dt
 
         while not_infinite_loop():  # noqa: RET503
 
@@ -48,16 +54,16 @@ class SunProducer(DateTimeProducerBase):
             next_sun = None  # type: datetime | None
             while next_sun is None:
                 try:
-                    next_sun = self.func(OBSERVER, dt.date(), tzinfo=dt.tzinfo)
+                    next_sun = self.func(OBSERVER, new_dt.date(), tzinfo=new_dt.tzinfo)
                 except ValueError:  # noqa: PERF203
-                    dt += timedelta(days=1)
+                    new_dt += timedelta(days=1)
 
             # Date has to be in the future
-            next_dt = pd_instance(next_sun, tz=dt.tz).set(microsecond=0)
-            if next_dt > now:
+            next_dt = pd_instance(next_sun, tz=new_dt.tz).set(microsecond=0)
+            if next_dt > dt and ((f := self._filter) is None or not f.skip(new_dt)):
                 return next_dt
 
-            dt += timedelta(days=1)
+            new_dt += timedelta(days=1)
 
 
 DawnProducer: Final = SunProducer(sun.dawn)

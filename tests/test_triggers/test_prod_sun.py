@@ -43,7 +43,7 @@ def get_params() -> Generator[ParameterSet, None, None]:
 
 @pytest.mark.parametrize(('producer', 'dt', 'result'), get_params())
 def test_sun(producer: SunProducer, dt: DateTime, result: DateTime):
-    assert producer.get_next(dt, dt) == result
+    assert producer.get_next(dt) == result
 
 
 def test_no_sun_pos():
@@ -52,7 +52,7 @@ def test_no_sun_pos():
 
     dt = DateTime(2024, 5, 16, tzinfo=tz)
     result = DateTime(2024, 5, 16, 1, 19, 58, tzinfo=tz)
-    assert SunriseProducer.get_next(dt, dt) == result
+    assert SunriseProducer.get_next(dt) == result
 
     # We don't have a sunrise, so we check that we jump forward
-    assert SunriseProducer.get_next(result, result) == DateTime(2024, 7, 27, 1, 30, 55, tzinfo=tz)
+    assert SunriseProducer.get_next(result) == DateTime(2024, 7, 27, 1, 30, 55, tzinfo=tz)

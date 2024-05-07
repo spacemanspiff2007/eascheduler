@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Generator, Literal
 
+from typing_extensions import override
+
 from eascheduler.errors import InfiniteLoopDetectedError
 
 
@@ -9,8 +11,16 @@ if TYPE_CHECKING:
     from pendulum import DateTime
 
 
+class ProducerFilterBase:
+    def skip(self, dt: DateTime) -> bool:
+        raise NotImplementedError()
+
+
 class DateTimeProducerBase:
-    def get_next(self, now: DateTime, dt: DateTime) -> DateTime:
+    def __init__(self):
+        self._filter: ProducerFilterBase | None = None
+
+    def get_next(self, dt: DateTime) -> DateTime:
         raise NotImplementedError()
 
 
