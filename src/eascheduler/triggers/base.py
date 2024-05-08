@@ -10,11 +10,15 @@ if TYPE_CHECKING:
 
 
 class ProducerFilterBase:
+    __slots__ = ()
+
     def skip(self, dt: DateTime) -> bool:
         raise NotImplementedError()
 
 
 class DateTimeProducerBase:
+    __slots__ = ('_filter', )
+
     def __init__(self):
         self._filter: ProducerFilterBase | None = None
 
@@ -23,6 +27,8 @@ class DateTimeProducerBase:
 
 
 class DateTimeOperationBase:
+    __slots__ = ()
+
     NAME: str
 
     def apply(self, dt: DateTime) -> DateTime | None:

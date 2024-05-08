@@ -24,6 +24,8 @@ def sort_trigger_operations(x: DateTimeOperationBase):
 
 
 class OffsetDateTimeOperation(DateTimeOperationBase):
+    __slots__ = ('offset', )
+
     NAME: Final = 'offset'
 
     def __init__(self, offset: timedelta):
@@ -40,6 +42,8 @@ class OffsetDateTimeOperation(DateTimeOperationBase):
 
 
 class JitterDateTimeOperation(DateTimeOperationBase):
+    __slots__ = ('low', 'high')
+
     NAME: Final = 'jitter'
 
     def __init__(self, low: float, high: float | None = None):
@@ -64,6 +68,8 @@ class JitterDateTimeOperation(DateTimeOperationBase):
 
 
 class EarliestDateTimeOperation(DateTimeOperationBase):
+    __slots__ = ('earliest', )
+
     NAME: Final = 'earliest'
 
     def __init__(self, earliest: time):
@@ -84,6 +90,8 @@ class EarliestDateTimeOperation(DateTimeOperationBase):
 
 
 class LatestDateTimeOperation(DateTimeOperationBase):
+    __slots__ = ('latest', )
+
     NAME: Final = 'latest'
 
     def __init__(self, latest: time):
@@ -104,6 +112,8 @@ class LatestDateTimeOperation(DateTimeOperationBase):
 
 
 class FunctionDateTimeOperation(DateTimeOperationBase):
+    __slots__ = ('func', )
+
     NAME: Final = 'func'
 
     def __init__(self, func: Callable[[datetime], datetime]):

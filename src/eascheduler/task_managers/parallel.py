@@ -38,7 +38,7 @@ class ParallelTaskManager(TaskManagerBase):
 
 
 class LimitingParallelTaskManager(TaskManagerBase):
-    __slots__ = ('tasks', 'parallel', 'parallel_action')
+    __slots__ = ('tasks', 'parallel', 'action')
 
     def __init__(self, parallel: int, action: ParallelTaskPolicy | str = POLICY_SKIP):
         super().__init__()

@@ -8,5 +8,7 @@ if TYPE_CHECKING:
 
 
 class TaskManagerBase:
+    __slots__ = ()
+
     def create_task(self, coro, *, name: str | None = None) -> Task | None:
         raise NotImplementedError()
