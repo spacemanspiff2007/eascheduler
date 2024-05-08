@@ -2,8 +2,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Generator, Literal
 
-from typing_extensions import override
-
 from eascheduler.errors import InfiniteLoopDetectedError
 
 

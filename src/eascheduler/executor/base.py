@@ -1,7 +1,7 @@
 from typing import Any, Awaitable, Callable, Final, override
 
 from eascheduler.errors.handler import process_exception
-from eascheduler.task_manager import ParallelTaskManager, TaskManagerBase
+from eascheduler.task_managers import ParallelTaskManager, TaskManagerBase
 
 
 class ExecutorBase:

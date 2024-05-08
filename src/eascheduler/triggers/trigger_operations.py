@@ -15,6 +15,7 @@ from .base import DateTimeOperationBase
 if TYPE_CHECKING:
     from pendulum import DateTime
 
+
 SORT_ORDER: Final = ('func', 'offset', 'jitter', 'earliest', 'latest')
 
 
