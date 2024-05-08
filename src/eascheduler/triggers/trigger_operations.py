@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime, time, timedelta
+from datetime import datetime, time
 from random import uniform
 from typing import TYPE_CHECKING, Callable, Final
 
@@ -16,24 +16,15 @@ if TYPE_CHECKING:
     from pendulum import DateTime
 
 
-SORT_ORDER: Final = ('func', 'offset', 'jitter', 'earliest', 'latest')
-
-
-def sort_trigger_operations(x: DateTimeOperationBase):
-    return SORT_ORDER.index(x.NAME)
-
-
 class OffsetDateTimeOperation(DateTimeOperationBase):
     __slots__ = ('offset', )
 
-    NAME: Final = 'offset'
-
-    def __init__(self, offset: timedelta):
+    def __init__(self, offset: float):
         self.offset: Final = offset
 
     @override
     def apply(self, dt: DateTime) -> DateTime | None:
-        return dt + self.offset
+        return dt.add(seconds=self.offset)
 
     def __eq__(self, other):
         if isinstance(other, OffsetDateTimeOperation):
@@ -43,8 +34,6 @@ class OffsetDateTimeOperation(DateTimeOperationBase):
 
 class JitterDateTimeOperation(DateTimeOperationBase):
     __slots__ = ('low', 'high')
-
-    NAME: Final = 'jitter'
 
     def __init__(self, low: float, high: float | None = None):
         if high is None:
@@ -59,7 +48,7 @@ class JitterDateTimeOperation(DateTimeOperationBase):
 
     @override
     def apply(self, dt: DateTime) -> DateTime | None:
-        return dt + timedelta(seconds=uniform(self.low, self.high))
+        return dt.add(seconds=uniform(self.low, self.high))
 
     def __eq__(self, other):
         if isinstance(other, JitterDateTimeOperation):
@@ -69,8 +58,6 @@ class JitterDateTimeOperation(DateTimeOperationBase):
 
 class EarliestDateTimeOperation(DateTimeOperationBase):
     __slots__ = ('earliest', )
-
-    NAME: Final = 'earliest'
 
     def __init__(self, earliest: time):
         self.earliest: Final = earliest
@@ -92,8 +79,6 @@ class EarliestDateTimeOperation(DateTimeOperationBase):
 class LatestDateTimeOperation(DateTimeOperationBase):
     __slots__ = ('latest', )
 
-    NAME: Final = 'latest'
-
     def __init__(self, latest: time):
         self.latest: Final = latest
 
@@ -114,14 +99,12 @@ class LatestDateTimeOperation(DateTimeOperationBase):
 class FunctionDateTimeOperation(DateTimeOperationBase):
     __slots__ = ('func', )
 
-    NAME: Final = 'func'
-
     def __init__(self, func: Callable[[datetime], datetime]):
         self.func: Final = func
 
     @override
     def apply(self, dt: DateTime) -> DateTime | None:
-        if obj := self.func(dt.naive()) is None:
+        if (obj := self.func(dt.naive())) is None:
             return None
         return instance(obj, local_tz).astimezone(local_tz)
 
@@ -129,3 +112,13 @@ class FunctionDateTimeOperation(DateTimeOperationBase):
         if isinstance(other, FunctionDateTimeOperation):
             return self.func is other.func
         return False
+
+
+SORT_ORDER: Final = (
+    FunctionDateTimeOperation, OffsetDateTimeOperation, JitterDateTimeOperation,
+    EarliestDateTimeOperation, LatestDateTimeOperation
+)
+
+
+def sort_trigger_operations(x: DateTimeOperationBase):
+    return SORT_ORDER.index(x.__class__)
