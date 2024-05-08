@@ -62,10 +62,10 @@ class SunProducer(DateTimeProducerBase):
 
             # Date has to be in the future
             next_dt = pd_instance(next_sun, tz=new_dt.tz).set(microsecond=0)
-            if next_dt > dt and ((f := self._filter) is None or not f.skip(new_dt)):
+            if next_dt > dt and ((f := self._filter) is None or not f.skip(next_dt)):
                 return next_dt
 
-            new_dt += timedelta(days=1)
+            new_dt = new_dt.add(days=1)
 
 
 DawnProducer: Final = SunProducer(sun.dawn)

@@ -14,32 +14,46 @@ if TYPE_CHECKING:
     from pendulum import DateTime
 
 
-class ProducerFilterGroup(ProducerFilterBase):
+class ProducerFilterGroupBase(ProducerFilterBase):
     __slots__ = ('_filters', )
 
-    def __init__(self):
-        self._filters: tuple[ProducerFilterBase, ...] = ()
+    def __init__(self, filters: Iterable[ProducerFilterBase] | None = None):
+        self._filters: tuple[ProducerFilterBase, ...] = () if filters is None else tuple(filters)
 
     # noinspection PyShadowingBuiltins
     def add_filter(self, filter: ProducerFilterBase):  # noqa: A002
         self._filters = (*self._filters, filter)
         return self
 
+
+class AnyGroupProducerFilter(ProducerFilterGroupBase):
     @override
     def skip(self, dt: DateTime) -> bool:
         return any(f.skip(dt) for f in self._filters)
 
 
-class InvertingProducerFilterGroup(ProducerFilterGroup):
+class AllGroupProducerFilter(ProducerFilterGroupBase):
     @override
     def skip(self, dt: DateTime) -> bool:
-        return not any(f.skip(dt) for f in self._filters)
+        return all(f.skip(dt) for f in self._filters)
+
+
+class InvertingProducerFilter(ProducerFilterBase):
+    __slots__ = ('_filter', )
+
+    # noinspection PyShadowingBuiltins
+    def __init__(self, filter: ProducerFilterBase):  # noqa: A002
+        self._filter: ProducerFilterBase = filter
+
+    @override
+    def skip(self, dt: DateTime) -> bool:
+        return not self._filter.skip(dt)
 
 
 class TimeProducerFilter(ProducerFilterBase):
     __slots__ = ('_lower', '_upper')
 
-    def __init__(self, lower: dt_time | None, upper: dt_time | None):
+    def __init__(self, lower: dt_time | None = None, upper: dt_time | None = None):
         super().__init__()
         self._lower = lower
         self._upper = upper
@@ -79,3 +93,15 @@ class DayOfMonthProducerFilter(ProducerFilterBase):
     @override
     def skip(self, dt: DateTime) -> bool:
         return dt.day not in self._days
+
+
+class MonthOfYearProducerFilter(ProducerFilterBase):
+    __slots__ = ('_months', )
+
+    def __init__(self, months: Iterable[int]):
+        super().__init__()
+        self._months: Final = frozenset(months)
+
+    @override
+    def skip(self, dt: DateTime) -> bool:
+        return dt.month not in self._months
