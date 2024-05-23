@@ -1,7 +1,7 @@
 from asyncio import Task, create_task
 from collections import deque
 from enum import Enum
-from typing import Final
+from typing import Coroutine, Final
 
 from typing_extensions import override
 
@@ -30,7 +30,7 @@ class ParallelTaskManager(TaskManagerBase):
         return f'<{self.__class__.__name__:s} {ct:d} Task{"" if ct == 1 else "s"}>'
 
     @override
-    def create_task(self, coro, *, name: str | None = None) -> Task | None:
+    def create_task(self, coro: Coroutine, *, name: str | None = None) -> Task | None:
         task = create_task(coro, name=name)
         self.tasks.add(task)
         task.add_done_callback(self.tasks.discard)
@@ -53,7 +53,7 @@ class LimitingParallelTaskManager(TaskManagerBase):
     def __repr__(self):
         ct = len(self.tasks)
         return (f'<{self.__class__.__name__:s} '
-                f'{ct:d}/{self.parallel:d} Task{"" if ct == 1 else "s"} action: {self.action:s}>')
+                f'{ct:d}/{self.parallel:d} Task{"" if ct == 1 else "s"} action={self.action.value:s}>')
 
     def _remove_task(self, task: Task):
         try:  # noqa: SIM105

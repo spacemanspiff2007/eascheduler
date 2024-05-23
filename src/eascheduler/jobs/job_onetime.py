@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 
 from typing_extensions import override
 
-from eascheduler.jobs.base import JobBase
+from eascheduler.jobs.base import STATUS_FINISHED, JobBase
 
 
 if TYPE_CHECKING:
@@ -18,4 +18,4 @@ class OneTimeJob(JobBase):
     @override
     def update_next(self):
         self.set_next_time(None)
-        self.status = 'finished'
+        self.status = STATUS_FINISHED

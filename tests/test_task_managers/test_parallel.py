@@ -20,6 +20,23 @@ def create_tasks(manager: T) -> tuple[T, set]:
     return manager, res
 
 
+async def test_repr():
+    m = ParallelTaskManager()
+
+    async def tmp():
+        await asyncio.sleep(0)
+
+    assert repr(m) == '<ParallelTaskManager 0 Tasks>'
+
+    m.create_task(tmp())
+    assert repr(m) == '<ParallelTaskManager 1 Task>'
+
+    m.create_task(tmp())
+    assert repr(m) == '<ParallelTaskManager 2 Tasks>'
+
+    await asyncio.sleep(0.01)
+
+
 async def test_parallel():
     t, res = create_tasks(ParallelTaskManager())
 
@@ -27,6 +44,24 @@ async def test_parallel():
     await asyncio.sleep(0.1)
     assert len(t.tasks) == 0
     assert res == set(range(10))
+
+
+async def test_repr_limiting():
+    m = LimitingParallelTaskManager(3)
+
+    async def tmp():
+        await asyncio.sleep(0)
+
+    assert repr(m) == '<LimitingParallelTaskManager 0/3 Tasks action=skip>'
+
+    m.create_task(tmp())
+    assert repr(m) == '<LimitingParallelTaskManager 1/3 Task action=skip>'
+
+    m.create_task(tmp())
+    assert repr(m) == '<LimitingParallelTaskManager 2/3 Tasks action=skip>'
+
+    await asyncio.sleep(0.01)
+
 
 
 async def test_parallel_limiting():

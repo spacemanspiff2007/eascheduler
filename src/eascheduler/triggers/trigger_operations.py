@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from datetime import datetime, time
 from random import uniform
 from typing import TYPE_CHECKING, Callable, Final
 
@@ -13,6 +12,8 @@ from .base import DateTimeOperationBase
 
 
 if TYPE_CHECKING:
+    from datetime import datetime, time
+
     from pendulum import DateTime
 
 

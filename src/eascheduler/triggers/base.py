@@ -29,8 +29,6 @@ class DateTimeProducerBase:
 class DateTimeOperationBase:
     __slots__ = ()
 
-    NAME: str
-
     def apply(self, dt: DateTime) -> DateTime | None:
         raise NotImplementedError()
 

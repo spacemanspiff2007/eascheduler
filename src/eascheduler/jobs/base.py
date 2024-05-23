@@ -1,7 +1,8 @@
 from __future__ import annotations  # noqa: I001
 
-from typing import TYPE_CHECKING, Final, Literal, Hashable, TypeVar, Generic
-from uuid import uuid4
+from enum import Enum
+from typing import Final
+from typing import TYPE_CHECKING, Hashable, TypeVar, Generic
 
 from pendulum import DateTime
 
@@ -14,13 +15,26 @@ if TYPE_CHECKING:
 IdType = TypeVar('IdType', bound=Hashable)
 
 
+class JobStatusEnum(str, Enum):
+    CREATED = 'created'
+    RUNNING = 'running'
+    PAUSED = 'paused'
+    FINISHED = 'finished'
+
+
+STATUS_CREATED: Final = JobStatusEnum.CREATED
+STATUS_RUNNING: Final = JobStatusEnum.RUNNING
+STATUS_PAUSED: Final = JobStatusEnum.PAUSED
+STATUS_FINISHED: Final = JobStatusEnum.FINISHED
+
+
 class JobBase(Generic[IdType]):
     def __init__(self, executor: ExecutorBase, job_id: IdType | None = None):
-        self._executor: Final = executor
-        self._job_id: Final = job_id if job_id is not None else id(self)
+        self.executor: Final = executor
+        self.id: Final[IdType] = job_id if job_id is not None else id(self)
 
         # Job status
-        self.status: Literal['created', 'running', 'paused', 'finished'] = 'created'
+        self.status: JobStatusEnum = STATUS_CREATED
 
         # used to schedule the job
         self.next_time: float | None = None
@@ -28,10 +42,6 @@ class JobBase(Generic[IdType]):
         # for information only
         self.next_run: DateTime | None = None
         self.last_run: DateTime | None = None
-
-    @property
-    def id(self) -> IdType:
-        return self._job_id
 
     def set_next_time(self, next_time: float | None, next_run: DateTime | None = None):
         self.next_time = next_time
@@ -42,9 +52,9 @@ class JobBase(Generic[IdType]):
         raise NotImplementedError()
 
     def execute(self):
-        self.update_next()
+        self.executor.execute()
         self.last_run = DateTime.now(tz=local_tz)
-        self._executor.execute()
+        self.update_next()
         return self.status
 
     def __lt__(self, other):

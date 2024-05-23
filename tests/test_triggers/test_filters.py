@@ -1,11 +1,13 @@
 from pendulum import DateTime, Time
 
 from eascheduler.triggers.prod_filter import (
+    AllGroupProducerFilter,
+    AnyGroupProducerFilter,
     DayOfMonthProducerFilter,
     DayOfWeekProducerFilter,
+    InvertingProducerFilter,
     MonthOfYearProducerFilter,
-    TimeProducerFilter, InvertingProducerFilter, AllGroupProducerFilter,
-    AnyGroupProducerFilter,
+    TimeProducerFilter,
 )
 
 

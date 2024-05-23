@@ -11,7 +11,7 @@ class ExecutorBase:
 
 # Sync e.g. for testing
 class SyncExecutor(ExecutorBase):
-    def __init__(self, coro: Callable[..., Awaitable[Any]], args: tuple = (), kwargs: dict | None = None):
+    def __init__(self, coro: Callable[..., Any], args: tuple = (), kwargs: dict | None = None):
         self._func: Final = coro
         self._args: Final = args
         self._kwargs: Final = kwargs if kwargs is not None else {}

@@ -39,17 +39,17 @@ class DateTimeTrigger:
             dt = next_dt
 
     def add(self, op: DateTimeOperationBase) -> bool:
-        operations = {o.NAME: o for o in self.operations}
+        operations = {o.__class__.__name__: o for o in self.operations}
 
-        if (existing := operations.get(op.NAME)) is not None and existing == op:
+        if (existing := operations.get(op.__class__.__name__)) is not None and existing == op:
             return False
 
-        operations[op.NAME] = op
+        operations[op.__class__.__name__] = op
         self.operations = tuple(sorted(operations.values(), key=sort_trigger_operations))
         return True
 
     def remove(self, name: str) -> bool:
-        operations = {o.NAME: o for o in self.operations}
+        operations = {o.__class__.__name__: o for o in self.operations}
 
         if operations.pop(name, None) is None:
             return False
