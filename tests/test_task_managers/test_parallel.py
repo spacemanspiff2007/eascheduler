@@ -63,7 +63,6 @@ async def test_repr_limiting():
     await asyncio.sleep(0.01)
 
 
-
 async def test_parallel_limiting():
     t, res = create_tasks(LimitingParallelTaskManager(3))
 

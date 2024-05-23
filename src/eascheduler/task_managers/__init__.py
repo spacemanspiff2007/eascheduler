@@ -1,3 +1,3 @@
 from .base import TaskManagerBase
 from .parallel import LimitingParallelTaskManager, ParallelTaskManager
-from .sequential import SequentialTaskManager
+from .sequential import LimitingSequentialTaskManager, SequentialTaskManager
