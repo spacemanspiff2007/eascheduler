@@ -11,19 +11,19 @@ from eascheduler.jobs.base import JobBase
 
 if TYPE_CHECKING:
     from eascheduler.executor import ExecutorBase
-    from eascheduler.triggers import DateTimeTrigger
+    from eascheduler.triggers.base import ProducerBase
 
 
 class DateTimeJob(JobBase):
-    def __init__(self, executor: ExecutorBase, trigger: DateTimeTrigger):
+    def __init__(self, executor: ExecutorBase, producer: ProducerBase):
         super().__init__(executor)
 
-        self.trigger: Final = trigger
+        self.producer: Final = producer
 
     def update_next(self):
         now = DateTime.now(tz=local_tz)
 
-        next_run = self.trigger.get_next(now)
+        next_run = self.producer.get_next(now)
         next_time = next_run.diff(DateTime.now(tz=local_tz)).total_seconds() - monotonic()
 
         self.set_next_time(next_time, next_run)

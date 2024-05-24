@@ -20,7 +20,7 @@ class GroupProducer(DateTimeProducerBase):
 
         next_dt = dt
 
-        while not_infinite_loop():  # noqa: RET503
+        for _ in not_infinite_loop():  # noqa: RET503
 
             values = sorted(p.get_next(next_dt) for p in self._producers)
             next_dt = values[0]

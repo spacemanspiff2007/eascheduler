@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 from bisect import insort
 from collections import deque
 from time import monotonic
@@ -12,7 +13,6 @@ from eascheduler.schedulers.base import SchedulerBase, SchedulerEvents
 
 
 if TYPE_CHECKING:
-    import asyncio
 
     from eascheduler.jobs.base import JobBase
 
@@ -20,8 +20,8 @@ if TYPE_CHECKING:
 class AsyncScheduler(SchedulerBase):
     __slots__ = ('_loop', 'timer', 'event_handler', 'jobs')
 
-    def __init__(self, event_loop: asyncio.AbstractEventLoop):
-        self._loop: Final = event_loop
+    def __init__(self, event_loop: asyncio.AbstractEventLoop | None = None):
+        self._loop: Final = event_loop if event_loop is not None else asyncio.get_running_loop()
 
         self.timer: asyncio.TimerHandle | None = None
         self.event_handler: SchedulerEvents | None = None
@@ -43,7 +43,7 @@ class AsyncScheduler(SchedulerBase):
         self.timer = self._loop.call_later(secs, self.run_jobs) if secs is not None else None
 
     def timer_update(self):
-        self.timer_set(None if not self.jobs else self.jobs[0])
+        self.timer_set(None if not self.jobs else self.jobs[0].next_time - monotonic())
 
     def run_jobs(self):
         self.timer = None
@@ -64,12 +64,11 @@ class AsyncScheduler(SchedulerBase):
                 except Exception as e:
                     process_exception(e)
 
-                if job.status == 'running':
-                    insort(jobs, job)
-                    event_handler.on_job_executed(job)
-                elif job.status == 'finished':
-                    jobs.remove(job)
-                    event_handler.on_job_finished(job)
+                # if job.status == 'running':
+                #     insort(jobs, job)
+                #     event_handler.on_job_executed(job)
+                # elif job.status == 'finished':
+                #     event_handler.on_job_finished(job)
 
         except Exception as e:
             process_exception(e)

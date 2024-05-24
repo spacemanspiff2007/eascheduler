@@ -9,6 +9,11 @@ if TYPE_CHECKING:
     from pendulum import DateTime
 
 
+class ProducerBase:
+    def get_next(self, dt: DateTime) -> DateTime:
+        raise NotImplementedError()
+
+
 class ProducerFilterBase:
     __slots__ = ()
 
@@ -16,24 +21,18 @@ class ProducerFilterBase:
         raise NotImplementedError()
 
 
-class DateTimeProducerBase:
+class DateTimeProducerBase(ProducerBase):
     __slots__ = ('_filter', )
 
     def __init__(self):
         self._filter: ProducerFilterBase | None = None
 
-    def get_next(self, dt: DateTime) -> DateTime:
-        raise NotImplementedError()
 
+class DateTimeProducerOperationBase(ProducerBase):
+    __slots__ = ('_producer', )
 
-class DateTimeOperationBase:
-    __slots__ = ()
-
-    def apply(self, dt: DateTime) -> DateTime | None:
-        raise NotImplementedError()
-
-    def __eq__(self, other):
-        raise NotImplementedError()
+    def __init__(self, producer: DateTimeProducerBase):
+        self._producer: DateTimeProducerBase = producer
 
 
 def not_infinite_loop() -> Generator[Literal[True], None, None]:

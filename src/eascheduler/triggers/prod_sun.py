@@ -49,7 +49,7 @@ class SunProducer(DateTimeProducerBase):
 
         new_dt = dt
 
-        while not_infinite_loop():  # noqa: RET503
+        for _ in not_infinite_loop():  # noqa: RET503
 
             # If we are very far north or very far south it's possible that we don't have a sunrise at all
             # If that's the case we advance and schedule for the next date that actually has a sunrise
