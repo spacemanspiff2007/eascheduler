@@ -20,23 +20,23 @@ POLICY_SKIP_LAST = SequentialTaskPolicy.SKIP_LAST
 
 
 class SequentialTaskManager(TaskManagerBase):
-    __slots__ = ('task', 'coros')
+    __slots__ = ('task', 'queue')
 
     def __init__(self):
         self.task: Task | None = None
-        self.coros: Final[deque[tuple[Coroutine, str]]] = deque()
+        self.queue: Final[deque[tuple[Coroutine, str]]] = deque()
 
     def __repr__(self):
-        return f'<{self.__class__.__name__:s} running={self.task is not None} coros={len(self.coros):d}>'
+        return f'<{self.__class__.__name__:s} running={self.task is not None} queue={len(self.queue):d}>'
 
     def _task_done(self, done_task: Task | None) -> Task | None:
         if done_task is self.task:
             self.task = None
 
-        if not (coros := self.coros):
+        if not (queue := self.queue):
             return None
 
-        coro, name = coros.popleft()
+        coro, name = queue.popleft()
         task = create_task(coro, name=name)
         self.task = task
         task.add_done_callback(self._task_done)
@@ -44,7 +44,7 @@ class SequentialTaskManager(TaskManagerBase):
 
     @override
     def create_task(self, coro: Coroutine, *, name: str | None = None) -> Task | None:
-        self.coros.append((coro, name))
+        self.queue.append((coro, name))
         if self.task is not None:
             return None
 
@@ -65,25 +65,25 @@ class LimitingSequentialTaskManager(SequentialTaskManager):
 
     def __repr__(self):
         return (
-            f'<{self.__class__.__name__:s} running={self.task is not None} coros={len(self.coros):d} '
+            f'<{self.__class__.__name__:s} running={self.task is not None} coros={len(self.queue):d} '
             f'max_queue={self.max_queue:d} action={self.action.value}>'
         )
 
     @override
     def create_task(self, coro: Coroutine, *, name: str | None = None) -> Task | None:
 
-        if len(coros := self.coros) >= self.max_queue:
+        if len(queue := self.queue) >= self.max_queue:
             if (action := self.action) is POLICY_SKIP:
                 return None
 
             if action is POLICY_SKIP_FIRST:
-                coros.popleft()
+                queue.popleft()
             elif action is POLICY_SKIP_LAST:
-                coros.pop()
+                queue.pop()
             else:
                 raise ValueError()
 
-        coros.append((coro, name))
+        queue.append((coro, name))
         if self.task is not None:
             return None
 
