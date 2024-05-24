@@ -4,8 +4,8 @@ import pytest
 from _pytest.mark import ParameterSet
 from pendulum import DateTime, Timezone
 
-from eascheduler.triggers import prod_sun as prod_sun_module
-from eascheduler.triggers.prod_sun import SunProducer, SunriseProducer, SunsetProducer
+from eascheduler.producers import prod_sun as prod_sun_module
+from eascheduler.producers.prod_sun import SunProducer, SunriseProducer, SunsetProducer
 
 
 tz = Timezone('Europe/Berlin')

@@ -5,7 +5,7 @@ import pendulum
 import pytest
 
 from eascheduler.errors import handler
-from eascheduler.triggers import prod_sun as sun_module
+from eascheduler.producers import prod_sun as sun_module
 
 
 @pytest.fixture(autouse=True)

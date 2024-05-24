@@ -1,6 +1,6 @@
 from pendulum import DateTime, Time
 
-from eascheduler.triggers.prod_filter import (
+from eascheduler.producers.prod_filter import (
     AllGroupProducerFilter,
     AnyGroupProducerFilter,
     DayOfMonthProducerFilter,

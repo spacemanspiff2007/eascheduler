@@ -5,9 +5,9 @@ from unittest.mock import Mock
 import pytest
 from pendulum import DateTime, Timezone
 
-import eascheduler.triggers.prod_operation as prod_operation_module
-from eascheduler.triggers.prod_interval import IntervalProducer
-from eascheduler.triggers.prod_operation import (
+import eascheduler.producers.prod_operation as prod_operation_module
+from eascheduler.producers.prod_interval import IntervalProducer
+from eascheduler.producers.prod_operation import (
     EarliestProducerOperation,
     JitterProducerOperation,
     LatestProducerOperation,

@@ -11,7 +11,7 @@ from eascheduler.jobs.base import JobBase
 
 if TYPE_CHECKING:
     from eascheduler.executor import ExecutorBase
-    from eascheduler.triggers.base import ProducerBase
+    from eascheduler.producers.base import ProducerBase
 
 
 class DateTimeJob(JobBase):

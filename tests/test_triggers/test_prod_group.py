@@ -1,8 +1,8 @@
 from pendulum import DateTime, Timezone
 
-from eascheduler.triggers.prod_filter import DayOfWeekProducerFilter
-from eascheduler.triggers.prod_group import GroupProducer
-from eascheduler.triggers.prod_interval import IntervalProducer
+from eascheduler.producers.prod_filter import DayOfWeekProducerFilter
+from eascheduler.producers.prod_group import GroupProducer
+from eascheduler.producers.prod_interval import IntervalProducer
 
 
 def dt(day, hour):
