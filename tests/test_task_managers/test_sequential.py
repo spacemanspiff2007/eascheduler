@@ -37,16 +37,16 @@ async def test_sequential():
 
 async def test_repr():
     m = SequentialTaskManager()
-    assert repr(m) == '<SequentialTaskManager running=False coros=0>'
+    assert repr(m) == '<SequentialTaskManager running=False queue=0>'
 
     async def tmp():
         await asyncio.sleep(0.01)
 
     m.create_task(tmp())
-    assert repr(m) == '<SequentialTaskManager running=True coros=0>'
+    assert repr(m) == '<SequentialTaskManager running=True queue=0>'
 
     m.create_task(tmp())
-    assert repr(m) == '<SequentialTaskManager running=True coros=1>'
+    assert repr(m) == '<SequentialTaskManager running=True queue=1>'
 
     await await_tasks(m)
 

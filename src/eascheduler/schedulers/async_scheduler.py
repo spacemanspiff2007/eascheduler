@@ -9,6 +9,7 @@ from typing import TYPE_CHECKING, Final
 from typing_extensions import override
 
 from eascheduler.errors.handler import process_exception
+from eascheduler.jobs.base import STATUS_FINISHED, STATUS_RUNNING
 from eascheduler.schedulers.base import SchedulerBase, SchedulerEvents
 
 
@@ -64,11 +65,13 @@ class AsyncScheduler(SchedulerBase):
                 except Exception as e:
                     process_exception(e)
 
-                # if job.status == 'running':
-                #     insort(jobs, job)
-                #     event_handler.on_job_executed(job)
-                # elif job.status == 'finished':
-                #     event_handler.on_job_finished(job)
+                if job.status is STATUS_RUNNING:
+                    insort(jobs, job)
+                    if event_handler is not None:
+                        event_handler.on_job_executed(job)
+                elif job.status == STATUS_FINISHED:
+                    if event_handler is not None:
+                        event_handler.on_job_finished(job)
 
         except Exception as e:
             process_exception(e)
@@ -93,6 +96,6 @@ class AsyncScheduler(SchedulerBase):
         except IndexError:
             pass
 
-        if job.status == 'running':
+        if job.status is STATUS_RUNNING:
             insort(self.jobs, job)
         self.timer_update()

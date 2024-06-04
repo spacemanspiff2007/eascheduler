@@ -17,5 +17,5 @@ class OneTimeJob(JobBase):
 
     @override
     def update_next(self):
-        self.set_next_time(None)
+        self.set_next_time(None, None)
         self.status = STATUS_FINISHED

@@ -28,7 +28,7 @@ def test_time_filter():
 
 
 def test_dow_filter():
-    f = DayOfWeekProducerFilter([1])
+    f = DayOfWeekProducerFilter([2, 3, 4, 5, 6, 7])
     assert not f.skip(DateTime(2001, 1, 1))
 
     for i in range(2, 7):
@@ -38,7 +38,7 @@ def test_dow_filter():
 
 
 def test_dom_filter():
-    f = DayOfMonthProducerFilter([1])
+    f = DayOfMonthProducerFilter(list(range(2, 31)))
     assert not f.skip(DateTime(2001, 1, 1))
 
     for i in range(2, 31):
@@ -48,7 +48,7 @@ def test_dom_filter():
 
 
 def test_moy_filter():
-    f = MonthOfYearProducerFilter([2])
+    f = MonthOfYearProducerFilter([1, 3, 4])
     assert f.skip(DateTime(2001, 1, 31))
 
     for i in range(1, 29):
@@ -58,7 +58,7 @@ def test_moy_filter():
 
 
 def test_inverting_filter():
-    f = InvertingProducerFilter(DayOfWeekProducerFilter([1]))
+    f = InvertingProducerFilter(DayOfWeekProducerFilter([2, 3, 4, 5, 6, 7]))
     assert f.skip(DateTime(2001, 1, 1))
 
     for i in range(2, 7):
@@ -68,7 +68,7 @@ def test_inverting_filter():
 
 
 def test_or_group():
-    f = AnyGroupProducerFilter([DayOfWeekProducerFilter([1, 2]), DayOfWeekProducerFilter([2, 3])])
+    f = AnyGroupProducerFilter([DayOfWeekProducerFilter([3, 4, 5, 6, 7]), DayOfWeekProducerFilter([1, 4, 5, 6, 7])])
     assert f.skip(DateTime(2001, 1, 1))
     assert not f.skip(DateTime(2001, 1, 2))
     assert f.skip(DateTime(2001, 1, 3))
@@ -76,7 +76,7 @@ def test_or_group():
 
 
 def test_and_group():
-    f = AllGroupProducerFilter([DayOfWeekProducerFilter([1, 2]), DayOfWeekProducerFilter([2, 3])])
+    f = AllGroupProducerFilter([DayOfWeekProducerFilter([3, 4, 5, 6, 7]), DayOfWeekProducerFilter([1, 4, 5, 6, 7])])
     assert not f.skip(DateTime(2001, 1, 1))
     assert not f.skip(DateTime(2001, 1, 2))
     assert not f.skip(DateTime(2001, 1, 3))

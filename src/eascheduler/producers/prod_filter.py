@@ -80,7 +80,7 @@ class DayOfWeekProducerFilter(ProducerFilterBase):
 
     @override
     def skip(self, dt: DateTime) -> bool:
-        return dt.isoweekday() not in self._weekdays
+        return dt.isoweekday() in self._weekdays
 
 
 class DayOfMonthProducerFilter(ProducerFilterBase):
@@ -92,7 +92,7 @@ class DayOfMonthProducerFilter(ProducerFilterBase):
 
     @override
     def skip(self, dt: DateTime) -> bool:
-        return dt.day not in self._days
+        return dt.day in self._days
 
 
 class MonthOfYearProducerFilter(ProducerFilterBase):
@@ -104,4 +104,4 @@ class MonthOfYearProducerFilter(ProducerFilterBase):
 
     @override
     def skip(self, dt: DateTime) -> bool:
-        return dt.month not in self._months
+        return dt.month in self._months

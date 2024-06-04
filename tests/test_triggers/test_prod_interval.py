@@ -30,7 +30,7 @@ def test_filter():
     assert producer.get_next(dt(1, 8)) == dt(1, 20)
     assert producer.get_next(dt(1, 20)) == dt(2, 8)
 
-    producer._filter = DayOfWeekProducerFilter([6])
+    producer._filter = DayOfWeekProducerFilter([1, 2, 3, 4, 5, 7])
     assert producer.get_next(dt(1, 7)) == dt(6, 8)
     assert producer.get_next(dt(6, 8)) == dt(6, 20)
     assert producer.get_next(dt(6, 20)) == dt(13, 8)

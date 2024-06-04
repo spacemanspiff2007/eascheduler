@@ -29,7 +29,7 @@ def test_filter():
     p2 = IntervalProducer(dt(1, 8), 3600 * 3)   # 8, 11, 14, 17, 20, 23, 2, 5
 
     p = GroupProducer([p1, p2])
-    p._filter = DayOfWeekProducerFilter([2])
+    p._filter = DayOfWeekProducerFilter([1, 3, 4, 5, 6, 7])
 
     assert p.get_next(dt(1, 6)) == dt(2, 2)
     assert p.get_next(dt(2, 2)) == dt(2, 4)

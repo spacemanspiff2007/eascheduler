@@ -1,7 +1,7 @@
 from __future__ import annotations  # noqa: I001
 
 from enum import Enum
-from typing import Final
+from typing import Final, overload
 from typing import TYPE_CHECKING, Hashable, TypeVar, Generic
 
 from pendulum import DateTime
@@ -43,7 +43,15 @@ class JobBase(Generic[IdType]):
         self.next_run: DateTime | None = None
         self.last_run: DateTime | None = None
 
-    def set_next_time(self, next_time: float | None, next_run: DateTime | None = None):
+    @overload
+    def set_next_time(self, next_time: None, next_run: None):
+        ...
+
+    @overload
+    def set_next_time(self, next_time: float, next_run: DateTime):
+        ...
+
+    def set_next_time(self, next_time, next_run):
         self.next_time = next_time
         self.next_run = next_run
         return self
