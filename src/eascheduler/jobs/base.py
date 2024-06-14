@@ -7,10 +7,11 @@ from typing import TYPE_CHECKING, Hashable, TypeVar, Generic
 from pendulum import DateTime
 
 from eascheduler.const import local_tz
+from eascheduler.jobs.event_handler import JobEventHandler
+
 
 if TYPE_CHECKING:
     from eascheduler.executor import ExecutorBase
-
 
 IdType = TypeVar('IdType', bound=Hashable)
 
@@ -43,6 +44,10 @@ class JobBase(Generic[IdType]):
         self.next_run: DateTime | None = None
         self.last_run: DateTime | None = None
 
+        # callbacks
+        self.on_update: Final = JobEventHandler()       # running | paused -> running | paused
+        self.on_finished: Final = JobEventHandler()     # running | paused -> -> finished
+
     @overload
     def set_next_time(self, next_time: None, next_run: None):
         ...
@@ -54,6 +59,9 @@ class JobBase(Generic[IdType]):
     def set_next_time(self, next_time, next_run):
         self.next_time = next_time
         self.next_run = next_run
+
+        self.status = STATUS_RUNNING if next_time is not None else STATUS_PAUSED
+        self.on_update.run(self)
         return self
 
     def update_next(self):

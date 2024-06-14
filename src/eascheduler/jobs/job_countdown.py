@@ -8,7 +8,7 @@ from pendulum import DateTime
 from typing_extensions import override
 
 from eascheduler.const import local_tz
-from eascheduler.jobs.base import STATUS_PAUSED, STATUS_RUNNING, JobBase
+from eascheduler.jobs.base import JobBase
 
 
 if TYPE_CHECKING:
@@ -24,7 +24,6 @@ class CountdownJob(JobBase):
     @override
     def update_next(self):
         self.set_next_time(None, None)
-        self.status = STATUS_PAUSED
 
     def countdown(self, secs: float):
         assert secs > 0, secs
@@ -33,8 +32,6 @@ class CountdownJob(JobBase):
     def reset(self):
         next_time = monotonic() + self._seconds
         self.set_next_time(next_time, DateTime.now(tz=local_tz) + timedelta(next_time - monotonic()))
-        self.status = STATUS_RUNNING
 
     def stop(self):
         self.set_next_time(None, None)
-        self.status = STATUS_PAUSED

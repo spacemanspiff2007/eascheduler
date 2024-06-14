@@ -1,12 +1,13 @@
 import asyncio
-from typing import TypeVar
+from typing import TypeVar, Callable, Any
 
-from eascheduler.task_managers import SequentialTaskManager, TaskManagerBase, LimitingSequentialTaskManager
+from eascheduler.task_managers import LimitingSequentialTaskManager, SequentialTaskManager, TaskManagerBase, SequentialDeduplicatingTaskManager
+
 
 T = TypeVar('T', bound=TaskManagerBase)
 
 
-def create_tasks(manager: T) -> tuple[T, list]:
+def create_tasks(manager: T, arg_func: Callable[[int], Any] | None = None) -> tuple[T, list]:
     res = []
 
     count = 10
@@ -16,12 +17,15 @@ def create_tasks(manager: T) -> tuple[T, list]:
         res.append(value)
 
     for i in range(count):
-        manager.create_task(test(i))
+        if arg_func is None:
+            manager.create_task(test(i))
+        else:
+            manager.create_task(test(i), arg_func(i))
 
     return manager, res
 
 
-async def await_tasks(m: SequentialTaskManager):
+async def await_tasks(m: SequentialTaskManager | SequentialDeduplicatingTaskManager):
     await asyncio.sleep(0.01)
     while m.task:
         await asyncio.sleep(0.01)
@@ -89,3 +93,32 @@ async def test_limiting_skip_last():
     await await_tasks(t)
 
     assert res == [0, 1, 2, 9]
+
+
+async def test_deduplicating_repr():
+    m = SequentialDeduplicatingTaskManager()
+    assert repr(m) == '<SequentialDeduplicatingTaskManager running=False queue=0>'
+
+    async def tmp():
+        await asyncio.sleep(0.01)
+
+    m.create_task(tmp(), 1)
+    assert repr(m) == '<SequentialDeduplicatingTaskManager running=True queue=0>'
+
+    for _ in range(10):
+        m.create_task(tmp(), 1)
+        assert repr(m) == '<SequentialDeduplicatingTaskManager running=True queue=1>'
+
+    await await_tasks(m)
+
+
+async def test_deduplicating_skip():
+    d = {k: 1 for k in range(10)}
+    d[2] = 3
+    d[3] = 2
+
+    t, res = create_tasks(SequentialDeduplicatingTaskManager(), d.get)
+
+    await await_tasks(t)
+
+    assert res == [0, 2, 3, 9]

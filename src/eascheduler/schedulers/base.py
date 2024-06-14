@@ -8,6 +8,8 @@ if TYPE_CHECKING:
 
 
 class SchedulerBase:
+    __slots__ = ()
+
     def add_job(self, job: JobBase):
         pass
 
@@ -16,11 +18,3 @@ class SchedulerBase:
 
     def update_job(self, job: JobBase):
         pass
-
-
-class SchedulerEvents:
-    def on_job_finished(self, job: JobBase):
-        raise NotImplementedError()
-
-    def on_job_executed(self, job: JobBase):
-        raise NotImplementedError()

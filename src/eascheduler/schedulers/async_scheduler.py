@@ -9,48 +9,30 @@ from typing import TYPE_CHECKING, Final
 from typing_extensions import override
 
 from eascheduler.errors.handler import process_exception
-from eascheduler.jobs.base import STATUS_FINISHED, STATUS_RUNNING
-from eascheduler.schedulers.base import SchedulerBase, SchedulerEvents
+from eascheduler.jobs.base import STATUS_RUNNING
+from eascheduler.schedulers.base import SchedulerBase
 
 
 if TYPE_CHECKING:
-
     from eascheduler.jobs.base import JobBase
 
 
 class AsyncScheduler(SchedulerBase):
-    __slots__ = ('_loop', 'timer', 'event_handler', 'jobs')
+    __slots__ = ('_loop', 'timer', 'jobs')
 
     def __init__(self, event_loop: asyncio.AbstractEventLoop | None = None):
         self._loop: Final = event_loop if event_loop is not None else asyncio.get_running_loop()
 
         self.timer: asyncio.TimerHandle | None = None
-        self.event_handler: SchedulerEvents | None = None
         self.jobs: Final[deque[JobBase]] = deque()
 
-    def set_event_handler(self, view: SchedulerEvents):
-        if self.event_handler is not None:
-            raise ValueError()
-        self.event_handler = view
-
-    def timer_cancel(self):
-        if (timer := self.timer) is not None:
-            self.timer = None
-            timer.cancel()
-
-    def timer_set(self, secs: float | None):
-        if (timer := self.timer) is not None:
-            timer.cancel()
-        self.timer = self._loop.call_later(secs, self.run_jobs) if secs is not None else None
-
-    def timer_update(self):
-        self.timer_set(None if not self.jobs else self.jobs[0].next_time - monotonic())
+    def __repr__(self):
+        next_run = f'{self.timer.when() - self._loop.time():.3f}s' if self.timer is not None else 'None'
+        return f'<{self.__class__.__name__:s} jobs={len(self.jobs):d} next_run={next_run}>'
 
     def run_jobs(self):
         self.timer = None
-
         jobs = self.jobs
-        event_handler = self.event_handler
 
         try:
             while jobs:
@@ -65,37 +47,61 @@ class AsyncScheduler(SchedulerBase):
                 except Exception as e:
                     process_exception(e)
 
+                # Reschedule job if it's still running
                 if job.status is STATUS_RUNNING:
-                    insort(jobs, job)
-                    if event_handler is not None:
-                        event_handler.on_job_executed(job)
-                elif job.status == STATUS_FINISHED:
-                    if event_handler is not None:
-                        event_handler.on_job_finished(job)
+                    self.add_job(job)
 
         except Exception as e:
             process_exception(e)
 
         if jobs:
-            self.timer_set(monotonic() - jobs[0].next_time)
+            self._set_timer(jobs[0])
+
+    def _set_timer(self, job: JobBase | None):
+        if (timer := self.timer) is not None:
+            timer.cancel()
+
+        if job is None:
+            self.timer = None
+        else:
+            self.timer = self._loop.call_later(job.next_time - monotonic(), self.run_jobs)
 
     @override
     def add_job(self, job: JobBase):
         insort(self.jobs, job)
-        self.timer_update()
+        if job is self.jobs[0]:
+            self._set_timer(job)
+        return self
 
     @override
     def remove_job(self, job: JobBase):
-        self.jobs.remove(job)
-        self.timer_update()
+        if not (jobs := self.jobs):
+            self._set_timer(None)
+            return None
+
+        is_first = job is self.jobs[0]
+        try:  # noqa: SIM105
+            jobs.remove(job)
+        except ValueError:
+            pass
+
+        if not jobs:
+            self._set_timer(None)
+            return self
+
+        if is_first:
+            self._set_timer(jobs[0])
+        return self
 
     @override
     def update_job(self, job: JobBase):
         try:  # noqa: SIM105
             self.jobs.remove(job)
-        except IndexError:
+        except ValueError:
             pass
 
         if job.status is STATUS_RUNNING:
             insort(self.jobs, job)
-        self.timer_update()
+        if job is self.jobs[0]:
+            self._set_timer(job)
+        return self

@@ -1,7 +1,7 @@
 from asyncio import Task, create_task
-from collections import deque
+from collections import OrderedDict, deque
 from enum import Enum
-from typing import Coroutine, Final
+from typing import Coroutine, Final, Hashable
 
 from typing_extensions import override
 
@@ -19,36 +19,53 @@ POLICY_SKIP_FIRST = SequentialTaskPolicy.SKIP_FIRST
 POLICY_SKIP_LAST = SequentialTaskPolicy.SKIP_LAST
 
 
-class SequentialTaskManager(TaskManagerBase):
-    __slots__ = ('task', 'queue')
+class SequentialTaskManagerBase(TaskManagerBase):
+    __slots__ = ('task', )
 
     def __init__(self):
         self.task: Task | None = None
-        self.queue: Final[deque[tuple[Coroutine, str]]] = deque()
 
-    def __repr__(self):
-        return f'<{self.__class__.__name__:s} running={self.task is not None} queue={len(self.queue):d}>'
+    def _get_next_task(self) -> None | tuple[Coroutine, str | None]:
+        raise NotImplementedError()
+
+    def _task_start(self) -> Task | None:
+        if self.task is not None:
+            return None
+        return self._task_done(None)
 
     def _task_done(self, done_task: Task | None) -> Task | None:
         if done_task is self.task:
             self.task = None
 
-        if not (queue := self.queue):
+        if (next_obj := self._get_next_task()) is None:
             return None
 
-        coro, name = queue.popleft()
-        task = create_task(coro, name=name)
-        self.task = task
+        coro, name = next_obj
+        self.task = task = create_task(coro, name=name)
         task.add_done_callback(self._task_done)
         return task
+
+
+class SequentialTaskManager(SequentialTaskManagerBase):
+    __slots__ = ('queue', )
+
+    def __init__(self):
+        super().__init__()
+        self.queue: Final[deque[tuple[Coroutine, str]]] = deque()
+
+    def __repr__(self):
+        return f'<{self.__class__.__name__:s} running={self.task is not None} queue={len(self.queue):d}>'
+
+    @override
+    def _get_next_task(self) -> None | tuple[Coroutine, str | None]:
+        if not (queue := self.queue):
+            return None
+        return queue.popleft()
 
     @override
     def create_task(self, coro: Coroutine, *, name: str | None = None) -> Task | None:
         self.queue.append((coro, name))
-        if self.task is not None:
-            return None
-
-        return self._task_done(None)
+        return self._task_start()
 
 
 class LimitingSequentialTaskManager(SequentialTaskManager):
@@ -84,7 +101,30 @@ class LimitingSequentialTaskManager(SequentialTaskManager):
                 raise ValueError()
 
         queue.append((coro, name))
-        if self.task is not None:
-            return None
+        return self._task_start()
 
-        return self._task_done(None)
+
+class SequentialDeduplicatingTaskManager(SequentialTaskManagerBase):
+    __slots__ = ('queue', )
+
+    def __init__(self):
+        super().__init__()
+        self.queue: Final[OrderedDict[Hashable, tuple[Coroutine, str | None]]] = OrderedDict()
+
+    def __repr__(self):
+        return f'<{self.__class__.__name__:s} running={self.task is not None} queue={len(self.queue):d}>'
+
+    @override
+    def _get_next_task(self) -> None | tuple[Coroutine, str | None]:
+        if not (queue := self.queue):
+            return None
+        return queue.popitem(last=False)[1]
+
+    # noinspection PyMethodOverriding
+    @override
+    def create_task(self, coro: Coroutine, key: Hashable, *, name: str | None = None) -> Task | None:
+        queue = self.queue
+        queue.pop(key, None)
+
+        queue[key] = (coro, name)
+        return self._task_start()
