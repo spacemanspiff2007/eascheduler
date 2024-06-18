@@ -1,14 +1,16 @@
-from __future__ import annotations  # noqa: I001
+from __future__ import annotations
 
 from enum import Enum
-from typing import Final, overload
-from typing import TYPE_CHECKING, Hashable, TypeVar, Generic
+from time import monotonic
+from typing import TYPE_CHECKING, Final, Generic, Hashable, TypeVar, overload
 
 from pendulum import DateTime
 from typing_extensions import Self
 
 from eascheduler.const import local_tz
+from eascheduler.errors.errors import JobAlreadyFinishedError, ScheduledRunInThePastError
 from eascheduler.jobs.event_handler import JobEventHandler
+
 
 if TYPE_CHECKING:
     from eascheduler.executor import ExecutorBase
@@ -26,7 +28,7 @@ class JobStatusEnum(str, Enum):
 
 STATUS_CREATED: Final = JobStatusEnum.CREATED
 STATUS_RUNNING: Final = JobStatusEnum.RUNNING
-STATUS_PAUSED: Final = JobStatusEnum.STOPPED
+STATUS_STOPPED: Final = JobStatusEnum.STOPPED
 STATUS_FINISHED: Final = JobStatusEnum.FINISHED
 
 
@@ -58,21 +60,13 @@ class JobBase(Generic[IdType]):
         if self._scheduler is scheduler:
             return self
 
-        if self._scheduler is None:
-            self._scheduler = scheduler
-            return self
+        if self._scheduler is not None:
+            msg = 'Job already linked to a scheduler'
+            raise ValueError(msg)
 
-        msg = 'Job already linked to a scheduler'
-        raise ValueError(msg)
-
-    def set_finished(self):
-        self._scheduler = None
-
-        self.status = STATUS_FINISHED
-        self.next_time = None
-        self.next_run = None
-
-        self.on_finished.run(self)
+        self._scheduler = scheduler
+        self.update_first()
+        self._scheduler.add_job(self)
         return self
 
     @overload
@@ -84,12 +78,18 @@ class JobBase(Generic[IdType]):
         ...
 
     def set_next_time(self, next_time, next_run) -> Self:
+        if monotonic() >= next_time + 0.1:
+            raise ScheduledRunInThePastError()
+
         self.next_time = next_time
         self.next_run = next_run
 
-        self.status = STATUS_RUNNING if next_time is not None else STATUS_PAUSED
+        self.status = STATUS_RUNNING if next_time is not None else STATUS_STOPPED
         self.on_update.run(self)
         return self
+
+    def update_first(self):
+        self.update_next()
 
     def update_next(self):
         raise NotImplementedError()
@@ -103,8 +103,32 @@ class JobBase(Generic[IdType]):
     def __lt__(self, other):
         return self.next_time < other.next_time
 
-    def stop(self):
-        raise NotImplementedError()
+    def __repr__(self):
+        return f'<{self.__class__.__name__} id={self.id!r} status={self.status!s} next_run={self.next_run}>'
 
-    def resume(self):
-        raise NotImplementedError()
+    def job_finish(self):
+        if self.status is STATUS_FINISHED:
+            raise JobAlreadyFinishedError()
+
+        self._scheduler = None
+
+        self.status = STATUS_FINISHED
+        self.next_time = None
+        self.next_run = None
+
+        self.on_finished.run(self)
+        return self
+
+    def job_stop(self):
+        if self.status is STATUS_FINISHED:
+            raise JobAlreadyFinishedError()
+
+        self._scheduler.remove_job(self)
+        self.set_next_time(None, None)
+
+    def job_resume(self):
+        if self.status is STATUS_FINISHED:
+            raise JobAlreadyFinishedError()
+
+        self.update_next()
+        self._scheduler.update_job(self)

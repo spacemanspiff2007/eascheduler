@@ -34,9 +34,6 @@ class CountdownJob(JobBase):
         self.set_next_time(next_time, DateTime.now(tz=local_tz) + timedelta(next_time - monotonic()))
 
     @override
-    def stop(self):
-        self.set_next_time(None, None)
-
-    @override
-    def resume(self):
-        self.update_next()
+    def job_resume(self):
+        # Should call reset
+        raise NotImplementedError()

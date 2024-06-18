@@ -30,9 +30,9 @@ class DateTimeJob(JobBase):
         self.set_next_time(next_time, next_run)
 
     @override
-    def stop(self):
+    def job_stop(self):
         self.set_next_time(None, None)
 
     @override
-    def resume(self):
+    def job_resume(self):
         self.update_next()

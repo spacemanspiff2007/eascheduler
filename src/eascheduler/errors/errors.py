@@ -10,7 +10,7 @@ class UnknownWeekdayError(EaSchedulerError):
     pass
 
 
-class FirstRunInThePastError(EaSchedulerError):
+class ScheduledRunInThePastError(EaSchedulerError):
     pass
 
 
@@ -19,4 +19,8 @@ class BoundaryFunctionError(EaSchedulerError):
 
 
 class InfiniteLoopDetectedError(EaSchedulerError):
+    pass
+
+
+class JobAlreadyFinishedError(EaSchedulerError):
     pass
