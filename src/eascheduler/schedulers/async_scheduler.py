@@ -9,7 +9,7 @@ from typing import TYPE_CHECKING, Final
 from typing_extensions import override
 
 from eascheduler.errors.handler import process_exception
-from eascheduler.jobs.base import STATUS_RUNNING
+from eascheduler.jobs.base import STATUS_RUNNING, STATUS_FINISHED
 from eascheduler.schedulers.base import SchedulerBase
 
 
@@ -22,7 +22,6 @@ class AsyncScheduler(SchedulerBase):
 
     def __init__(self, event_loop: asyncio.AbstractEventLoop | None = None):
         self._loop: Final = event_loop if event_loop is not None else asyncio.get_running_loop()
-
         self.timer: asyncio.TimerHandle | None = None
         self.jobs: Final[deque[JobBase]] = deque()
 

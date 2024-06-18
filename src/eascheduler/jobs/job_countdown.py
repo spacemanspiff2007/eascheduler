@@ -33,5 +33,10 @@ class CountdownJob(JobBase):
         next_time = monotonic() + self._seconds
         self.set_next_time(next_time, DateTime.now(tz=local_tz) + timedelta(next_time - monotonic()))
 
+    @override
     def stop(self):
         self.set_next_time(None, None)
+
+    @override
+    def resume(self):
+        self.update_next()

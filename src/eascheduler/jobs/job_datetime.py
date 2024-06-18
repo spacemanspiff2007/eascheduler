@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from time import monotonic
-from typing import TYPE_CHECKING, Final
+from typing import TYPE_CHECKING, Final, override
 
 from pendulum import DateTime
 
@@ -20,6 +20,7 @@ class DateTimeJob(JobBase):
 
         self.producer: Final = producer
 
+    @override
     def update_next(self):
         now = DateTime.now(tz=local_tz)
 
@@ -28,5 +29,10 @@ class DateTimeJob(JobBase):
 
         self.set_next_time(next_time, next_run)
 
+    @override
     def stop(self):
         self.set_next_time(None, None)
+
+    @override
+    def resume(self):
+        self.update_next()

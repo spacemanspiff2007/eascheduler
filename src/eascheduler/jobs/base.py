@@ -5,13 +5,14 @@ from typing import Final, overload
 from typing import TYPE_CHECKING, Hashable, TypeVar, Generic
 
 from pendulum import DateTime
+from typing_extensions import Self
 
 from eascheduler.const import local_tz
 from eascheduler.jobs.event_handler import JobEventHandler
 
-
 if TYPE_CHECKING:
     from eascheduler.executor import ExecutorBase
+    from eascheduler.schedulers import SchedulerBase
 
 IdType = TypeVar('IdType', bound=Hashable)
 
@@ -19,20 +20,21 @@ IdType = TypeVar('IdType', bound=Hashable)
 class JobStatusEnum(str, Enum):
     CREATED = 'created'
     RUNNING = 'running'
-    PAUSED = 'paused'
+    STOPPED = 'stopped'
     FINISHED = 'finished'
 
 
 STATUS_CREATED: Final = JobStatusEnum.CREATED
 STATUS_RUNNING: Final = JobStatusEnum.RUNNING
-STATUS_PAUSED: Final = JobStatusEnum.PAUSED
+STATUS_PAUSED: Final = JobStatusEnum.STOPPED
 STATUS_FINISHED: Final = JobStatusEnum.FINISHED
 
 
 class JobBase(Generic[IdType]):
     def __init__(self, executor: ExecutorBase, job_id: IdType | None = None):
         self.executor: Final = executor
-        self.id: Final[IdType] = job_id if job_id is not None else id(self)
+        self._id: Final[IdType] = job_id if job_id is not None else id(self)
+        self._scheduler: SchedulerBase | None = None
 
         # Job status
         self.status: JobStatusEnum = STATUS_CREATED
@@ -48,6 +50,31 @@ class JobBase(Generic[IdType]):
         self.on_update: Final = JobEventHandler()       # running | paused -> running | paused
         self.on_finished: Final = JobEventHandler()     # running | paused -> -> finished
 
+    @property
+    def id(self) -> IdType:
+        return self._id
+
+    def link_scheduler(self, scheduler: SchedulerBase) -> Self:
+        if self._scheduler is scheduler:
+            return self
+
+        if self._scheduler is None:
+            self._scheduler = scheduler
+            return self
+
+        msg = 'Job already linked to a scheduler'
+        raise ValueError(msg)
+
+    def set_finished(self):
+        self._scheduler = None
+
+        self.status = STATUS_FINISHED
+        self.next_time = None
+        self.next_run = None
+
+        self.on_finished.run(self)
+        return self
+
     @overload
     def set_next_time(self, next_time: None, next_run: None):
         ...
@@ -56,7 +83,7 @@ class JobBase(Generic[IdType]):
     def set_next_time(self, next_time: float, next_run: DateTime):
         ...
 
-    def set_next_time(self, next_time, next_run):
+    def set_next_time(self, next_time, next_run) -> Self:
         self.next_time = next_time
         self.next_run = next_run
 
@@ -75,3 +102,9 @@ class JobBase(Generic[IdType]):
 
     def __lt__(self, other):
         return self.next_time < other.next_time
+
+    def stop(self):
+        raise NotImplementedError()
+
+    def resume(self):
+        raise NotImplementedError()
