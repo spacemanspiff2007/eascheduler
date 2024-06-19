@@ -79,7 +79,7 @@ class JobBase(Generic[IdType]):
         ...
 
     def set_next_time(self, next_time, next_run) -> Self:
-        if monotonic() >= next_time + 0.1:
+        if next_time is not None and monotonic() >= next_time + 0.1:
             raise ScheduledRunInThePastError()
 
         self.next_time = next_time
@@ -101,8 +101,12 @@ class JobBase(Generic[IdType]):
         self.update_next()
         return self.status
 
-    def __lt__(self, other):
-        return self.next_time < other.next_time
+    def __lt__(self, other_job) -> bool:
+        if (other := other_job.next_time) is None:
+            return True
+        if (this := self.next_time) is None:
+            return False
+        return this < other
 
     def __repr__(self):
         return f'<{self.__class__.__name__} id={self.id!r} status={self.status!s} next_run={self.next_run}>'

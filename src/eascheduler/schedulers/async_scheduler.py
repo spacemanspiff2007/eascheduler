@@ -67,9 +67,10 @@ class AsyncScheduler(SchedulerBase):
 
     @override
     def add_job(self, job: JobBase):
-        insort(self.jobs, job)
-        if job is self.jobs[0]:
-            self._set_timer(job)
+        if job.status is STATUS_RUNNING:
+            insort(self.jobs, job)
+            if job is self.jobs[0]:
+                self._set_timer(job)
         return self
 
     @override
@@ -94,13 +95,6 @@ class AsyncScheduler(SchedulerBase):
 
     @override
     def update_job(self, job: JobBase):
-        try:  # noqa: SIM105
-            self.jobs.remove(job)
-        except ValueError:
-            pass
-
-        if job.status is STATUS_RUNNING:
-            insort(self.jobs, job)
-        if job is self.jobs[0]:
-            self._set_timer(job)
+        self.remove_job(job)
+        self.add_job(job)
         return self
