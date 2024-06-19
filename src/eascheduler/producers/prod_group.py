@@ -12,7 +12,7 @@ if TYPE_CHECKING:
 class GroupProducer(DateTimeProducerBase):
     __slots__ = ('_producers', )
 
-    def __init__(self, producers: Iterable[DateTimeProducerBase]):
+    def __init__(self, producers: Iterable[DateTimeProducerBase]) -> None:
         super().__init__()
         self._producers: Final = tuple(producers)
 

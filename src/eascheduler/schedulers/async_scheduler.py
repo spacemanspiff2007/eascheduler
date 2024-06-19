@@ -20,7 +20,7 @@ if TYPE_CHECKING:
 class AsyncScheduler(SchedulerBase):
     __slots__ = ('_loop', 'timer', 'jobs')
 
-    def __init__(self, event_loop: asyncio.AbstractEventLoop | None = None):
+    def __init__(self, event_loop: asyncio.AbstractEventLoop | None = None) -> None:
         self._loop: Final = event_loop if event_loop is not None else asyncio.get_running_loop()
         self.timer: asyncio.TimerHandle | None = None
         self.jobs: Final[deque[JobBase]] = deque()
@@ -29,7 +29,7 @@ class AsyncScheduler(SchedulerBase):
         next_run = f'{self.timer.when() - self._loop.time():.3f}s' if self.timer is not None else 'None'
         return f'<{self.__class__.__name__:s} jobs={len(self.jobs):d} next_run={next_run}>'
 
-    def run_jobs(self):
+    def run_jobs(self) -> None:
         self.timer = None
         jobs = self.jobs
 
@@ -56,7 +56,7 @@ class AsyncScheduler(SchedulerBase):
         if jobs:
             self._set_timer(jobs[0])
 
-    def _set_timer(self, job: JobBase | None):
+    def _set_timer(self, job: JobBase | None) -> None:
         if (timer := self.timer) is not None:
             timer.cancel()
 

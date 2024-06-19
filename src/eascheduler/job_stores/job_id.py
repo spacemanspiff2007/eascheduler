@@ -16,7 +16,7 @@ JOB_TYPE = TypeVar('JOB_TYPE', bound=JobBase)
 class SimpleJobIdStore(Generic[KEY_TYPE, JOB_TYPE]):
     __slots__ = ('_scheduler', '_jobs')
 
-    def __init__(self, scheduler: SchedulerBase):
+    def __init__(self, scheduler: SchedulerBase) -> None:
         self._scheduler: Final = scheduler
         self._jobs: Final[dict[KEY_TYPE, JOB_TYPE]] = {}
 
@@ -29,16 +29,16 @@ class SimpleJobIdStore(Generic[KEY_TYPE, JOB_TYPE]):
         self._jobs[job_id] = job
         self._scheduler.add_job(job)
 
-    def remove_job(self, job: JOB_TYPE):
-        job = self._jobs.pop(job.job_id)
+    def remove_job(self, job: JOB_TYPE) -> JOB_TYPE:
+        job = self._jobs.pop(job.id)
         self._scheduler.remove_job(job)
         return job
 
-    def update_job(self, job: JobBase):
+    def update_job(self, job: JobBase) -> None:
         self._scheduler.update_job(job)
 
     # noinspection PyShadowingBuiltins
-    def pop(self, id: Any) -> None:
+    def pop(self, id: Any) -> JOB_TYPE:
         return self.remove_job(self._jobs[id])
 
     # noinspection PyShadowingBuiltins

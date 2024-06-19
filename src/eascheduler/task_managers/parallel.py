@@ -22,7 +22,7 @@ POLICY_CANCEL_LAST = ParallelTaskPolicy.CANCEL_LAST
 class ParallelTaskManager(TaskManagerBase):
     __slots__ = ('tasks',)
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.tasks: Final[set[Task]] = set()
 
     def __repr__(self):
@@ -55,7 +55,7 @@ class LimitingParallelTaskManager(TaskManagerBase):
         return (f'<{self.__class__.__name__:s} '
                 f'{ct:d}/{self.parallel:d} Task{"" if ct == 1 else "s"} action={self.action.value:s}>')
 
-    def _remove_task(self, task: Task):
+    def _remove_task(self, task: Task) -> None:
         try:  # noqa: SIM105
             self.tasks.remove(task)
         except ValueError:

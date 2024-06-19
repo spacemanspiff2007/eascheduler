@@ -11,7 +11,7 @@ from eascheduler.old_schedulers import AsyncScheduler
 
 
 class SchedulerView:
-    def __init__(self, scheduler: AsyncScheduler, executor: Type[ExecutorBase]):
+    def __init__(self, scheduler: AsyncScheduler, executor: Type[ExecutorBase]) -> None:
         self._scheduler: AsyncScheduler = scheduler
         self._executor: Type[ExecutorBase] = executor
 

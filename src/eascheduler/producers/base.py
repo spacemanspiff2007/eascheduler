@@ -24,14 +24,14 @@ class ProducerFilterBase:
 class DateTimeProducerBase(ProducerBase):
     __slots__ = ('_filter', )
 
-    def __init__(self):
+    def __init__(self) -> None:
         self._filter: ProducerFilterBase | None = None
 
 
 class DateTimeProducerOperationBase(ProducerBase):
     __slots__ = ('_producer', )
 
-    def __init__(self, producer: DateTimeProducerBase):
+    def __init__(self, producer: DateTimeProducerBase) -> None:
         self._producer: DateTimeProducerBase = producer
 
 

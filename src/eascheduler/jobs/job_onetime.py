@@ -17,16 +17,16 @@ if TYPE_CHECKING:
 
 
 class OneTimeJob(JobBase):
-    def __init__(self, executor: ExecutorBase, execution_time: float, *, job_id: IdType | None = None):
+    def __init__(self, executor: ExecutorBase, execution_time: float, *, job_id: IdType | None = None) -> None:
         super().__init__(executor, job_id=job_id)
         self.execution_time: Final = execution_time
 
     @override
-    def update_next(self):
+    def update_next(self) -> None:
         self.job_finish()
 
     @override
-    def update_first(self):
+    def update_first(self) -> None:
         self.set_next_time(
             self.execution_time, DateTime.now(tz=local_tz) + timedelta(self.execution_time - monotonic())
         )

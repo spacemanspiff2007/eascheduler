@@ -5,10 +5,10 @@ from typing import Any, Callable
 HANDLER: Callable[[Exception], Any] = lambda x: logging.getLogger('EAScheduler').error(x)
 
 
-def set_exception_handler(handler: Callable[[Exception], Any]):
+def set_exception_handler(handler: Callable[[Exception], Any]) -> None:
     global HANDLER
     HANDLER = handler
 
 
-def process_exception(e: Exception):
+def process_exception(e: Exception) -> None:
     HANDLER(e)

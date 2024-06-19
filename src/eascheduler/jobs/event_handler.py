@@ -12,7 +12,7 @@ if TYPE_CHECKING:
 class JobEventHandler:
     __slots__ = ('_callbacks', )
 
-    def __init__(self):
+    def __init__(self) -> None:
         self._callbacks: tuple[Callable[[JobBase], None], ...] = ()
 
     def register(self, callback: Callable[[JobBase], None]) -> bool:
@@ -27,10 +27,10 @@ class JobEventHandler:
         self._callbacks = tuple(cb for cb in self._callbacks if cb is not callback)
         return True
 
-    def clear(self):
+    def clear(self) -> None:
         self._callbacks = ()
 
-    def run(self, job: JobBase):
+    def run(self, job: JobBase) -> None:
         for callback in self._callbacks:
             try:
                 callback(job)

@@ -22,7 +22,7 @@ POLICY_SKIP_LAST = SequentialTaskPolicy.SKIP_LAST
 class SequentialTaskManagerBase(TaskManagerBase):
     __slots__ = ('task', )
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.task: Task | None = None
 
     def _get_next_task(self) -> None | tuple[Coroutine, str | None]:
@@ -49,7 +49,7 @@ class SequentialTaskManagerBase(TaskManagerBase):
 class SequentialTaskManager(SequentialTaskManagerBase):
     __slots__ = ('queue', )
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.queue: Final[deque[tuple[Coroutine, str | None]]] = deque()
 
@@ -107,7 +107,7 @@ class LimitingSequentialTaskManager(SequentialTaskManager):
 class SequentialDeduplicatingTaskManager(SequentialTaskManagerBase):
     __slots__ = ('queue', )
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.queue: Final[OrderedDict[Hashable, tuple[Coroutine, str | None]]] = OrderedDict()
 

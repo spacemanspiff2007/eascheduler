@@ -33,7 +33,7 @@ STATUS_FINISHED: Final = JobStatusEnum.FINISHED
 
 
 class JobBase(Generic[IdType]):
-    def __init__(self, executor: ExecutorBase, *, job_id: IdType | None = None):
+    def __init__(self, executor: ExecutorBase, *, job_id: IdType | None = None) -> None:
         super().__init__()
         self.executor: Final = executor
         self._id: Final[IdType] = job_id if job_id is not None else id(self)
@@ -71,11 +71,11 @@ class JobBase(Generic[IdType]):
         return self
 
     @overload
-    def set_next_time(self, next_time: None, next_run: None):
+    def set_next_time(self, next_time: None, next_run: None) -> None:
         ...
 
     @overload
-    def set_next_time(self, next_time: float, next_run: DateTime):
+    def set_next_time(self, next_time: float, next_run: DateTime) -> None:
         ...
 
     def set_next_time(self, next_time, next_run) -> Self:
@@ -89,7 +89,7 @@ class JobBase(Generic[IdType]):
         self.on_update.run(self)
         return self
 
-    def update_first(self):
+    def update_first(self) -> None:
         self.update_next()
 
     def update_next(self):

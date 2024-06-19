@@ -16,20 +16,20 @@ if TYPE_CHECKING:
 
 
 class CountdownJob(JobBase):
-    def __init__(self, executor: ExecutorBase, *, job_id: IdType | None = None):
+    def __init__(self, executor: ExecutorBase, *, job_id: IdType | None = None) -> None:
         super().__init__(executor, job_id=job_id)
         self._seconds: float = 0
 
     @override
-    def update_next(self):
+    def update_next(self) -> None:
         self.set_next_time(None, None)
         self._scheduler.update_job(self)
 
-    def countdown(self, secs: float):
+    def countdown(self, secs: float) -> None:
         assert secs > 0, secs
         self._seconds = secs
 
-    def reset(self):
+    def reset(self) -> None:
         next_time = monotonic() + self._seconds
         self.set_next_time(next_time, DateTime.now(tz=local_tz) + timedelta(next_time - monotonic()))
         self._scheduler.update_job(self)

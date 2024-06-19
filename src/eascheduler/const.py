@@ -10,7 +10,7 @@ local_tz = _local_timezone()
 DAY_NAMES: Final[dict[str, int]] = {}
 
 
-def __create_day_names():
+def __create_day_names() -> None:
     values = {}
     for i in range(1, 8):
         values[dt_date(2001, 1, i).strftime('%A').lower()] = i

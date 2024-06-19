@@ -14,7 +14,7 @@ from .base import DateTimeProducerBase, not_infinite_loop
 OBSERVER: Observer | None = None
 
 
-def set_location(latitude: float, longitude: float, elevation: float | int = 0.0):
+def set_location(latitude: float, longitude: float, elevation: float | int = 0.0) -> None:
     """
         Latitude and longitude can be set either as a float or as a string.
     For strings they must be of the form
@@ -39,7 +39,7 @@ def set_location(latitude: float, longitude: float, elevation: float | int = 0.0
 class SunProducer(DateTimeProducerBase):
     __slots__ = ('func', )
 
-    def __init__(self, func):
+    def __init__(self, func) -> None:
         super().__init__()
 
         self.func: Final = func

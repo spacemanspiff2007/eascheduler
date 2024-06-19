@@ -10,11 +10,11 @@ if TYPE_CHECKING:
 class SchedulerBase:
     __slots__ = ()
 
-    def add_job(self, job: JobBase):
+    def add_job(self, job: JobBase) -> None:
         pass
 
-    def remove_job(self, job: JobBase):
+    def remove_job(self, job: JobBase) -> None:
         pass
 
-    def update_job(self, job: JobBase):
+    def update_job(self, job: JobBase) -> None:
         pass

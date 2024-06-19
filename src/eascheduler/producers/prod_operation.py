@@ -17,7 +17,7 @@ if TYPE_CHECKING:
 class OffsetProducerOperation(DateTimeProducerOperationBase):
     __slots__ = ('offset', )
 
-    def __init__(self, producer: DateTimeProducerBase, offset: float):
+    def __init__(self, producer: DateTimeProducerBase, offset: float) -> None:
         super().__init__(producer)
         self.offset: Final = offset
 
@@ -31,7 +31,7 @@ class OffsetProducerOperation(DateTimeProducerOperationBase):
 class EarliestProducerOperation(DateTimeProducerOperationBase):
     __slots__ = ('earliest',)
 
-    def __init__(self, producer: DateTimeProducerBase, earliest: dt_time):
+    def __init__(self, producer: DateTimeProducerBase, earliest: dt_time) -> None:
         super().__init__(producer)
         self.earliest: Final = earliest
 
@@ -49,7 +49,7 @@ class EarliestProducerOperation(DateTimeProducerOperationBase):
 class LatestProducerOperation(DateTimeProducerOperationBase):
     __slots__ = ('latest',)
 
-    def __init__(self, producer: DateTimeProducerBase, earliest: dt_time):
+    def __init__(self, producer: DateTimeProducerBase, earliest: dt_time) -> None:
         super().__init__(producer)
         self.latest: Final = earliest
 

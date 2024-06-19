@@ -1,9 +1,10 @@
 from __future__ import annotations
 
 from time import monotonic
-from typing import TYPE_CHECKING, Final, override
+from typing import TYPE_CHECKING, Final
 
 from pendulum import DateTime
+from typing_extensions import override
 
 from eascheduler.const import local_tz
 from eascheduler.jobs.base import IdType, JobBase
@@ -15,13 +16,13 @@ if TYPE_CHECKING:
 
 
 class DateTimeJob(JobBase):
-    def __init__(self, executor: ExecutorBase, producer: ProducerBase, *, job_id: IdType | None = None):
+    def __init__(self, executor: ExecutorBase, producer: ProducerBase, *, job_id: IdType | None = None) -> None:
         super().__init__(executor, job_id=job_id)
 
         self.producer: Final = producer
 
     @override
-    def update_next(self):
+    def update_next(self) -> None:
         now = DateTime.now(tz=local_tz)
 
         next_run = self.producer.get_next(now)
