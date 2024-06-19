@@ -33,7 +33,8 @@ STATUS_FINISHED: Final = JobStatusEnum.FINISHED
 
 
 class JobBase(Generic[IdType]):
-    def __init__(self, executor: ExecutorBase, job_id: IdType | None = None):
+    def __init__(self, executor: ExecutorBase, *, job_id: IdType | None = None):
+        super().__init__()
         self.executor: Final = executor
         self._id: Final[IdType] = job_id if job_id is not None else id(self)
         self._scheduler: SchedulerBase | None = None

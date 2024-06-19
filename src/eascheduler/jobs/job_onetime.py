@@ -9,7 +9,7 @@ from typing_extensions import override
 
 from eascheduler.const import local_tz
 from eascheduler.errors import ScheduledRunInThePastError
-from eascheduler.jobs.base import JobBase
+from eascheduler.jobs.base import IdType, JobBase
 
 
 if TYPE_CHECKING:
@@ -17,9 +17,8 @@ if TYPE_CHECKING:
 
 
 class OneTimeJob(JobBase):
-    def __init__(self, executor: ExecutorBase, execution_time: float):
-        super().__init__(executor)
-
+    def __init__(self, executor: ExecutorBase, execution_time: float, *, job_id: IdType | None = None):
+        super().__init__(executor, job_id=job_id)
         self.execution_time: Final = execution_time
 
     @override

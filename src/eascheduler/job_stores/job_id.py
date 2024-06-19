@@ -9,8 +9,8 @@ if TYPE_CHECKING:
     from eascheduler.schedulers import SchedulerBase
 
 
-KEY_TYPE: TypeAlias = TypeVar('KEY_TYPE')
-JOB_TYPE: TypeAlias = TypeVar('JOB_TYPE', bound=JobBase)
+KEY_TYPE = TypeVar('KEY_TYPE')
+JOB_TYPE = TypeVar('JOB_TYPE', bound=JobBase)
 
 
 class SimpleJobIdStore(Generic[KEY_TYPE, JOB_TYPE]):
@@ -22,7 +22,7 @@ class SimpleJobIdStore(Generic[KEY_TYPE, JOB_TYPE]):
 
     def add_job(self, job: JOB_TYPE):
         # remove job from scheduler if it already exists
-        if (job_id := job.job_id) in self._jobs:
+        if (job_id := job.id) in self._jobs:
             msg = f'Duplicate key: {job_id}'
             raise KeyError(msg)
 

@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Final, override
 from pendulum import DateTime
 
 from eascheduler.const import local_tz
-from eascheduler.jobs.base import JobBase
+from eascheduler.jobs.base import IdType, JobBase
 
 
 if TYPE_CHECKING:
@@ -15,8 +15,8 @@ if TYPE_CHECKING:
 
 
 class DateTimeJob(JobBase):
-    def __init__(self, executor: ExecutorBase, producer: ProducerBase):
-        super().__init__(executor)
+    def __init__(self, executor: ExecutorBase, producer: ProducerBase, *, job_id: IdType | None = None):
+        super().__init__(executor, job_id=job_id)
 
         self.producer: Final = producer
 
@@ -28,11 +28,3 @@ class DateTimeJob(JobBase):
         next_time = next_run.diff(DateTime.now(tz=local_tz)).total_seconds() - monotonic()
 
         self.set_next_time(next_time, next_run)
-
-    @override
-    def job_stop(self):
-        self.set_next_time(None, None)
-
-    @override
-    def job_resume(self):
-        self.update_next()

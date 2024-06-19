@@ -51,7 +51,7 @@ class SequentialTaskManager(SequentialTaskManagerBase):
 
     def __init__(self):
         super().__init__()
-        self.queue: Final[deque[tuple[Coroutine, str]]] = deque()
+        self.queue: Final[deque[tuple[Coroutine, str | None]]] = deque()
 
     def __repr__(self):
         return f'<{self.__class__.__name__:s} running={self.task is not None} queue={len(self.queue):d}>'

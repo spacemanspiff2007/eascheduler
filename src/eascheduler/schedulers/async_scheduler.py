@@ -9,7 +9,7 @@ from typing import TYPE_CHECKING, Final
 from typing_extensions import override
 
 from eascheduler.errors.handler import process_exception
-from eascheduler.jobs.base import STATUS_RUNNING, STATUS_FINISHED
+from eascheduler.jobs.base import STATUS_RUNNING
 from eascheduler.schedulers.base import SchedulerBase
 
 
