@@ -26,6 +26,6 @@ class DateTimeJob(JobBase):
         now = DateTime.now(tz=local_tz)
 
         next_run = self.producer.get_next(now)
-        next_time = next_run.diff(DateTime.now(tz=local_tz)).total_seconds() - monotonic()
+        next_time = monotonic() + next_run.diff(DateTime.now(tz=local_tz)).total_seconds()
 
         self.set_next_time(next_time, next_run)
