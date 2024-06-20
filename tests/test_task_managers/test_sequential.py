@@ -1,7 +1,12 @@
 import asyncio
-from typing import TypeVar, Callable, Any
+from typing import Any, Callable, TypeVar
 
-from eascheduler.task_managers import LimitingSequentialTaskManager, SequentialTaskManager, TaskManagerBase, SequentialDeduplicatingTaskManager
+from eascheduler.task_managers import (
+    LimitingSequentialTaskManager,
+    SequentialDeduplicatingTaskManager,
+    SequentialTaskManager,
+    TaskManagerBase,
+)
 
 
 T = TypeVar('T', bound=TaskManagerBase)
@@ -114,8 +119,8 @@ async def test_deduplicating_repr():
 
 async def test_deduplicating_skip():
     d = {k: 1 for k in range(10)}
-    d[2] = 3
-    d[3] = 2
+    d[2] = 2
+    d[3] = 3
 
     t, res = create_tasks(SequentialDeduplicatingTaskManager(), d.get)
 

@@ -2,12 +2,14 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Final
 
-from pendulum import DateTime
 from typing_extensions import override
 
 from eascheduler.jobs.base import IdType, JobBase
 
+
 if TYPE_CHECKING:
+    from pendulum import DateTime
+
     from eascheduler.executor import ExecutorBase
 
 
