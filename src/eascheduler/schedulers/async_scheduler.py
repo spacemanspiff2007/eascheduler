@@ -3,11 +3,13 @@ from __future__ import annotations
 import asyncio
 from bisect import insort
 from collections import deque
-from time import monotonic
 from typing import TYPE_CHECKING, Final
 
-from typing_extensions import override
+from pendulum import DateTime
+from typing_extensions import Self, override
 
+from eascheduler.const import local_tz
+from eascheduler.errors import ScheduledRunInThePastError
 from eascheduler.errors.handler import process_exception
 from eascheduler.jobs.base import STATUS_RUNNING
 from eascheduler.schedulers.base import SchedulerBase
@@ -32,11 +34,12 @@ class AsyncScheduler(SchedulerBase):
     def run_jobs(self) -> None:
         self.timer = None
         jobs = self.jobs
+        loop = self._loop
 
         try:
             while jobs:
                 job = jobs[0]
-                if job.next_time > monotonic():
+                if job.loop_time > loop.time():
                     break
 
                 jobs.popleft()
@@ -63,10 +66,25 @@ class AsyncScheduler(SchedulerBase):
         if job is None:
             self.timer = None
         else:
-            self.timer = self._loop.call_later(job.next_time - monotonic(), self.run_jobs)
+            self.timer = self._loop.call_at(job.loop_time, self.run_jobs)
 
     @override
-    def add_job(self, job: JobBase):
+    def set_job_time(self, job: JobBase, next_time: DateTime | None) -> Self:
+
+        if next_time is None:
+            job.set_loop_time(None, None)
+            return None
+
+        loop_now = self._loop.time()
+        loop_next = loop_now + next_time.diff(DateTime.now(tz=local_tz)).total_seconds()
+        if loop_next < loop_now - 0.1:
+            raise ScheduledRunInThePastError()
+
+        job.set_loop_time(loop_next, next_time)
+        return None
+
+    @override
+    def add_job(self, job: JobBase) -> Self:
         if job.status is STATUS_RUNNING:
             insort(self.jobs, job)
             if job is self.jobs[0]:
@@ -74,7 +92,7 @@ class AsyncScheduler(SchedulerBase):
         return self
 
     @override
-    def remove_job(self, job: JobBase):
+    def remove_job(self, job: JobBase) -> Self:
         if not (jobs := self.jobs):
             self._set_timer(None)
             return None
@@ -94,7 +112,7 @@ class AsyncScheduler(SchedulerBase):
         return self
 
     @override
-    def update_job(self, job: JobBase):
+    def update_job(self, job: JobBase) -> Self:
         self.remove_job(job)
         self.add_job(job)
         return self

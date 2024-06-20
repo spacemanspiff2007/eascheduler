@@ -1,6 +1,9 @@
 import asyncio
 from time import monotonic
 
+from pendulum import DateTime
+
+from eascheduler.const import local_tz
 from eascheduler.executor.base import SyncExecutor
 from eascheduler.jobs.job_onetime import OneTimeJob
 from eascheduler.schedulers.async_scheduler import AsyncScheduler
@@ -12,9 +15,8 @@ async def test_scheduler():
 
     def append():
         calls.append(1)
-
     s = AsyncScheduler()
-    job = OneTimeJob(SyncExecutor(append), monotonic() + 0.01)
+    job = OneTimeJob(SyncExecutor(append), DateTime.now(tz=local_tz).add(seconds=0.01))
     job.link_scheduler(s)
 
     await asyncio.sleep(0.1)
@@ -32,10 +34,10 @@ async def test_scheduler_update():
         call_duration = monotonic() - t
 
     s = AsyncScheduler()
-    job = OneTimeJob(SyncExecutor(append, (monotonic(), )), monotonic() + 0.01)
+    job = OneTimeJob(SyncExecutor(append, (monotonic(), )), DateTime.now(tz=local_tz).add(seconds=0.01))
     job.link_scheduler(s)
 
-    job.next_time = monotonic() + 0.02
+    job.loop_time = monotonic() + 0.02
     s.update_job(job)
 
     await asyncio.sleep(0.1)
@@ -49,7 +51,7 @@ async def test_scheduler_repr():
     s = AsyncScheduler()
     assert repr(s) == '<AsyncScheduler jobs=0 next_run=None>'
 
-    job = OneTimeJob(SyncExecutor(lambda: None), monotonic() + 0.01)
+    job = OneTimeJob(SyncExecutor(lambda: None), DateTime.now(tz=local_tz).add(seconds=0.01))
     job.link_scheduler(s)
     assert repr(s) == '<AsyncScheduler jobs=1 next_run=0.010s>'
 

@@ -1,14 +1,13 @@
 from __future__ import annotations
 
 from enum import Enum
-from time import monotonic
 from typing import TYPE_CHECKING, Final, Generic, Hashable, TypeVar, overload
 
 from pendulum import DateTime
 from typing_extensions import Self
 
 from eascheduler.const import local_tz
-from eascheduler.errors.errors import JobAlreadyFinishedError, ScheduledRunInThePastError
+from eascheduler.errors.errors import JobAlreadyFinishedError
 from eascheduler.jobs.event_handler import JobEventHandler
 
 
@@ -43,7 +42,7 @@ class JobBase(Generic[IdType]):
         self.status: JobStatusEnum = STATUS_CREATED
 
         # used to schedule the job
-        self.next_time: float | None = None
+        self.loop_time: float | None = None
 
         # for information only
         self.next_run: DateTime | None = None
@@ -71,21 +70,18 @@ class JobBase(Generic[IdType]):
         return self
 
     @overload
-    def set_next_time(self, next_time: None, next_run: None) -> None:
+    def set_loop_time(self, next_time: None, next_run: None) -> Self:
         ...
 
     @overload
-    def set_next_time(self, next_time: float, next_run: DateTime) -> None:
+    def set_loop_time(self, next_time: float, next_run: DateTime) -> Self:
         ...
 
-    def set_next_time(self, next_time, next_run) -> Self:
-        if next_time is not None and monotonic() >= next_time + 0.1:
-            raise ScheduledRunInThePastError()
-
-        self.next_time = next_time
+    def set_loop_time(self, loop_time, next_run) -> Self:
+        self.loop_time = loop_time
         self.next_run = next_run
 
-        self.status = STATUS_RUNNING if next_time is not None else STATUS_STOPPED
+        self.status = STATUS_RUNNING if loop_time is not None else STATUS_STOPPED
         self.on_update.run(self)
         return self
 
@@ -102,9 +98,9 @@ class JobBase(Generic[IdType]):
         return self.status
 
     def __lt__(self, other_job) -> bool:
-        if (other := other_job.next_time) is None:
+        if (other := other_job.loop_time) is None:
             return True
-        if (this := self.next_time) is None:
+        if (this := self.loop_time) is None:
             return False
         return this < other
 
@@ -118,7 +114,7 @@ class JobBase(Generic[IdType]):
         self._scheduler = None
 
         self.status = STATUS_FINISHED
-        self.next_time = None
+        self.loop_time = None
         self.next_run = None
 
         self.on_finished.run(self)
@@ -129,7 +125,7 @@ class JobBase(Generic[IdType]):
             raise JobAlreadyFinishedError()
 
         self._scheduler.remove_job(self)
-        self.set_next_time(None, None)
+        self.set_loop_time(None, None)
 
     def job_resume(self):
         if self.status is STATUS_FINISHED:

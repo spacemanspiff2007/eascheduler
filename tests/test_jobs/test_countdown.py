@@ -2,7 +2,7 @@ import asyncio
 from time import monotonic
 
 from eascheduler.executor.base import SyncExecutor
-from eascheduler.jobs.base import STATUS_FINISHED, STATUS_STOPPED, STATUS_RUNNING
+from eascheduler.jobs.base import STATUS_RUNNING, STATUS_STOPPED
 from eascheduler.jobs.job_countdown import CountdownJob
 from eascheduler.schedulers.async_scheduler import AsyncScheduler
 

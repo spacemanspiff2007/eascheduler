@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from datetime import timedelta
-from time import monotonic
 from typing import TYPE_CHECKING
 
 from pendulum import DateTime
@@ -22,16 +20,14 @@ class CountdownJob(JobBase):
 
     @override
     def update_next(self) -> None:
-        self.set_next_time(None, None)
-        self._scheduler.update_job(self)
+        self.set_loop_time(None, None)
 
     def countdown(self, secs: float) -> None:
         assert secs > 0, secs
         self._seconds = secs
 
     def reset(self) -> None:
-        next_time = monotonic() + self._seconds
-        self.set_next_time(next_time, DateTime.now(tz=local_tz) + timedelta(next_time - monotonic()))
+        self._scheduler.set_job_time(self, DateTime.now(tz=local_tz).add(seconds=self._seconds))
         self._scheduler.update_job(self)
 
     @override

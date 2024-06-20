@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from time import monotonic
 from typing import TYPE_CHECKING, Final
 
 from pendulum import DateTime
@@ -23,9 +22,5 @@ class DateTimeJob(JobBase):
 
     @override
     def update_next(self) -> None:
-        now = DateTime.now(tz=local_tz)
-
-        next_run = self.producer.get_next(now)
-        next_time = monotonic() + next_run.diff(DateTime.now(tz=local_tz)).total_seconds()
-
-        self.set_next_time(next_time, next_run)
+        next_run = self.producer.get_next(DateTime.now(tz=local_tz))
+        self._scheduler.set_job_time(self, next_run)
