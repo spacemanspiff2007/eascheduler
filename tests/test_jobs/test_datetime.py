@@ -29,7 +29,6 @@ async def test_datetime():
 
     for i, (low, high) in enumerate(targets):
         assert low <= calls[i] <= high
-
     assert job.status is STATUS_RUNNING
 
     job.job_stop()

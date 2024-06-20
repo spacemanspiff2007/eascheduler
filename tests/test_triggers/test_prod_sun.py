@@ -43,7 +43,8 @@ def get_params() -> Generator[ParameterSet, None, None]:
 
 @pytest.mark.parametrize(('producer', 'dt', 'result'), get_params())
 def test_sun(producer: SunProducer, dt: DateTime, result: DateTime):
-    assert producer.get_next(dt) == result
+    for _ in range(10):
+        assert producer.get_next(dt) == result
 
 
 def test_no_sun_pos():

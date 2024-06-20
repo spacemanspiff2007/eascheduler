@@ -16,12 +16,14 @@ def test_simple():
 
     p = GroupProducer([p1, p2])
 
-    assert p.get_next(dt(1, 6)) == dt(1, 8)
-    assert p.get_next(dt(1, 8)) == dt(1, 11)
-    assert p.get_next(dt(1, 11)) == dt(1, 13)
-    assert p.get_next(dt(1, 13)) == dt(1, 14)
-    assert p.get_next(dt(1, 14)) == dt(1, 17)
-    assert p.get_next(dt(1, 17)) == dt(1, 18)
+    # ensure that it's stateless
+    for _ in range(10):
+        assert p.get_next(dt(1, 6)) == dt(1, 8)
+        assert p.get_next(dt(1, 8)) == dt(1, 11)
+        assert p.get_next(dt(1, 11)) == dt(1, 13)
+        assert p.get_next(dt(1, 13)) == dt(1, 14)
+        assert p.get_next(dt(1, 14)) == dt(1, 17)
+        assert p.get_next(dt(1, 17)) == dt(1, 18)
 
 
 def test_filter():
@@ -31,6 +33,8 @@ def test_filter():
     p = GroupProducer([p1, p2])
     p._filter = DayOfWeekProducerFilter([1, 3, 4, 5, 6, 7])
 
-    assert p.get_next(dt(1, 6)) == dt(2, 2)
-    assert p.get_next(dt(2, 2)) == dt(2, 4)
-    assert p.get_next(dt(2, 4)) == dt(2, 5)
+    # ensure that it's stateless
+    for _ in range(10):
+        assert p.get_next(dt(1, 6)) == dt(2, 2)
+        assert p.get_next(dt(2, 2)) == dt(2, 4)
+        assert p.get_next(dt(2, 4)) == dt(2, 5)
