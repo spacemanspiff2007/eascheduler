@@ -111,6 +111,7 @@ class JobBase(Generic[IdType]):
         if self.status is STATUS_FINISHED:
             raise JobAlreadyFinishedError()
 
+        self._scheduler.remove_job(self)
         self._scheduler = None
 
         self.status = STATUS_FINISHED
