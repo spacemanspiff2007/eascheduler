@@ -22,7 +22,7 @@ class CountdownJob(JobBase):
     def update_next(self) -> None:
         self.set_loop_time(None, None)
 
-    def countdown(self, secs: float) -> None:
+    def set_countdown(self, secs: float) -> None:
         assert secs > 0, secs
         self._seconds = secs
 

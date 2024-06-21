@@ -17,7 +17,7 @@ async def test_countdown():
 
     s = AsyncScheduler()
     job = CountdownJob(SyncExecutor(append))
-    job.countdown(0.3)
+    job.set_countdown(0.3)
     job.link_scheduler(s)
 
     job.reset()
@@ -46,7 +46,7 @@ async def test_stop():
 
     s = AsyncScheduler()
     job = CountdownJob(SyncExecutor(append))
-    job.countdown(0.1)
+    job.set_countdown(0.1)
     job.link_scheduler(s)
 
     job.reset()
