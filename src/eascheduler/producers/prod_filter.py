@@ -63,12 +63,12 @@ class TimeProducerFilter(ProducerFilterBase):
 
         time = dt.time()
         if (lower := self._lower) is not None and time < lower:
-            return True
+            return False
 
-        if (upper := self._upper) is not None and time > upper:
-            return True
+        if (upper := self._upper) is not None and time >= upper:
+            return False
 
-        return False
+        return True
 
 
 class DayOfWeekProducerFilter(ProducerFilterBase):

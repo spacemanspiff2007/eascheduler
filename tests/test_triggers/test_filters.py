@@ -12,19 +12,20 @@ from eascheduler.producers.prod_filter import (
 
 
 def test_time_filter():
-    f = TimeProducerFilter(Time(8))
-    assert f.allow(DateTime(2001, 1, 1, 7, 59))
-    assert not f.allow(DateTime(2001, 1, 1, 8))
+    f = TimeProducerFilter(lower=Time(8))
+    assert not f.allow(DateTime(2001, 1, 1, 7, 59))
+    assert f.allow(DateTime(2001, 1, 1, 8))
 
     f = TimeProducerFilter(upper=Time(8))
-    assert not f.allow(DateTime(2001, 1, 1, 7, 59))
-    assert f.allow(DateTime(2001, 1, 1, 8, 0, 1))
+    assert f.allow(DateTime(2001, 1, 1, 7, 59))
+    assert not f.allow(DateTime(2001, 1, 1, 8))
+    assert not f.allow(DateTime(2001, 1, 1, 8, 0, 1))
 
     f = TimeProducerFilter(lower=Time(7), upper=Time(8))
-    assert f.allow(DateTime(2001, 1, 1, 6, 59))
-    assert not f.allow(DateTime(2001, 1, 1, 7))
-    assert not f.allow(DateTime(2001, 1, 1, 7, 59, 59))
-    assert f.allow(DateTime(2001, 1, 1, 8, 0, 1))
+    assert not f.allow(DateTime(2001, 1, 1, 6, 59))
+    assert f.allow(DateTime(2001, 1, 1, 7))
+    assert f.allow(DateTime(2001, 1, 1, 7, 59, 59))
+    assert not f.allow(DateTime(2001, 1, 1, 8, 0))
 
 
 def test_dow_filter():
