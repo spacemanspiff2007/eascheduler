@@ -23,9 +23,13 @@ class OffsetProducerOperation(DateTimeProducerOperationBase):
 
     @override
     def get_next(self, dt: DateTime) -> DateTime:
-        next_dt = self._producer.get_next(dt)
+        next_dt = dt
 
-        return next_dt.add(seconds=self.offset)
+        for _ in not_infinite_loop():  # noqa: RET503
+            next_dt = self._producer.get_next(next_dt)
+            offset_dt = next_dt.add(seconds=self.offset)
+            if offset_dt > dt:
+                return offset_dt
 
 
 class EarliestProducerOperation(DateTimeProducerOperationBase):

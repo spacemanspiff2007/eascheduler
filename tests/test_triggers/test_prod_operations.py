@@ -42,23 +42,49 @@ def _patch_uniform(monkeypatch):
     monkeypatch.setattr(prod_operation_module, 'uniform', PatchedUniform())
 
 
+def test_offset():
+
+    o = OffsetProducerOperation(IntervalProducer(dt(1, 0), 3600), -3600 * 10)
+
+    for _ in range(10):
+        assert o.get_next(dt(1, 3)) == dt(1, 4)
+        assert o.get_next(dt(1, 4)) == dt(1, 5)
+        assert o.get_next(dt(1, 5)) == dt(1, 6)
+
+    o = OffsetProducerOperation(IntervalProducer(dt(1, 0), 3600), 300)
+
+    for _ in range(10):
+        assert o.get_next(dt(1, 3)) == dt(1, 4, 5)
+        assert o.get_next(dt(1, 4)) == dt(1, 5, 5)
+        assert o.get_next(dt(1, 5)) == dt(1, 6, 5)
+
+    o = OffsetProducerOperation(IntervalProducer(dt(1, 0), 3600), -300)
+
+    for _ in range(10):
+        assert o.get_next(dt(1, 3)) == dt(1, 3, 55)
+        assert o.get_next(dt(1, 4)) == dt(1, 4, 55)
+        assert o.get_next(dt(1, 5)) == dt(1, 5, 55)
+
+
 def test_earliest():
 
     o = EarliestProducerOperation(IntervalProducer(dt(1, 0), 3600), dt_time(8, 0, 0))
 
-    assert o.get_next(dt(1, 3)) == dt(1, 8)
-    assert o.get_next(dt(1, 7, 1)) == dt(1, 8)
-    assert o.get_next(dt(1, 22)) == dt(1, 23)
-    assert o.get_next(dt(1, 23)) == dt(2, 8)
+    for _ in range(10):
+        assert o.get_next(dt(1, 3)) == dt(1, 8)
+        assert o.get_next(dt(1, 7, 1)) == dt(1, 8)
+        assert o.get_next(dt(1, 22)) == dt(1, 23)
+        assert o.get_next(dt(1, 23)) == dt(2, 8)
 
 
 def test_latest():
 
     o = LatestProducerOperation(IntervalProducer(dt(1, 0, 30), 3600), dt_time(8, 0, 0))
 
-    assert o.get_next(dt(1, 7)) == dt(1, 7, 30)
-    assert o.get_next(dt(1, 7, 59)) == dt(1, 8)
-    assert o.get_next(dt(1, 8, 1)) == dt(2, 0, 30)
+    for _ in range(10):
+        assert o.get_next(dt(1, 7)) == dt(1, 7, 30)
+        assert o.get_next(dt(1, 7, 59)) == dt(1, 8)
+        assert o.get_next(dt(1, 8, 1)) == dt(2, 0, 30)
 
 
 def test_jitter():
@@ -67,9 +93,10 @@ def test_jitter():
 
     start = dt(1, 0, 59)
 
-    assert o.get_next(start) == dt(1, 1)
-    assert o.get_next(start) == dt(1, 1, 0, 30)
-    assert o.get_next(start) == dt(1, 1, 1)
+    for _ in range(10):
+        assert o.get_next(start) == dt(1, 1)
+        assert o.get_next(start) == dt(1, 1, 0, 30)
+        assert o.get_next(start) == dt(1, 1, 1)
 
 
 def test_jitter_low_ok():
@@ -78,9 +105,10 @@ def test_jitter_low_ok():
 
     start = dt(1, 0, 30)
 
-    assert o.get_next(start) == dt(1, 0, 59)
-    assert o.get_next(start) == dt(1, 1, 0)
-    assert o.get_next(start) == dt(1, 1, 1)
+    for _ in range(10):
+        assert o.get_next(start) == dt(1, 0, 59)
+        assert o.get_next(start) == dt(1, 1, 0)
+        assert o.get_next(start) == dt(1, 1, 1)
 
 
 def test_jitter_shift_forward():
@@ -89,6 +117,7 @@ def test_jitter_shift_forward():
 
     start = dt(1, 0, 59, 30)
 
-    assert o.get_next(start) == start
-    assert o.get_next(start) == dt(1, 1, 0, 30)
-    assert o.get_next(start) == dt(1, 1, 1, 30)
+    for _ in range(10):
+        assert o.get_next(start) == start
+        assert o.get_next(start) == dt(1, 1, 0, 30)
+        assert o.get_next(start) == dt(1, 1, 1, 30)
