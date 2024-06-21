@@ -70,11 +70,11 @@ class JobBase(Generic[IdType]):
         return self
 
     @overload
-    def set_loop_time(self, next_time: None, next_run: None) -> Self:
+    def set_loop_time(self, loop_time: None, next_run: None) -> Self:
         ...
 
     @overload
-    def set_loop_time(self, next_time: float, next_run: DateTime) -> Self:
+    def set_loop_time(self, loop_time: float, next_run: DateTime) -> Self:
         ...
 
     def set_loop_time(self, loop_time, next_run) -> Self:

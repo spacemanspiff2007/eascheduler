@@ -45,7 +45,7 @@ class SunProducer(DateTimeProducerBase):
         self.func: Final = func
 
     @override
-    def get_next(self, dt: DateTime) -> DateTime:
+    def get_next(self, dt: DateTime) -> DateTime:   # type: ignore[return]
 
         new_dt = dt
 

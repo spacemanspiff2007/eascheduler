@@ -22,7 +22,7 @@ class OffsetProducerOperation(DateTimeProducerOperationBase):
         self.offset: Final = offset
 
     @override
-    def get_next(self, dt: DateTime) -> DateTime:
+    def get_next(self, dt: DateTime) -> DateTime:   # type: ignore[return]
         next_dt = dt
 
         for _ in not_infinite_loop():  # noqa: RET503
@@ -58,7 +58,7 @@ class LatestProducerOperation(DateTimeProducerOperationBase):
         self.latest: Final = earliest
 
     @override
-    def get_next(self, dt: DateTime) -> DateTime:
+    def get_next(self, dt: DateTime) -> DateTime:   # type: ignore[return]
         l = self.latest  # noqa: E741
         next_dt = dt
 

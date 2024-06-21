@@ -73,7 +73,7 @@ class AsyncScheduler(SchedulerBase):
 
         if next_time is None:
             job.set_loop_time(None, None)
-            return None
+            return self
 
         loop_now = self._loop.time()
         loop_next = loop_now + next_time.diff(DateTime.now(tz=local_tz)).total_seconds()
@@ -81,7 +81,7 @@ class AsyncScheduler(SchedulerBase):
             raise ScheduledRunInThePastError()
 
         job.set_loop_time(loop_next, next_time)
-        return None
+        return self
 
     @override
     def add_job(self, job: JobBase) -> Self:
@@ -95,7 +95,7 @@ class AsyncScheduler(SchedulerBase):
     def remove_job(self, job: JobBase) -> Self:
         if not (jobs := self.jobs):
             self._set_timer(None)
-            return None
+            return self
 
         is_first = job is self.jobs[0]
         try:  # noqa: SIM105

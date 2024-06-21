@@ -13,7 +13,9 @@ class HasJob(Protocol):
 
 
 class BaseControl:
-    def __eq__(self: HasJob, other: HasJob):
+    def __eq__(self: HasJob, other) -> bool:
+        if not isinstance(other, BaseControl):
+            return False
         if (other_job := getattr(other, '_job', None)) is None:
             return False
         return self._job is other_job

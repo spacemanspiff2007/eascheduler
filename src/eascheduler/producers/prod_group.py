@@ -16,7 +16,7 @@ class GroupProducer(DateTimeProducerBase):
         super().__init__()
         self._producers: Final = tuple(producers)
 
-    def get_next(self, dt: DateTime) -> DateTime:
+    def get_next(self, dt: DateTime) -> DateTime:   # type: ignore[return]
 
         next_dt = dt
 
