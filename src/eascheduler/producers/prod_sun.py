@@ -62,14 +62,33 @@ class SunProducer(DateTimeProducerBase):
 
             # Date has to be in the future
             next_dt = pd_instance(next_sun, tz=new_dt.tz).set(microsecond=0)
-            if next_dt > dt and ((f := self._filter) is None or not f.skip(next_dt)):
+            if next_dt > dt and ((f := self._filter) is None or f.allow(next_dt)):
                 return next_dt
 
             new_dt = new_dt.add(days=1)
 
 
-DawnProducer: Final = SunProducer(sun.dawn)
-SunriseProducer: Final = SunProducer(sun.sunrise)
-NoonProducer: Final = SunProducer(sun.noon)
-SunsetProducer: Final = SunProducer(sun.sunset)
-DuskProducer: Final = SunProducer(sun.dusk)
+class DawnProducer(SunProducer):
+    def __init__(self) -> None:
+        super().__init__(sun.dawn)
+
+
+class SunriseProducer(SunProducer):
+    def __init__(self) -> None:
+        super().__init__(sun.sunrise)
+
+
+class NoonProducer(SunProducer):
+    def __init__(self) -> None:
+        super().__init__(sun.noon)
+
+
+class SunsetProducer(SunProducer):
+    def __init__(self) -> None:
+        super().__init__(sun.sunset)
+
+
+class DuskProducer(SunProducer):
+    def __init__(self) -> None:
+        super().__init__(sun.dusk)
+

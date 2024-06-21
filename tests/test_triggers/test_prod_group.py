@@ -31,10 +31,11 @@ def test_filter():
     p2 = IntervalProducer(dt(1, 8), 3600 * 3)   # 8, 11, 14, 17, 20, 23, 2, 5
 
     p = GroupProducer([p1, p2])
-    p._filter = DayOfWeekProducerFilter([1, 3, 4, 5, 6, 7])
+    p._filter = DayOfWeekProducerFilter([2])
 
     # ensure that it's stateless
     for _ in range(10):
         assert p.get_next(dt(1, 6)) == dt(2, 2)
         assert p.get_next(dt(2, 2)) == dt(2, 4)
         assert p.get_next(dt(2, 4)) == dt(2, 5)
+        assert p.get_next(dt(2, 23)) == dt(9, 1)

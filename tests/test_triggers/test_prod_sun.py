@@ -4,7 +4,7 @@ import pytest
 from _pytest.mark import ParameterSet
 from pendulum import DateTime, Timezone
 
-from eascheduler.producers import prod_sun as prod_sun_module
+from eascheduler.producers import prod_sun as prod_sun_module, DayOfWeekProducerFilter
 from eascheduler.producers.prod_sun import SunProducer, SunriseProducer, SunsetProducer
 
 
@@ -26,17 +26,17 @@ def get_params() -> Generator[ParameterSet, None, None]:
     # Double check with http://suncalc.net/#/52.5245,13.3717,17/2024.03.29/07:29
 
     yield pytest.param(
-        SunriseProducer, DateTime(2024, 3, 29, 12, tzinfo=tz), DateTime(2024, 3, 30, 5, 44, 58, tzinfo=tz),
+        SunriseProducer(), DateTime(2024, 3, 29, 12, tzinfo=tz), DateTime(2024, 3, 30, 5, 44, 58, tzinfo=tz),
         id='Sunrise-30'
     )
     # DST change is on 2024-03-31 02:00
     yield pytest.param(
-        SunriseProducer, DateTime(2024, 3, 30, 12, tzinfo=tz), DateTime(2024, 3, 31, 6, 42, 37, tzinfo=tz),
+        SunriseProducer(), DateTime(2024, 3, 30, 12, tzinfo=tz), DateTime(2024, 3, 31, 6, 42, 37, tzinfo=tz),
         id='Sunrise-31'
     )
 
     yield pytest.param(
-        SunsetProducer, DateTime(2024, 3, 29, 19, tzinfo=tz), DateTime(2024, 3, 30, 18, 37, 42, tzinfo=tz),
+        SunsetProducer(), DateTime(2024, 3, 29, 19, tzinfo=tz), DateTime(2024, 3, 30, 18, 37, 42, tzinfo=tz),
         id='Sunset-30'
     )
 
@@ -50,10 +50,24 @@ def test_sun(producer: SunProducer, dt: DateTime, result: DateTime):
 def test_no_sun_pos():
     prod_sun_module.set_location(69.6529, 18.9565, 10)
     tz = Timezone('Europe/Oslo')
+    producer = SunriseProducer()
 
     dt = DateTime(2024, 5, 16, tzinfo=tz)
     result = DateTime(2024, 5, 16, 1, 19, 58, tzinfo=tz)
-    assert SunriseProducer.get_next(dt) == result
 
+    assert producer.get_next(dt) == result
     # We don't have a sunrise, so we check that we jump forward
-    assert SunriseProducer.get_next(result) == DateTime(2024, 7, 27, 1, 30, 55, tzinfo=tz)
+    assert producer.get_next(result) == DateTime(2024, 7, 27, 1, 30, 55, tzinfo=tz)
+
+
+def test_filter():
+    dt = DateTime(2001, 1, 1, tzinfo=tz)
+    producer = SunriseProducer()
+
+    for _ in range(10):
+        assert producer.get_next(dt) == DateTime(2001, 1, 1, 8, 17, 42, tzinfo=tz)
+
+    producer._filter = DayOfWeekProducerFilter([6])
+
+    for _ in range(10):
+        assert producer.get_next(dt) == DateTime(2001, 1, 6, 8, 16, 19, tzinfo=tz)

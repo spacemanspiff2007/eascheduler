@@ -27,7 +27,7 @@ class TimeProducer(DateTimeProducerBase):
         t = self._time
         new_dt = dt.at(t.hour, t.minute, t.second, t.microsecond)
 
-        while new_dt <= dt or (f := self._filter) is not None and f.skip(new_dt):
+        while new_dt <= dt or ((f := self._filter) is not None and not f.allow(new_dt)):
             new_dt = new_dt.add(days=1)
 
         return new_dt

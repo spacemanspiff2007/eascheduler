@@ -26,5 +26,5 @@ class GroupProducer(DateTimeProducerBase):
             next_dt = values[0]
 
             for value in values:
-                if value > dt and ((f := self._filter) is None or not f.skip(value)):
+                if value > dt and ((f := self._filter) is None or f.allow(value)):
                     return value

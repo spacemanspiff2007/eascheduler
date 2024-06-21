@@ -17,7 +17,7 @@ class ProducerBase:
 class ProducerFilterBase:
     __slots__ = ()
 
-    def skip(self, dt: DateTime) -> bool:
+    def allow(self, dt: DateTime) -> bool:
         raise NotImplementedError()
 
 

@@ -28,14 +28,14 @@ class ProducerFilterGroupBase(ProducerFilterBase):
 
 class AnyGroupProducerFilter(ProducerFilterGroupBase):
     @override
-    def skip(self, dt: DateTime) -> bool:
-        return any(f.skip(dt) for f in self._filters)
+    def allow(self, dt: DateTime) -> bool:
+        return any(f.allow(dt) for f in self._filters)
 
 
 class AllGroupProducerFilter(ProducerFilterGroupBase):
     @override
-    def skip(self, dt: DateTime) -> bool:
-        return all(f.skip(dt) for f in self._filters)
+    def allow(self, dt: DateTime) -> bool:
+        return all(f.allow(dt) for f in self._filters)
 
 
 class InvertingProducerFilter(ProducerFilterBase):
@@ -46,8 +46,8 @@ class InvertingProducerFilter(ProducerFilterBase):
         self._filter: ProducerFilterBase = filter
 
     @override
-    def skip(self, dt: DateTime) -> bool:
-        return not self._filter.skip(dt)
+    def allow(self, dt: DateTime) -> bool:
+        return not self._filter.allow(dt)
 
 
 class TimeProducerFilter(ProducerFilterBase):
@@ -59,7 +59,7 @@ class TimeProducerFilter(ProducerFilterBase):
         self._upper = upper
 
     @override
-    def skip(self, dt: DateTime) -> bool:
+    def allow(self, dt: DateTime) -> bool:
 
         time = dt.time()
         if (lower := self._lower) is not None and time < lower:
@@ -79,7 +79,7 @@ class DayOfWeekProducerFilter(ProducerFilterBase):
         self._weekdays: Final = frozenset(weekdays)
 
     @override
-    def skip(self, dt: DateTime) -> bool:
+    def allow(self, dt: DateTime) -> bool:
         return dt.isoweekday() in self._weekdays
 
 
@@ -91,7 +91,7 @@ class DayOfMonthProducerFilter(ProducerFilterBase):
         self._days: Final = frozenset(days)
 
     @override
-    def skip(self, dt: DateTime) -> bool:
+    def allow(self, dt: DateTime) -> bool:
         return dt.day in self._days
 
 
@@ -103,5 +103,5 @@ class MonthOfYearProducerFilter(ProducerFilterBase):
         self._months: Final = frozenset(months)
 
     @override
-    def skip(self, dt: DateTime) -> bool:
+    def allow(self, dt: DateTime) -> bool:
         return dt.month in self._months
