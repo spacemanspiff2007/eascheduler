@@ -2,7 +2,7 @@ import asyncio
 from time import monotonic
 
 from eascheduler.executor.base import SyncExecutor
-from eascheduler.jobs.base import STATUS_RUNNING, STATUS_STOPPED
+from eascheduler.jobs.base import STATUS_RUNNING, STATUS_PAUSED
 from eascheduler.jobs.job_countdown import CountdownJob
 from eascheduler.schedulers.async_scheduler import AsyncScheduler
 
@@ -33,7 +33,7 @@ async def test_countdown():
 
     assert len(calls) == 1
     assert 0.25 < calls[0] < 0.35
-    assert job.status is STATUS_STOPPED
+    assert job.status is STATUS_PAUSED
 
 
 async def test_stop():
@@ -54,11 +54,11 @@ async def test_stop():
         await asyncio.sleep(0.005)
         job.reset()
 
-    job.job_stop()
+    job.job_pause()
     await asyncio.sleep(0.15)
 
     assert calls == []
-    assert job.status is STATUS_STOPPED
+    assert job.status is STATUS_PAUSED
 
     job.reset()
     last_reset = monotonic()
@@ -67,4 +67,4 @@ async def test_stop():
 
     assert len(calls) == 1
     assert 0.05 < calls[0] < 0.15
-    assert job.status is STATUS_STOPPED
+    assert job.status is STATUS_PAUSED

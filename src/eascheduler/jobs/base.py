@@ -21,13 +21,13 @@ IdType = TypeVar('IdType', bound=Hashable)
 class JobStatusEnum(str, Enum):
     CREATED = 'created'
     RUNNING = 'running'
-    STOPPED = 'stopped'
+    PAUSED = 'paused'
     FINISHED = 'finished'
 
 
 STATUS_CREATED: Final = JobStatusEnum.CREATED
 STATUS_RUNNING: Final = JobStatusEnum.RUNNING
-STATUS_STOPPED: Final = JobStatusEnum.STOPPED
+STATUS_PAUSED: Final = JobStatusEnum.PAUSED
 STATUS_FINISHED: Final = JobStatusEnum.FINISHED
 
 
@@ -81,7 +81,7 @@ class JobBase(Generic[IdType]):
         self.loop_time = loop_time
         self.next_run = next_run
 
-        self.status = STATUS_RUNNING if loop_time is not None else STATUS_STOPPED
+        self.status = STATUS_RUNNING if loop_time is not None else STATUS_PAUSED
         self.on_update.run(self)
         return self
 
@@ -121,7 +121,7 @@ class JobBase(Generic[IdType]):
         self.on_finished.run(self)
         return self
 
-    def job_stop(self):
+    def job_pause(self):
         if self.status is STATUS_FINISHED:
             raise JobAlreadyFinishedError()
 

@@ -12,8 +12,8 @@ class DateTimeJobControl(BaseControl):
     def cancel(self):
         self._job.job_finish()
 
-    def stop(self):
-        self._job.job_stop()
+    def pause(self):
+        self._job.job_pause()
 
     def resume(self):
         self._job.job_resume()

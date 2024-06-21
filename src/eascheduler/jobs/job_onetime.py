@@ -27,7 +27,7 @@ class OneTimeJob(JobBase):
         self._scheduler.set_job_time(self, self.execution_time)
 
     @override
-    def job_stop(self):
+    def job_pause(self):
         raise NotImplementedError()
 
     @override

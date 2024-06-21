@@ -16,7 +16,7 @@ class CountdownJobControl(BaseControl):
         self._job.job_finish()
 
     def stop(self):
-        self._job.job_stop()
+        self._job.job_pause()
 
     def reset(self):
         self._job.reset()
