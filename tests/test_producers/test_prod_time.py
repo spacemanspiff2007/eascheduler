@@ -1,9 +1,8 @@
 from datetime import time as dt_time
 
-from tests.helper import get_ger_str, get_german_as_utc
-
 from eascheduler.producers import TimeProducer
 from eascheduler.producers.prod_filter import DayOfWeekProducerFilter
+from tests.helper import get_ger_str, get_german_as_utc
 
 
 def test_simple():

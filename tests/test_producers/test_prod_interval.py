@@ -1,7 +1,6 @@
-from tests.helper import cmp_utc_with_german, get_ger_str, get_german_as_utc
-
 from eascheduler.producers.prod_filter import DayOfWeekProducerFilter
 from eascheduler.producers.prod_interval import IntervalProducer
+from tests.helper import cmp_utc_with_german, get_ger_str, get_german_as_utc
 
 
 def test_simple():

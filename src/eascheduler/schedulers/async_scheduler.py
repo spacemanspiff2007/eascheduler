@@ -5,10 +5,9 @@ from bisect import insort
 from collections import deque
 from typing import TYPE_CHECKING, Final
 
-from whenever import UTCDateTime
 from typing_extensions import Self, override
+from whenever import UTCDateTime
 
-from eascheduler.const import local_tz
 from eascheduler.errors import ScheduledRunInThePastError
 from eascheduler.errors.handler import process_exception
 from eascheduler.jobs.base import STATUS_RUNNING

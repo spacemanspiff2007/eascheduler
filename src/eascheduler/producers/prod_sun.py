@@ -5,10 +5,10 @@ from typing import Final
 
 from astral import Observer, sun
 from typing_extensions import override
-from eascheduler.const import local_tz
-from whenever import UTCDateTime, LocalSystemDateTime
+from whenever import UTCDateTime
 
 from .base import DateTimeProducerBase, not_infinite_loop
+
 
 OBSERVER: Observer | None = None
 

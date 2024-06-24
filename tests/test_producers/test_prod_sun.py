@@ -3,12 +3,12 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 import pytest
-from tests.helper import get_ger_str, get_german_as_utc
 from whenever import LocalSystemDateTime, ZonedDateTime
 
 from eascheduler.producers import DayOfWeekProducerFilter
 from eascheduler.producers import prod_sun as prod_sun_module
 from eascheduler.producers.prod_sun import SunProducer, SunriseProducer, SunsetProducer
+from tests.helper import get_ger_str, get_german_as_utc
 
 
 if TYPE_CHECKING:

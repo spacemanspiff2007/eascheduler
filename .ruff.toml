@@ -62,7 +62,12 @@ builtins-ignorelist = ["id", "input"]
 
 
 [lint.per-file-ignores]
-"docs/conf.py" = ["INP001", "A001"]
+"docs/conf.py" = [
+    "INP001",   # File `conf.py` is part of an implicit namespace package. Add an `__init__.py`.
+    "A001",     # Variable `copyright` is shadowing a Python builtin
+    "PTH118",   # `os.path.join()` should be replaced by `Path` with `/` operator
+    "PTH100",   # `os.path.abspath()` should be replaced by `Path.resolve()`
+]
 "setup.py" = ["PTH123"]
 
 

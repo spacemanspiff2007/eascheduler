@@ -6,7 +6,7 @@ from eascheduler.errors import InfiniteLoopDetectedError
 
 
 if TYPE_CHECKING:
-    from whenever import UTCDateTime, LocalSystemDateTime
+    from whenever import LocalSystemDateTime, UTCDateTime
 
 
 class ProducerBase:

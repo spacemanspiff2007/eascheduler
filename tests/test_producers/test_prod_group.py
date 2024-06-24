@@ -1,8 +1,7 @@
-from tests.helper import get_german_as_utc
-
 from eascheduler.producers.prod_filter import DayOfWeekProducerFilter
 from eascheduler.producers.prod_group import GroupProducer
 from eascheduler.producers.prod_interval import IntervalProducer
+from tests.helper import get_german_as_utc
 
 
 def test_simple():

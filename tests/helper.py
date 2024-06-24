@@ -1,10 +1,4 @@
-from asyncio import sleep as async_sleep
-from datetime import datetime as dt_datetime
-from typing import Union
-
 from whenever import LocalSystemDateTime, UTCDateTime, ZonedDateTime
-
-from eascheduler.const import local_tz
 
 
 def get_local_as_utc(month=1, day=1, hour=0, minute=0, second=0, *, year=2001,) -> UTCDateTime:
@@ -29,7 +23,3 @@ def cmp_utc_with_german(obj, *args, **kwargs):
 
 def get_ger_str(obj: UTCDateTime) -> str:
     return obj.as_zoned('Europe/Berlin').as_offset().common_iso8601()
-
-
-def get_onetime_job():
-    ...

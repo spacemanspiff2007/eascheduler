@@ -13,6 +13,7 @@
 import os
 import sys
 
+
 # required for autodoc
 sys.path.insert(0, os.path.join(os.path.abspath('..'), 'src'))
 
@@ -20,7 +21,7 @@ sys.path.insert(0, os.path.join(os.path.abspath('..'), 'src'))
 # -- Project information -----------------------------------------------------
 
 project = 'EAScheduler'
-copyright = '2021, spaceman_spiff'
+copyright = '2024, spaceman_spiff'
 author = 'spaceman_spiff'
 
 

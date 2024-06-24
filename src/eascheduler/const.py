@@ -1,6 +1,6 @@
-from datetime import date as dt_date, datetime, tzinfo
+from datetime import date as dt_date
+from datetime import datetime, tzinfo
 from typing import Final
-
 
 
 local_tz: Final[tzinfo] = datetime.now().astimezone().tzinfo
