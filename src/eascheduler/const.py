@@ -1,10 +1,9 @@
-from datetime import date as dt_date
+from datetime import date as dt_date, datetime, tzinfo
 from typing import Final
 
-from pendulum.tz.local_timezone import get_local_timezone as _local_timezone
 
 
-local_tz = _local_timezone()
+local_tz: Final[tzinfo] = datetime.now().astimezone().tzinfo
 
 
 DAY_NAMES: Final[dict[str, int]] = {}

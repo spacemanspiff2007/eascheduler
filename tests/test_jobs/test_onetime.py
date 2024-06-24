@@ -1,8 +1,7 @@
 import asyncio
 
-from pendulum import DateTime
+from whenever import TimeDelta, UTCDateTime
 
-from eascheduler.const import local_tz
 from eascheduler.executor.base import SyncExecutor
 from eascheduler.jobs.base import STATUS_FINISHED
 from eascheduler.jobs.job_onetime import OneTimeJob
@@ -17,7 +16,7 @@ async def test_onetime():
         calls.append(1)
 
     s = AsyncScheduler()
-    job = OneTimeJob(SyncExecutor(append), DateTime.now(tz=local_tz).add(seconds=0.01))
+    job = OneTimeJob(SyncExecutor(append), UTCDateTime.now() + TimeDelta(seconds=0.01))
     job.link_scheduler(s)
 
     await asyncio.sleep(0.05)

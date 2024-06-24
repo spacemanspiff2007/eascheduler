@@ -1,15 +1,14 @@
 from __future__ import annotations
 
-from datetime import datetime, timedelta
+from datetime import datetime
 from typing import Final
 
 from astral import Observer, sun
-from pendulum import DateTime
-from pendulum import instance as pd_instance
 from typing_extensions import override
+from eascheduler.const import local_tz
+from whenever import UTCDateTime, LocalSystemDateTime
 
 from .base import DateTimeProducerBase, not_infinite_loop
-
 
 OBSERVER: Observer | None = None
 
@@ -45,7 +44,7 @@ class SunProducer(DateTimeProducerBase):
         self.func: Final = func
 
     @override
-    def get_next(self, dt: DateTime) -> DateTime:   # type: ignore[return]
+    def get_next(self, dt: UTCDateTime) -> UTCDateTime:   # type: ignore[return]
 
         new_dt = dt
 
@@ -56,14 +55,14 @@ class SunProducer(DateTimeProducerBase):
             next_sun = None  # type: datetime | None
             while next_sun is None:
                 try:
-                    next_sun = self.func(OBSERVER, new_dt.date(), tzinfo=new_dt.tzinfo)
+                    next_sun = self.func(OBSERVER, new_dt.date().py_date())
                 except ValueError:  # noqa: PERF203
-                    new_dt += timedelta(days=1)
+                    new_dt = new_dt.add(days=1)
 
             # Date has to be in the future
-            next_dt = pd_instance(next_sun, tz=new_dt.tz).set(microsecond=0)
-            if next_dt > dt and ((f := self._filter) is None or f.allow(next_dt)):
-                return next_dt
+            new_dt = UTCDateTime.from_py_datetime(next_sun).replace(microsecond=0)
+            if new_dt > dt and ((f := self._filter) is None or f.allow(new_dt.as_local())):
+                return new_dt
 
             new_dt = new_dt.add(days=1)
 

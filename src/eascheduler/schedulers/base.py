@@ -6,7 +6,7 @@ from typing_extensions import Self
 
 
 if TYPE_CHECKING:
-    from pendulum import DateTime
+    from whenever import UTCDateTime
 
     from eascheduler.jobs.base import JobBase
 
@@ -23,5 +23,5 @@ class SchedulerBase:
     def update_job(self, job: JobBase) -> Self:
         raise NotImplementedError()
 
-    def set_job_time(self, job: JobBase, next_time: DateTime | None) -> Self:
+    def set_job_time(self, job: JobBase, next_time: UTCDateTime | None) -> Self:
         raise NotImplementedError()

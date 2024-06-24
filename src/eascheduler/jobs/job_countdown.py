@@ -2,10 +2,9 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from pendulum import DateTime
 from typing_extensions import override
+from whenever import TimeDelta, UTCDateTime
 
-from eascheduler.const import local_tz
 from eascheduler.jobs.base import IdType, JobBase
 
 
@@ -27,7 +26,7 @@ class CountdownJob(JobBase):
         self._seconds = secs
 
     def reset(self) -> None:
-        self._scheduler.set_job_time(self, DateTime.now(tz=local_tz).add(seconds=self._seconds))
+        self._scheduler.set_job_time(self, UTCDateTime.now() + TimeDelta(seconds=self._seconds))
         self._scheduler.update_job(self)
 
     @override

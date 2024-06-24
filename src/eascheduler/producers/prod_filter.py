@@ -11,7 +11,7 @@ if TYPE_CHECKING:
     from collections.abc import Iterable
     from datetime import time as dt_time
 
-    from pendulum import DateTime
+    from whenever import LocalSystemDateTime
 
 
 class ProducerFilterGroupBase(ProducerFilterBase):
@@ -28,13 +28,13 @@ class ProducerFilterGroupBase(ProducerFilterBase):
 
 class AnyGroupProducerFilter(ProducerFilterGroupBase):
     @override
-    def allow(self, dt: DateTime) -> bool:
+    def allow(self, dt: LocalSystemDateTime) -> bool:
         return any(f.allow(dt) for f in self._filters)
 
 
 class AllGroupProducerFilter(ProducerFilterGroupBase):
     @override
-    def allow(self, dt: DateTime) -> bool:
+    def allow(self, dt: LocalSystemDateTime) -> bool:
         return all(f.allow(dt) for f in self._filters)
 
 
@@ -46,7 +46,7 @@ class InvertingProducerFilter(ProducerFilterBase):
         self._filter: ProducerFilterBase = filter
 
     @override
-    def allow(self, dt: DateTime) -> bool:
+    def allow(self, dt: LocalSystemDateTime) -> bool:
         return not self._filter.allow(dt)
 
 
@@ -59,9 +59,9 @@ class TimeProducerFilter(ProducerFilterBase):
         self._upper = upper
 
     @override
-    def allow(self, dt: DateTime) -> bool:
+    def allow(self, dt: LocalSystemDateTime) -> bool:
 
-        time = dt.time()
+        time = dt.py_datetime().time()
         if (lower := self._lower) is not None and time < lower:
             return False
 
@@ -79,8 +79,8 @@ class DayOfWeekProducerFilter(ProducerFilterBase):
         self._weekdays: Final = frozenset(weekdays)
 
     @override
-    def allow(self, dt: DateTime) -> bool:
-        return dt.isoweekday() in self._weekdays
+    def allow(self, dt: LocalSystemDateTime) -> bool:
+        return dt.py_datetime().isoweekday() in self._weekdays
 
 
 class DayOfMonthProducerFilter(ProducerFilterBase):
@@ -91,7 +91,7 @@ class DayOfMonthProducerFilter(ProducerFilterBase):
         self._days: Final = frozenset(days)
 
     @override
-    def allow(self, dt: DateTime) -> bool:
+    def allow(self, dt: LocalSystemDateTime) -> bool:
         return dt.day in self._days
 
 
@@ -103,5 +103,5 @@ class MonthOfYearProducerFilter(ProducerFilterBase):
         self._months: Final = frozenset(months)
 
     @override
-    def allow(self, dt: DateTime) -> bool:
+    def allow(self, dt: LocalSystemDateTime) -> bool:
         return dt.month in self._months

@@ -6,7 +6,7 @@ from .base import DateTimeProducerBase, not_infinite_loop
 
 
 if TYPE_CHECKING:
-    from pendulum import DateTime
+    from whenever import UTCDateTime
 
 
 class GroupProducer(DateTimeProducerBase):
@@ -16,7 +16,7 @@ class GroupProducer(DateTimeProducerBase):
         super().__init__()
         self._producers: Final = tuple(producers)
 
-    def get_next(self, dt: DateTime) -> DateTime:   # type: ignore[return]
+    def get_next(self, dt: UTCDateTime) -> UTCDateTime:   # type: ignore[return]
 
         next_dt = dt
 
@@ -26,5 +26,5 @@ class GroupProducer(DateTimeProducerBase):
             next_dt = values[0]
 
             for value in values:
-                if value > dt and ((f := self._filter) is None or f.allow(value)):
+                if value > dt and ((f := self._filter) is None or f.allow(value.as_local())):
                     return value

@@ -1,59 +1,62 @@
-from pendulum import DateTime, Timezone
+from tests.helper import cmp_utc_with_german, get_ger_str, get_german_as_utc
 
 from eascheduler.producers.prod_filter import DayOfWeekProducerFilter
 from eascheduler.producers.prod_interval import IntervalProducer
 
 
-def dt(day, hour):
-    return DateTime(2001, 1, day, hour, tzinfo=Timezone('Europe/Berlin'))
-
-
 def test_simple():
-    tz = Timezone('Europe/Berlin')
-    dt_start = DateTime(2001, 1, 1, tzinfo=tz)
+    dt_start = get_german_as_utc(1, 1, 1)
     dt_now = dt_start
 
-    p = IntervalProducer(DateTime(2001, 1, 1, 8, tzinfo=tz), 3600 * 5)
+    p = IntervalProducer(get_german_as_utc(1, 1, 8), 3600 * 5)
 
     for v in range(3, 100, 5):
         days = v // 24
         hours = v % 24
         for _ in range(20):
-            assert p.get_next(dt_now) == dt(dt_start.day + days, hours)
-        dt_now = dt(dt_start.day + days, hours)
+            cmp_utc_with_german(p.get_next(dt_now), 1, dt_start.day + days, hours)
+        dt_now = get_german_as_utc(1, dt_start.day + days, hours)
 
 
 def test_filter():
-    producer = IntervalProducer(dt(1, 8), 3600 * 12)
+    producer = IntervalProducer(get_german_as_utc(1, 1, 8), 3600 * 12)
 
     for _ in range(10):
-        assert producer.get_next(dt(1, 7)) == dt(1, 8)
-        assert producer.get_next(dt(1, 8)) == dt(1, 20)
-        assert producer.get_next(dt(1, 20)) == dt(2, 8)
+        assert producer.get_next(get_german_as_utc(1, 1, 7)) == get_german_as_utc(1, 1, 8)
+        assert producer.get_next(get_german_as_utc(1, 1, 8)) == get_german_as_utc(1, 1, 20)
+        assert producer.get_next(get_german_as_utc(1, 1, 20)) == get_german_as_utc(1, 2, 8)
 
     producer._filter = DayOfWeekProducerFilter([6])
     for _ in range(10):
-        assert producer.get_next(dt(1, 7)) == dt(6, 8)
-        assert producer.get_next(dt(6, 8)) == dt(6, 20)
-        assert producer.get_next(dt(6, 20)) == dt(13, 8)
+        assert producer.get_next(get_german_as_utc(1, 1, 7)) == get_german_as_utc(1, 6, 8)
+        assert producer.get_next(get_german_as_utc(1, 6, 8)) == get_german_as_utc(1, 6, 20)
+        assert producer.get_next(get_german_as_utc(1, 6, 20)) == get_german_as_utc(1, 13, 8)
 
 
 def test_dst():
     # one hour jump forward
-    start = DateTime(2001, 3, 25, 1, minute=30, tzinfo=Timezone('Europe/Berlin'))
+    start = get_german_as_utc(3, 25, 0, 30)
     producer = IntervalProducer(start, 3600)
-    assert str(start) == '2001-03-25 01:30:00+01:00'
 
     for _ in range(10):
-        assert str(producer.get_next(start)) == '2001-03-25 03:30:00+02:00'
+        dst_1 = producer.get_next(start)
+        dst_2 = producer.get_next(dst_1)
+        dst_3 = producer.get_next(dst_2)
+
+        assert get_ger_str(start) == '2001-03-25T00:30:00+01:00'
+        assert get_ger_str(dst_1) == '2001-03-25T01:30:00+01:00'
+        assert get_ger_str(dst_2) == '2001-03-25T03:30:00+02:00'
+        assert get_ger_str(dst_3) == '2001-03-25T04:30:00+02:00'
 
     # one hour jump backwards
-    start = DateTime(2001, 10, 28, 1, minute=30, tzinfo=Timezone('Europe/Berlin'))
-    dst_1 = DateTime(2001, 10, 28, 2, minute=30, tzinfo=Timezone('Europe/Berlin'))
-    dst_2 = DateTime(2001, 10, 28, 3, minute=30, tzinfo=Timezone('Europe/Berlin'))
+    start = get_german_as_utc(10, 28, 1, 30)
     producer = IntervalProducer(start, 3600)
 
     for _ in range(10):
-        assert str(producer.get_next(start)) == '2001-10-28 02:30:00+02:00'
-        assert str(producer.get_next(dst_1)) == '2001-10-28 03:30:00+01:00'
-        assert str(producer.get_next(dst_2)) == '2001-10-28 04:30:00+01:00'
+        dst_1 = producer.get_next(start)
+        dst_2 = producer.get_next(dst_1)
+        dst_3 = producer.get_next(dst_2)
+
+        assert get_ger_str(dst_1) == '2001-10-28T02:30:00+02:00'
+        assert get_ger_str(dst_2) == '2001-10-28T02:30:00+01:00'
+        assert get_ger_str(dst_3) == '2001-10-28T03:30:00+01:00'

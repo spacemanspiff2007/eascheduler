@@ -1,7 +1,6 @@
 from asyncio import CancelledError
 from traceback import format_exc
 
-import pendulum
 import pytest
 
 from eascheduler.errors import handler
@@ -13,9 +12,6 @@ def _reset_values():
     sun_module.set_location(52.51870523376821, 13.376072914752532)
 
     yield
-
-    # reset time
-    pendulum.travel_back()
 
     # remove location
     assert hasattr(sun_module, 'OBSERVER')

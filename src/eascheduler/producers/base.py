@@ -6,18 +6,18 @@ from eascheduler.errors import InfiniteLoopDetectedError
 
 
 if TYPE_CHECKING:
-    from pendulum import DateTime
+    from whenever import UTCDateTime, LocalSystemDateTime
 
 
 class ProducerBase:
-    def get_next(self, dt: DateTime) -> DateTime:
+    def get_next(self, dt: UTCDateTime) -> UTCDateTime:
         raise NotImplementedError()
 
 
 class ProducerFilterBase:
     __slots__ = ()
 
-    def allow(self, dt: DateTime) -> bool:
+    def allow(self, dt: LocalSystemDateTime) -> bool:
         raise NotImplementedError()
 
 

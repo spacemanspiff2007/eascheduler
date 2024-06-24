@@ -1,14 +1,23 @@
-from collections.abc import Generator
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
 
 import pytest
-from _pytest.mark import ParameterSet
-from pendulum import DateTime, Timezone
+from tests.helper import get_ger_str, get_german_as_utc
+from whenever import LocalSystemDateTime, ZonedDateTime
 
-from eascheduler.producers import prod_sun as prod_sun_module, DayOfWeekProducerFilter
+from eascheduler.producers import DayOfWeekProducerFilter
+from eascheduler.producers import prod_sun as prod_sun_module
 from eascheduler.producers.prod_sun import SunProducer, SunriseProducer, SunsetProducer
 
 
-tz = Timezone('Europe/Berlin')
+if TYPE_CHECKING:
+    from collections.abc import Generator
+
+    from _pytest.mark import ParameterSet
+
+
+tz = 'Europe/Berlin'
 
 
 @pytest.fixture(autouse=True)
@@ -26,48 +35,53 @@ def get_params() -> Generator[ParameterSet, None, None]:
     # Double check with http://suncalc.net/#/52.5245,13.3717,17/2024.03.29/07:29
 
     yield pytest.param(
-        SunriseProducer(), DateTime(2024, 3, 29, 12, tzinfo=tz), DateTime(2024, 3, 30, 5, 44, 58, tzinfo=tz),
+        SunriseProducer(), get_german_as_utc(3, 29, 12, year=2024), '2024-03-30T05:44:58+01:00',
         id='Sunrise-30'
     )
     # DST change is on 2024-03-31 02:00
     yield pytest.param(
-        SunriseProducer(), DateTime(2024, 3, 30, 12, tzinfo=tz), DateTime(2024, 3, 31, 6, 42, 37, tzinfo=tz),
+        SunriseProducer(), get_german_as_utc(3, 30, 12, year=2024), '2024-03-31T06:42:37+02:00',
         id='Sunrise-31'
     )
 
     yield pytest.param(
-        SunsetProducer(), DateTime(2024, 3, 29, 19, tzinfo=tz), DateTime(2024, 3, 30, 18, 37, 42, tzinfo=tz),
+        SunsetProducer(), get_german_as_utc(3, 30, 12, year=2024), '2024-03-30T18:37:42+01:00',
         id='Sunset-30'
+    )
+    yield pytest.param(
+        SunsetProducer(), get_german_as_utc(3, 31, 12, year=2024), '2024-03-31T19:39:27+02:00',
+        id='Sunset-31'
     )
 
 
 @pytest.mark.parametrize(('producer', 'dt', 'result'), get_params())
-def test_sun(producer: SunProducer, dt: DateTime, result: DateTime):
+def test_sun(producer: SunProducer, dt: LocalSystemDateTime, result: LocalSystemDateTime):
     for _ in range(10):
-        assert producer.get_next(dt) == result
+        assert get_ger_str(producer.get_next(dt.as_utc())) == result
 
 
 def test_no_sun_pos():
+    # http://suncalc.net/#/69.6529,18.9565,10/2024.05.16/13:11
     prod_sun_module.set_location(69.6529, 18.9565, 10)
-    tz = Timezone('Europe/Oslo')
+    tz = 'Europe/Oslo'
     producer = SunriseProducer()
 
-    dt = DateTime(2024, 5, 16, tzinfo=tz)
-    result = DateTime(2024, 5, 16, 1, 19, 58, tzinfo=tz)
+    dt = ZonedDateTime(2024, 5, 17, tz=tz)
+    result = ZonedDateTime(2024, 5, 17, 0, 57, 51, tz=tz)
 
-    assert producer.get_next(dt) == result
+    assert producer.get_next(dt.as_utc()).as_zoned(tz) == result
     # We don't have a sunrise, so we check that we jump forward
-    assert producer.get_next(result) == DateTime(2024, 7, 27, 1, 30, 55, tzinfo=tz)
+    assert producer.get_next(result.as_utc()).as_zoned(tz) == ZonedDateTime(2024, 7, 27, 1, 30, 55, tz=tz)
 
 
 def test_filter():
-    dt = DateTime(2001, 1, 1, tzinfo=tz)
+    dt = ZonedDateTime(2001, 1, 1, tz=tz)
     producer = SunriseProducer()
 
     for _ in range(10):
-        assert producer.get_next(dt) == DateTime(2001, 1, 1, 8, 17, 42, tzinfo=tz)
+        assert producer.get_next(dt.as_utc()).as_zoned(tz) == ZonedDateTime(2001, 1, 1, 8, 17, 42, tz=tz)
 
     producer._filter = DayOfWeekProducerFilter([6])
 
     for _ in range(10):
-        assert producer.get_next(dt) == DateTime(2001, 1, 6, 8, 16, 19, tzinfo=tz)
+        assert producer.get_next(dt.as_utc()).as_zoned(tz) == ZonedDateTime(2001, 1, 6, 8, 16, 19, tz=tz)

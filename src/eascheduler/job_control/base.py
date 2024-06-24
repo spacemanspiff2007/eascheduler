@@ -1,13 +1,11 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Hashable
 
 from typing_extensions import Self
 
 
 if TYPE_CHECKING:
-    from pendulum import DateTime
-
     from eascheduler.jobs.base import IdType, JobBase, JobStatusEnum
 
 
@@ -26,7 +24,7 @@ class BaseControl:
         return self
 
     @property
-    def id(self) -> IdType:
+    def id(self) -> Hashable:
         """Get the job's id"""
 
         return self._job.id

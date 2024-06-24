@@ -1,16 +1,16 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Iterable
 
 from typing_extensions import override
+from whenever import LocalSystemDateTime, UTCDateTime, SkippedTime, AmbiguousTime
 
-from .base import DateTimeProducerBase
+from .base import DateTimeProducerBase, not_infinite_loop
+
 
 
 if TYPE_CHECKING:
     from datetime import time as dt_time
-
-    from pendulum import DateTime
 
 
 class TimeProducer(DateTimeProducerBase):
@@ -21,13 +21,37 @@ class TimeProducer(DateTimeProducerBase):
 
         self._time: dt_time = time
 
+    @staticmethod
+    def _get_objs(dt: LocalSystemDateTime, time: dt_time) -> Iterable[LocalSystemDateTime]:
+        try:
+            return [
+                LocalSystemDateTime(dt.year, dt.month, dt.day, time.hour, time.minute, time.second, time.microsecond)
+            ]
+        except SkippedTime:
+            return []
+        except AmbiguousTime:
+            return [
+                LocalSystemDateTime(
+                    dt.year, dt.month, dt.day, time.hour, time.minute, time.second, time.microsecond,
+                    disambiguate='earlier'
+                ),
+                LocalSystemDateTime(
+                    dt.year, dt.month, dt.day, time.hour, time.minute, time.second, time.microsecond,
+                    disambiguate='later'
+                )
+            ]
+
     @override
-    def get_next(self, dt: DateTime) -> DateTime:
+    def get_next(self, dt: UTCDateTime) -> UTCDateTime:
+        time = self._time
 
-        t = self._time
-        new_dt = dt.at(t.hour, t.minute, t.second, t.microsecond)
+        next_dt = dt
 
-        while new_dt <= dt or ((f := self._filter) is not None and not f.allow(new_dt)):
-            new_dt = new_dt.add(days=1)
+        for _ in not_infinite_loop():  # noqa: RET503
+            for local_dt in self._get_objs(next_dt.as_local(), time):
+                next_dt = local_dt.as_utc()
+                if next_dt > dt and ((f := self._filter) is None or f.allow(local_dt)):
+                    return next_dt
 
-        return new_dt
+            next_dt = next_dt.add(days=1)
+

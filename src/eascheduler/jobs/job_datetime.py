@@ -2,10 +2,9 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Final
 
-from pendulum import DateTime
 from typing_extensions import override
+from whenever import UTCDateTime
 
-from eascheduler.const import local_tz
 from eascheduler.jobs.base import IdType, JobBase
 
 
@@ -22,5 +21,5 @@ class DateTimeJob(JobBase):
 
     @override
     def update_next(self) -> None:
-        next_run = self.producer.get_next(DateTime.now(tz=local_tz))
+        next_run = self.producer.get_next(UTCDateTime.now())
         self._scheduler.set_job_time(self, next_run)

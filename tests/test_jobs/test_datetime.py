@@ -1,6 +1,6 @@
 import asyncio
 
-from pendulum import DateTime
+from whenever import TimeDelta, UTCDateTime
 
 from eascheduler.executor.base import SyncExecutor
 from eascheduler.jobs.base import STATUS_PAUSED, STATUS_RUNNING
@@ -14,9 +14,9 @@ async def test_datetime():
     calls = []
 
     def append():
-        calls.append(DateTime.now())
+        calls.append(UTCDateTime.now())
 
-    now = DateTime.now().replace(microsecond=0)
+    now = UTCDateTime.now().replace(microsecond=0)
     producer = IntervalProducer(now, 1)
     s = AsyncScheduler()
     job = DateTimeJob(SyncExecutor(append), producer)
@@ -25,7 +25,7 @@ async def test_datetime():
     await asyncio.sleep(3.1)
 
     assert len(calls) == 3
-    targets = [(now.add(seconds=i), now.add(seconds=i + 0.1)) for i in range(1, 4)]
+    targets = [(now.add(seconds=i), now + TimeDelta(seconds=i + 0.1)) for i in range(1, 4)]
 
     for i, (low, high) in enumerate(targets):
         assert low <= calls[i] <= high

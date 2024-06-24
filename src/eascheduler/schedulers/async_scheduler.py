@@ -5,7 +5,7 @@ from bisect import insort
 from collections import deque
 from typing import TYPE_CHECKING, Final
 
-from pendulum import DateTime
+from whenever import UTCDateTime
 from typing_extensions import Self, override
 
 from eascheduler.const import local_tz
@@ -69,14 +69,14 @@ class AsyncScheduler(SchedulerBase):
             self.timer = self._loop.call_at(job.loop_time, self.run_jobs)
 
     @override
-    def set_job_time(self, job: JobBase, next_time: DateTime | None) -> Self:
+    def set_job_time(self, job: JobBase, next_time: UTCDateTime | None) -> Self:
 
         if next_time is None:
             job.set_loop_time(None, None)
             return self
 
         loop_now = self._loop.time()
-        loop_next = loop_now + next_time.diff(DateTime.now(tz=local_tz)).total_seconds()
+        loop_next = loop_now + (next_time - UTCDateTime.now()).in_seconds()
         if loop_next < loop_now - 0.1:
             raise ScheduledRunInThePastError()
 
