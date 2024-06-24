@@ -3,10 +3,9 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Iterable
 
 from typing_extensions import override
-from whenever import LocalSystemDateTime, UTCDateTime, SkippedTime, AmbiguousTime
+from whenever import AmbiguousTime, LocalSystemDateTime, SkippedTime, UTCDateTime
 
 from .base import DateTimeProducerBase, not_infinite_loop
-
 
 
 if TYPE_CHECKING:

@@ -5,7 +5,14 @@ from typing import Iterable, Type, Union
 
 from eascheduler.old_executors import ExecutorBase
 from eascheduler.old_jobs import (
-    CountdownJob, DawnJob, DayOfWeekJob, DuskJob, OneTimeJob, ReoccurringJob, SunriseJob, SunsetJob
+    CountdownJob,
+    DawnJob,
+    DayOfWeekJob,
+    DuskJob,
+    OneTimeJob,
+    ReoccurringJob,
+    SunriseJob,
+    SunsetJob,
 )
 from eascheduler.old_schedulers import AsyncScheduler
 
