@@ -1,6 +1,7 @@
+from datetime import datetime as dt_datetime
+
 from whenever import TimeDelta, UTCDateTime
 
-from eascheduler.const import local_tz
 from eascheduler.executor.base import SyncExecutor
 from eascheduler.job_control import OneTimeJobControl
 from eascheduler.jobs.base import STATUS_FINISHED
@@ -28,19 +29,17 @@ async def test_onetime():
 
 async def test_base_properties():
 
-    target = UTCDateTime.now() + TimeDelta(seconds=0.01)
+    target = (UTCDateTime.now() + TimeDelta(seconds=1)).replace(microsecond=0)
     s = AsyncScheduler()
     job = OneTimeJob(SyncExecutor(lambda: 1/0), target)
     job.link_scheduler(s)
 
     ctrl = OneTimeJobControl(job)
-    assert ctrl.next_run == target.naive()
-    assert ctrl.next_run_tz == target
+    assert ctrl.next_run_datetime == dt_datetime(year=target.year, month=target.month, day=target.day,
+                                                 hour=target.hour, minute=target.minute, second=target.second)
 
     ctrl.cancel()
     assert ctrl.status == 'finished'
 
-    assert ctrl.next_run is None
-    assert ctrl.next_run_tz is None
-    assert ctrl.last_run is None
-    assert ctrl.last_run_tz is None
+    assert ctrl.next_run_datetime is None
+    assert ctrl.next_run_datetime is None

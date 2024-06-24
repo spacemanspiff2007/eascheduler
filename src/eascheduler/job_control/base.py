@@ -6,7 +6,9 @@ from typing_extensions import Self
 
 
 if TYPE_CHECKING:
-    from eascheduler.jobs.base import IdType, JobBase, JobStatusEnum
+    from datetime import datetime as dt_datetime
+
+    from eascheduler.jobs.base import JobBase, JobStatusEnum
 
 
 class BaseControl:
@@ -36,33 +38,17 @@ class BaseControl:
         return self._job.status
 
     @property
-    def next_run(self) -> DateTime | None:
+    def next_run_datetime(self) -> dt_datetime | None:
         """Get the next run time as a naive datetime object (without timezone set) or None if not scheduled"""
 
         if (nr := self._job.next_run) is None:
             return None
-        return nr.naive()
+        return nr.naive().py_datetime()
 
     @property
-    def next_run_tz(self) -> DateTime | None:
-        """Get the next run time as a datetime object with a timezone set or None if not scheduled"""
-
-        if (nr := self._job.next_run) is None:
-            return None
-        return nr
-
-    @property
-    def last_run(self) -> DateTime | None:
+    def last_run_datetime(self) -> dt_datetime | None:
         """Get the last run time as a naive datetime object (without timezone set) or None if yet run"""
 
         if (nr := self._job.last_run) is None:
             return None
-        return nr.naive()
-
-    @property
-    def last_run_tz(self) -> DateTime | None:
-        """Get the last run time as a datetime object with a timezone set or None if not yet run"""
-
-        if (nr := self._job.last_run) is None:
-            return None
-        return nr
+        return nr.naive().py_datetime()
