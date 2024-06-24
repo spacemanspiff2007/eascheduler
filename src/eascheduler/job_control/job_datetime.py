@@ -15,10 +15,6 @@ class DateTimeJobControl(BaseControl):
     def __init__(self, job: DateTimeJob):
         self._job: Final = job
 
-    def cancel(self) -> Self:
-        self._job.job_finish()
-        return self
-
     def pause(self) -> Self:
         self._job.job_pause()
         return self

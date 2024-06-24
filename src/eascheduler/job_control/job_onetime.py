@@ -14,7 +14,3 @@ if TYPE_CHECKING:
 class OneTimeJobControl(BaseControl):
     def __init__(self, job: OneTimeJob):
         self._job: Final = job
-
-    def cancel(self) -> Self:
-        self._job.job_finish()
-        return self

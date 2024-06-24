@@ -36,3 +36,24 @@ def test_filter():
         assert producer.get_next(dt(1, 7)) == dt(6, 8)
         assert producer.get_next(dt(6, 8)) == dt(6, 20)
         assert producer.get_next(dt(6, 20)) == dt(13, 8)
+
+
+def test_dst():
+    # one hour jump forward
+    start = DateTime(2001, 3, 25, 1, minute=30, tzinfo=Timezone('Europe/Berlin'))
+    producer = IntervalProducer(start, 3600)
+    assert str(start) == '2001-03-25 01:30:00+01:00'
+
+    for _ in range(10):
+        assert str(producer.get_next(start)) == '2001-03-25 03:30:00+02:00'
+
+    # one hour jump backwards
+    start = DateTime(2001, 10, 28, 1, minute=30, tzinfo=Timezone('Europe/Berlin'))
+    dst_1 = DateTime(2001, 10, 28, 2, minute=30, tzinfo=Timezone('Europe/Berlin'))
+    dst_2 = DateTime(2001, 10, 28, 3, minute=30, tzinfo=Timezone('Europe/Berlin'))
+    producer = IntervalProducer(start, 3600)
+
+    for _ in range(10):
+        assert str(producer.get_next(start)) == '2001-10-28 02:30:00+02:00'
+        assert str(producer.get_next(dst_1)) == '2001-10-28 03:30:00+01:00'
+        assert str(producer.get_next(dst_2)) == '2001-10-28 04:30:00+01:00'

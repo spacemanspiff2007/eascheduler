@@ -3,7 +3,7 @@ import asyncio
 from pendulum import DateTime
 
 from eascheduler.executor.base import SyncExecutor
-from eascheduler.jobs.base import STATUS_RUNNING, STATUS_PAUSED
+from eascheduler.jobs.base import STATUS_PAUSED, STATUS_RUNNING
 from eascheduler.jobs.job_datetime import DateTimeJob
 from eascheduler.producers import IntervalProducer
 from eascheduler.schedulers.async_scheduler import AsyncScheduler
@@ -33,3 +33,8 @@ async def test_datetime():
 
     job.job_pause()
     assert job.status is STATUS_PAUSED
+    assert job.next_run is None
+
+    job.job_resume()
+    assert job.status is STATUS_RUNNING
+    assert job.next_run == now.add(seconds=4)
