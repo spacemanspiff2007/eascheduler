@@ -32,6 +32,7 @@ class DateTimeProducerOperationBase(ProducerBase):
     __slots__ = ('_producer', )
 
     def __init__(self, producer: DateTimeProducerBase) -> None:
+        super().__init__()
         self._producer: DateTimeProducerBase = producer
 
 
