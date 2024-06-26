@@ -11,6 +11,10 @@ from eascheduler.schedulers.async_scheduler import AsyncScheduler
 
 async def test_datetime():
 
+    # we have to start the test at the beginning of a second, otherwise we sleep too long and get too much calls
+    delay = 1 - UTCDateTime.now().microsecond / 100_000 - 0.1
+    await asyncio.sleep(delay)
+
     calls = []
 
     def append():

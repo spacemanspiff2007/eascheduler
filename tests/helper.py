@@ -5,8 +5,9 @@ def get_local_as_utc(month=1, day=1, hour=0, minute=0, second=0, *, year=2001,) 
     return LocalSystemDateTime(year, month, day, hour, minute=minute, second=second).as_utc()
 
 
-def get_german_as_utc(month=1, day=1, hour=0, minute=0, second=0, *, year=2001) -> UTCDateTime:
-    return ZonedDateTime(year, month, day, hour, minute=minute, second=second, tz='Europe/Berlin').as_utc()
+def get_german_as_utc(month=1, day=1, hour=0, minute=0, second=0, *, year=2001, microsecond=0) -> UTCDateTime:
+    return ZonedDateTime(
+        year, month, day, hour, minute=minute, second=second, microsecond=microsecond, tz='Europe/Berlin').as_utc()
 
 
 def cmp_utc_with_local(obj, *args, **kwargs):

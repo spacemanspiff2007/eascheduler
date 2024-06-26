@@ -10,11 +10,11 @@ from eascheduler.jobs.base import IdType, JobBase
 
 if TYPE_CHECKING:
     from eascheduler.executor import ExecutorBase
-    from eascheduler.producers.base import ProducerBase
+    from eascheduler.producers.base import DateTimeProducerBase
 
 
 class DateTimeJob(JobBase):
-    def __init__(self, executor: ExecutorBase, producer: ProducerBase, *, job_id: IdType | None = None) -> None:
+    def __init__(self, executor: ExecutorBase, producer: DateTimeProducerBase, *, job_id: IdType | None = None) -> None:
         super().__init__(executor, job_id=job_id)
 
         self.producer: Final = producer

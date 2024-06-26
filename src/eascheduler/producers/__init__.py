@@ -1,4 +1,4 @@
-from .base import ProducerBase
+from .base import DateTimeProducerBase
 from .prod_filter import (
     AllGroupProducerFilter,
     AnyGroupProducerFilter,

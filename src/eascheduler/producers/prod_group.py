@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Final, Iterable
 
-from .base import DateTimeProducerBase, ProducerBase, not_infinite_loop
+from .base import DateTimeProducerBase, not_infinite_loop
 
 
 if TYPE_CHECKING:
@@ -12,7 +12,7 @@ if TYPE_CHECKING:
 class GroupProducer(DateTimeProducerBase):
     __slots__ = ('_producers', )
 
-    def __init__(self, producers: Iterable[ProducerBase]) -> None:
+    def __init__(self, producers: Iterable[DateTimeProducerBase]) -> None:
         super().__init__()
         self._producers: Final = tuple(producers)
 

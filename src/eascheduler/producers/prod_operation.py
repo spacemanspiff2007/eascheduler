@@ -4,8 +4,9 @@ from random import uniform
 from typing import TYPE_CHECKING, Final
 
 from typing_extensions import override
+from whenever import TimeDelta
 
-from .base import DateTimeProducerBase, DateTimeProducerOperationBase, not_infinite_loop
+from .base import DateTimeProducerBase, DateTimeProducerOperationBase
 
 
 if TYPE_CHECKING:
@@ -22,14 +23,8 @@ class OffsetProducerOperation(DateTimeProducerOperationBase):
         self.offset: Final = offset
 
     @override
-    def get_next(self, dt: UTCDateTime) -> UTCDateTime:   # type: ignore[return]
-        next_dt = dt
-
-        for _ in not_infinite_loop():  # noqa: RET503
-            next_dt = self._producer.get_next(next_dt)
-            offset_dt = next_dt.add(seconds=self.offset)
-            if offset_dt > dt:
-                return offset_dt
+    def apply_operation(self, next_dt: UTCDateTime, dt: UTCDateTime) -> UTCDateTime:
+        return next_dt.add(seconds=self.offset)
 
 
 class EarliestProducerOperation(DateTimeProducerOperationBase):
@@ -40,9 +35,7 @@ class EarliestProducerOperation(DateTimeProducerOperationBase):
         self.earliest: Final = earliest
 
     @override
-    def get_next(self, dt: UTCDateTime) -> UTCDateTime:
-        next_dt = self._producer.get_next(dt)
-
+    def apply_operation(self, next_dt: UTCDateTime, dt: UTCDateTime) -> UTCDateTime:
         e = self.earliest
         earliest_dt = next_dt.as_local().replace(
             hour=e.hour, minute=e.minute, second=e.second, microsecond=e.microsecond).as_utc()
@@ -59,20 +52,13 @@ class LatestProducerOperation(DateTimeProducerOperationBase):
         self.latest: Final = earliest
 
     @override
-    def get_next(self, dt: UTCDateTime) -> UTCDateTime:   # type: ignore[return]
+    def apply_operation(self, next_dt: UTCDateTime, dt: UTCDateTime) -> UTCDateTime:
         l = self.latest  # noqa: E741
-        next_dt = dt
-
-        for _ in not_infinite_loop():  # noqa: RET503
-            next_dt = self._producer.get_next(next_dt)
-
-            latest_dt = next_dt.as_local().replace(
-                hour=l.hour, minute=l.minute, second=l.second, microsecond=l.microsecond).as_utc()
-            if latest_dt >= next_dt:
-                return next_dt
-
-            if latest_dt > dt:
-                return latest_dt
+        latest_dt = next_dt.as_local().replace(
+            hour=l.hour, minute=l.minute, second=l.second, microsecond=l.microsecond).as_utc()
+        if next_dt < latest_dt:
+            return next_dt
+        return latest_dt
 
 
 class JitterProducerOperation(DateTimeProducerOperationBase):
@@ -91,16 +77,15 @@ class JitterProducerOperation(DateTimeProducerOperationBase):
         self.high: Final = high
 
     @override
-    def get_next(self, dt: UTCDateTime) -> UTCDateTime:
-        next_dt = self._producer.get_next(dt)
-
+    def apply_operation(self, next_dt: UTCDateTime, dt: UTCDateTime) -> UTCDateTime:
         if (low := self.low) >= 0:
             return next_dt.add(seconds=int(uniform(low, self.high)))
 
+        # We can use the whole interval because we will always
         lowest = (dt - next_dt).in_seconds()
         if lowest < low:
             return next_dt.add(seconds=int(uniform(low, self.high)))
 
         # shift the interval forward in time
-        diff = lowest - low
-        return next_dt.add(seconds=int(uniform(low + diff, self.high + diff)))
+        diff = lowest - low + 0.0001    # Add a small fraction, so we can be sure that we move forward in time
+        return next_dt + TimeDelta(seconds=uniform(low + diff, self.high + diff))

@@ -112,6 +112,6 @@ def test_jitter_shift_forward():
     start = get_german_as_utc(1, 1, 0, 59, 30)
 
     for _ in range(10):
-        assert o.get_next(start) == start
-        assert o.get_next(start) == get_german_as_utc(1, 1, 1, 0, 30)
-        assert o.get_next(start) == get_german_as_utc(1, 1, 1, 1, 30)
+        assert o.get_next(start) == get_german_as_utc(1, 1, 0, 59, 30, microsecond=100)
+        assert o.get_next(start) == get_german_as_utc(1, 1, 1, 0, 30, microsecond=100)
+        assert o.get_next(start) == get_german_as_utc(1, 1, 1, 1, 30, microsecond=100)
