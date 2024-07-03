@@ -13,16 +13,20 @@ if TYPE_CHECKING:
 
 
 class CountdownJob(JobBase):
-    def __init__(self, executor: ExecutorBase, *, job_id: IdType | None = None) -> None:
+    def __init__(self, executor: ExecutorBase, secs: float, *, job_id: IdType | None = None) -> None:
         super().__init__(executor, job_id=job_id)
         self._seconds: float = 0
+        self.set_countdown(secs)    # Validate and set the countdown
 
     @override
     def update_next(self) -> None:
         self.set_loop_time(None, None)
 
     def set_countdown(self, secs: float) -> None:
-        assert secs > 0, secs
+        if not isinstance(secs, (int, float)):
+            raise TypeError()
+        if secs <= 0:
+            raise ValueError()
         self._seconds = secs
 
     def reset(self) -> None:

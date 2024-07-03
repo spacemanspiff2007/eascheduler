@@ -9,8 +9,8 @@ from eascheduler.schedulers.async_scheduler import AsyncScheduler
 
 
 async def test_eq():
-    job1 = CountdownJob(SyncExecutor(lambda: 1/0))
-    job2 = CountdownJob(SyncExecutor(lambda: 1/0))
+    job1 = CountdownJob(SyncExecutor(lambda: 1/0), 1)
+    job2 = CountdownJob(SyncExecutor(lambda: 1/0), 1)
 
     assert CountdownJobControl(job1) == CountdownJobControl(job1)
     assert CountdownJobControl(job1) != CountdownJobControl(job2)
@@ -25,7 +25,7 @@ async def test_countdown():
         calls.append(monotonic() - last_reset)
 
     s = AsyncScheduler()
-    job = CountdownJob(SyncExecutor(append))
+    job = CountdownJob(SyncExecutor(append), 1)
     job.link_scheduler(s)
 
     ctrl = CountdownJobControl(job)
@@ -56,7 +56,7 @@ async def test_stop():
         calls.append(monotonic() - last_reset)
 
     s = AsyncScheduler()
-    job = CountdownJob(SyncExecutor(append))
+    job = CountdownJob(SyncExecutor(append), 1)
     job.link_scheduler(s)
 
     ctrl = CountdownJobControl(job)

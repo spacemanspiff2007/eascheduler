@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Iterable
+from typing import TYPE_CHECKING, Final, Iterable
 
 from typing_extensions import override
 from whenever import AmbiguousTime, LocalSystemDateTime, SkippedTime, UTCDateTime
@@ -11,14 +11,16 @@ from .base import DateTimeProducerBase, not_infinite_loop
 if TYPE_CHECKING:
     from datetime import time as dt_time
 
+    from whenever import Time
+
 
 class TimeProducer(DateTimeProducerBase):
     __slots__ = ('_time', )
 
-    def __init__(self, time: dt_time) -> None:
+    def __init__(self, time: dt_time | Time) -> None:
         super().__init__()
 
-        self._time: dt_time = time
+        self._time: Final = time
 
     @staticmethod
     def _get_objs(dt: LocalSystemDateTime, time: dt_time) -> Iterable[LocalSystemDateTime]:
@@ -53,4 +55,3 @@ class TimeProducer(DateTimeProducerBase):
                     return next_dt
 
             next_dt = next_dt.add(days=1)
-

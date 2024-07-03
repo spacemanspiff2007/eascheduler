@@ -6,7 +6,6 @@ from typing import TYPE_CHECKING, Final, Generic, Hashable, TypeVar, overload
 from typing_extensions import Self
 from whenever import UTCDateTime
 
-from eascheduler.const import local_tz
 from eascheduler.errors.errors import JobAlreadyFinishedError
 from eascheduler.jobs.event_handler import JobEventHandler
 
