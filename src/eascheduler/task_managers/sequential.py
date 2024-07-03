@@ -1,7 +1,8 @@
 from asyncio import Task, create_task
 from collections import OrderedDict, deque
+from collections.abc import Coroutine, Hashable
 from enum import Enum
-from typing import Coroutine, Final, Hashable
+from typing import Final
 
 from typing_extensions import override
 
