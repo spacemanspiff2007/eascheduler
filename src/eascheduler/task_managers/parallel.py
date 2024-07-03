@@ -65,6 +65,7 @@ class LimitingParallelTaskManager(TaskManagerBase):
     def create_task(self, coro, *, name: str | None = None) -> Task | None:
         if len(self.tasks) >= self.parallel:
             if (action := self.action) is POLICY_SKIP:
+                coro.close()
                 return None
 
             if action is POLICY_CANCEL_FIRST:

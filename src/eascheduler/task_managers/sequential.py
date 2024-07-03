@@ -91,12 +91,13 @@ class LimitingSequentialTaskManager(SequentialTaskManager):
 
         if len(queue := self.queue) >= self.max_queue:
             if (action := self.action) is POLICY_SKIP:
+                coro.close()
                 return None
 
             if action is POLICY_SKIP_FIRST:
-                queue.popleft()
+                queue.popleft()[0].close()
             elif action is POLICY_SKIP_LAST:
-                queue.pop()
+                queue.pop()[0].close()
             else:
                 raise ValueError()
 
@@ -124,7 +125,8 @@ class SequentialDeduplicatingTaskManager(SequentialTaskManagerBase):
     @override
     def create_task(self, coro: Coroutine, key: Hashable, *, name: str | None = None) -> Task | None:
         queue = self.queue
-        queue.pop(key, None)
+        if (rem_coro := queue.pop(key, None)) is not None:
+            rem_coro[0].close()
 
         queue[key] = (coro, name)
         return self._task_start()

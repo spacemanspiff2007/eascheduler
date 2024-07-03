@@ -12,9 +12,6 @@ from eascheduler.task_managers import (
 T = TypeVar('T', bound=TaskManagerBase)
 
 
-TASKS = []
-
-
 def create_tasks(manager: T, arg_func: Callable[[int], Any] | None = None) -> tuple[T, list]:
     res = []
 
@@ -25,28 +22,18 @@ def create_tasks(manager: T, arg_func: Callable[[int], Any] | None = None) -> tu
         res.append(value)
 
     for i in range(count):
-        if arg_func is None:  # noqa: SIM108
-            t = manager.create_task(test(i))
+        if arg_func is None:
+            manager.create_task(test(i))
         else:
-            t = manager.create_task(test(i), arg_func(i))
-
-        if t is not None:
-            TASKS.append(t)
+            manager.create_task(test(i), arg_func(i))
 
     return manager, res
 
 
 async def await_tasks(m: SequentialTaskManager | SequentialDeduplicatingTaskManager):
     await asyncio.sleep(0.01)
-
-    # wait till queue is empty
     while m.task:
         await asyncio.sleep(0.01)
-
-    # await task objects
-    for t in TASKS:
-        await t
-    TASKS.clear()
 
 
 async def test_sequential():
