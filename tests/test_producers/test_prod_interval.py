@@ -1,6 +1,6 @@
 from eascheduler.producers.prod_filter import DayOfWeekProducerFilter
 from eascheduler.producers.prod_interval import IntervalProducer
-from tests.helper import cmp_utc_with_german, get_ger_str, get_local_as_utc
+from tests.helper import cmp_utc_with_german, get_ger_str, get_local_as_utc, get_german_as_utc
 
 
 def test_simple():
@@ -34,7 +34,7 @@ def test_filter():
 
 def test_dst():
     # one hour jump forward
-    start = get_local_as_utc(3, 25, 0, 30)
+    start = get_german_as_utc(3, 25, 0, 30)
     producer = IntervalProducer(start, 3600)
 
     for _ in range(10):
@@ -48,7 +48,7 @@ def test_dst():
         assert get_ger_str(dst_3) == '2001-03-25T04:30:00+02:00'
 
     # one hour jump backwards
-    start = get_local_as_utc(10, 28, 1, 30)
+    start = get_german_as_utc(10, 28, 1, 30)
     producer = IntervalProducer(start, 3600)
 
     for _ in range(10):
