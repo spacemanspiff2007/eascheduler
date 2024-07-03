@@ -90,4 +90,3 @@ class SunsetProducer(SunProducer):
 class DuskProducer(SunProducer):
     def __init__(self) -> None:
         super().__init__(sun.dusk)
-

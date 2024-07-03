@@ -55,5 +55,3 @@ def test_dst():
         assert get_ger_str(dst_1) == '2001-10-28T02:30:00+02:00'
         assert get_ger_str(dst_2) == '2001-10-28T02:30:00+01:00'
         assert get_ger_str(dst_3) == '2001-10-29T02:30:00+01:00'
-
-
