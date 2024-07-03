@@ -10,7 +10,7 @@ from eascheduler.producers.prod_operation import (
     LatestProducerOperation,
     OffsetProducerOperation,
 )
-from tests.helper import get_german_as_utc
+from tests.helper import get_local_as_utc
 
 
 class PatchedUniform:
@@ -38,80 +38,80 @@ def _patch_uniform(monkeypatch):
 
 def test_offset():
 
-    o = OffsetProducerOperation(IntervalProducer(get_german_as_utc(1, 1, 0), 3600), -3600 * 10)
+    o = OffsetProducerOperation(IntervalProducer(get_local_as_utc(1, 1, 0), 3600), -3600 * 10)
 
     for _ in range(10):
-        assert o.get_next(get_german_as_utc(1, 1, 3)) == get_german_as_utc(1, 1, 4)
-        assert o.get_next(get_german_as_utc(1, 1, 4)) == get_german_as_utc(1, 1, 5)
-        assert o.get_next(get_german_as_utc(1, 1, 5)) == get_german_as_utc(1, 1, 6)
+        assert o.get_next(get_local_as_utc(1, 1, 3)) == get_local_as_utc(1, 1, 4)
+        assert o.get_next(get_local_as_utc(1, 1, 4)) == get_local_as_utc(1, 1, 5)
+        assert o.get_next(get_local_as_utc(1, 1, 5)) == get_local_as_utc(1, 1, 6)
 
-    o = OffsetProducerOperation(IntervalProducer(get_german_as_utc(1, 1, 0), 3600), 300)
-
-    for _ in range(10):
-        assert o.get_next(get_german_as_utc(1, 1, 3)) == get_german_as_utc(1, 1, 4, 5)
-        assert o.get_next(get_german_as_utc(1, 1, 4)) == get_german_as_utc(1, 1, 5, 5)
-        assert o.get_next(get_german_as_utc(1, 1, 5)) == get_german_as_utc(1, 1, 6, 5)
-
-    o = OffsetProducerOperation(IntervalProducer(get_german_as_utc(1, 1, 0), 3600), -300)
+    o = OffsetProducerOperation(IntervalProducer(get_local_as_utc(1, 1, 0), 3600), 300)
 
     for _ in range(10):
-        assert o.get_next(get_german_as_utc(1, 1, 3)) == get_german_as_utc(1, 1, 3, 55)
-        assert o.get_next(get_german_as_utc(1, 1, 4)) == get_german_as_utc(1, 1, 4, 55)
-        assert o.get_next(get_german_as_utc(1, 1, 5)) == get_german_as_utc(1, 1, 5, 55)
+        assert o.get_next(get_local_as_utc(1, 1, 3)) == get_local_as_utc(1, 1, 4, 5)
+        assert o.get_next(get_local_as_utc(1, 1, 4)) == get_local_as_utc(1, 1, 5, 5)
+        assert o.get_next(get_local_as_utc(1, 1, 5)) == get_local_as_utc(1, 1, 6, 5)
+
+    o = OffsetProducerOperation(IntervalProducer(get_local_as_utc(1, 1, 0), 3600), -300)
+
+    for _ in range(10):
+        assert o.get_next(get_local_as_utc(1, 1, 3)) == get_local_as_utc(1, 1, 3, 55)
+        assert o.get_next(get_local_as_utc(1, 1, 4)) == get_local_as_utc(1, 1, 4, 55)
+        assert o.get_next(get_local_as_utc(1, 1, 5)) == get_local_as_utc(1, 1, 5, 55)
 
 
 def test_earliest():
 
-    o = EarliestProducerOperation(IntervalProducer(get_german_as_utc(1, 1, 0), 3600), dt_time(8, 0, 0))
+    o = EarliestProducerOperation(IntervalProducer(get_local_as_utc(1, 1, 0), 3600), dt_time(8, 0, 0))
 
     for _ in range(10):
-        assert o.get_next(get_german_as_utc(1, 1, 3)) == get_german_as_utc(1, 1, 8)
-        assert o.get_next(get_german_as_utc(1, 1, 7, 1)) == get_german_as_utc(1, 1, 8)
-        assert o.get_next(get_german_as_utc(1, 1, 22)) == get_german_as_utc(1, 1, 23)
-        assert o.get_next(get_german_as_utc(1, 1, 23)) == get_german_as_utc(1, 2, 8)
+        assert o.get_next(get_local_as_utc(1, 1, 3)) == get_local_as_utc(1, 1, 8)
+        assert o.get_next(get_local_as_utc(1, 1, 7, 1)) == get_local_as_utc(1, 1, 8)
+        assert o.get_next(get_local_as_utc(1, 1, 22)) == get_local_as_utc(1, 1, 23)
+        assert o.get_next(get_local_as_utc(1, 1, 23)) == get_local_as_utc(1, 2, 8)
 
 
 def test_latest():
 
-    o = LatestProducerOperation(IntervalProducer(get_german_as_utc(1, 1, 0, 30), 3600), dt_time(8, 0, 0))
+    o = LatestProducerOperation(IntervalProducer(get_local_as_utc(1, 1, 0, 30), 3600), dt_time(8, 0, 0))
 
     for _ in range(10):
-        assert o.get_next(get_german_as_utc(1, 1, 7)) == get_german_as_utc(1, 1, 7, 30)
-        assert o.get_next(get_german_as_utc(1, 1, 7, 59)) == get_german_as_utc(1, 1, 8)
-        assert o.get_next(get_german_as_utc(1, 1, 8, 1)) == get_german_as_utc(1, 2, 0, 30)
+        assert o.get_next(get_local_as_utc(1, 1, 7)) == get_local_as_utc(1, 1, 7, 30)
+        assert o.get_next(get_local_as_utc(1, 1, 7, 59)) == get_local_as_utc(1, 1, 8)
+        assert o.get_next(get_local_as_utc(1, 1, 8, 1)) == get_local_as_utc(1, 2, 0, 30)
 
 
 def test_jitter():
 
-    o = JitterProducerOperation(IntervalProducer(get_german_as_utc(1, 1, 1), 3600), 60)
+    o = JitterProducerOperation(IntervalProducer(get_local_as_utc(1, 1, 1), 3600), 60)
 
-    start = get_german_as_utc(1, 1, 0, 59)
+    start = get_local_as_utc(1, 1, 0, 59)
 
     for _ in range(10):
-        assert o.get_next(start) == get_german_as_utc(1, 1, 1)
-        assert o.get_next(start) == get_german_as_utc(1, 1, 1, 0, 30)
-        assert o.get_next(start) == get_german_as_utc(1, 1, 1, 1)
+        assert o.get_next(start) == get_local_as_utc(1, 1, 1)
+        assert o.get_next(start) == get_local_as_utc(1, 1, 1, 0, 30)
+        assert o.get_next(start) == get_local_as_utc(1, 1, 1, 1)
 
 
 def test_jitter_low_ok():
 
-    o = JitterProducerOperation(IntervalProducer(get_german_as_utc(1, 1, 1), 3600), -60, 60)
+    o = JitterProducerOperation(IntervalProducer(get_local_as_utc(1, 1, 1), 3600), -60, 60)
 
-    start = get_german_as_utc(1, 1, 0, 30)
+    start = get_local_as_utc(1, 1, 0, 30)
 
     for _ in range(10):
-        assert o.get_next(start) == get_german_as_utc(1, 1, 0, 59)
-        assert o.get_next(start) == get_german_as_utc(1, 1, 1, 0)
-        assert o.get_next(start) == get_german_as_utc(1, 1, 1, 1)
+        assert o.get_next(start) == get_local_as_utc(1, 1, 0, 59)
+        assert o.get_next(start) == get_local_as_utc(1, 1, 1, 0)
+        assert o.get_next(start) == get_local_as_utc(1, 1, 1, 1)
 
 
 def test_jitter_shift_forward():
 
-    o = JitterProducerOperation(IntervalProducer(get_german_as_utc(1, 1, 1), 3600), -60, 60)
+    o = JitterProducerOperation(IntervalProducer(get_local_as_utc(1, 1, 1), 3600), -60, 60)
 
-    start = get_german_as_utc(1, 1, 0, 59, 30)
+    start = get_local_as_utc(1, 1, 0, 59, 30)
 
     for _ in range(10):
-        assert o.get_next(start) == get_german_as_utc(1, 1, 0, 59, 30, microsecond=100)
-        assert o.get_next(start) == get_german_as_utc(1, 1, 1, 0, 30, microsecond=100)
-        assert o.get_next(start) == get_german_as_utc(1, 1, 1, 1, 30, microsecond=100)
+        assert o.get_next(start) == get_local_as_utc(1, 1, 0, 59, 30, microsecond=100)
+        assert o.get_next(start) == get_local_as_utc(1, 1, 1, 0, 30, microsecond=100)
+        assert o.get_next(start) == get_local_as_utc(1, 1, 1, 1, 30, microsecond=100)
