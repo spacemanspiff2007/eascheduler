@@ -12,3 +12,5 @@ ruff == 0.4.10
 pur == 7.3.2
 
 autotyping == 24.3.0
+
+tzlocal == 5.2
