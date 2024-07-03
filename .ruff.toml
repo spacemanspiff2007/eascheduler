@@ -7,9 +7,6 @@ src = ["src", "test"]
 
 [lint]
 
-# https://docs.astral.sh/ruff/settings/#ignore-init-module-imports
-ignore-init-module-imports = true
-
 select = [
     "E", "W",   # https://docs.astral.sh/ruff/rules/#pycodestyle-e-w
     "I",        # https://docs.astral.sh/ruff/rules/#isort-i
