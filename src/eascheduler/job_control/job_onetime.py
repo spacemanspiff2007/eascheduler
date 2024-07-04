@@ -10,5 +10,5 @@ if TYPE_CHECKING:
 
 
 class OneTimeJobControl(BaseControl):
-    def __init__(self, job: OneTimeJob):
+    def __init__(self, job: OneTimeJob) -> None:
         self._job: Final = job  # type: ignore[misc]

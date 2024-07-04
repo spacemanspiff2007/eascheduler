@@ -20,7 +20,7 @@ if TYPE_CHECKING:
 
 
 class FilterObject:
-    def __init__(self, filter: ProducerFilterBase):  # noqa: A002
+    def __init__(self, filter: ProducerFilterBase) -> None:  # noqa: A002
         self._filter: Final = filter
 
 

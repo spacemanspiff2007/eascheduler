@@ -16,13 +16,13 @@ def __create_names() -> None:
             raise ValueError(msg)
         values[key] = value
 
-    def add_values(objs: Iterable[str], cut: int | None):
+    def add_values(objs: Iterable[str], cut: int | None) -> None:
         for nr, day in enumerate(objs, start=1):
             _set_in_values(day.lower(), nr)
             if cut:
                 _set_in_values(day[:cut].lower(), nr)
 
-    def to_dict(dst: dict):
+    def to_dict(dst: dict) -> None:
         for key, value in sorted(values.items(), key=lambda x: (x[1], x[0])):
             dst[key] = value
         values.clear()

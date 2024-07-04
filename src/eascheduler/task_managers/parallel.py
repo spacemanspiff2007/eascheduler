@@ -26,7 +26,7 @@ class ParallelTaskManager(TaskManagerBase):
     def __init__(self) -> None:
         self.tasks: Final[set[Task]] = set()
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         ct = len(self.tasks)
         return f'<{self.__class__.__name__:s} {ct:d} Task{"" if ct == 1 else "s"}>'
 
@@ -51,7 +51,7 @@ class LimitingParallelTaskManager(TaskManagerBase):
         self.action: Final[ParallelTaskPolicy] = \
             ParallelTaskPolicy(action) if not isinstance(action, ParallelTaskPolicy) else action
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         ct = len(self.tasks)
         return (f'<{self.__class__.__name__:s} '
                 f'{ct:d}/{self.parallel:d} Task{"" if ct == 1 else "s"} action={self.action.value:s}>')

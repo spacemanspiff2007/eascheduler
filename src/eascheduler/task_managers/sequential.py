@@ -54,7 +54,7 @@ class SequentialTaskManager(SequentialTaskManagerBase):
         super().__init__()
         self.queue: Final[deque[tuple[Coroutine, str | None]]] = deque()
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f'<{self.__class__.__name__:s} running={self.task is not None} queue={len(self.queue):d}>'
 
     @override
@@ -81,7 +81,7 @@ class LimitingSequentialTaskManager(SequentialTaskManager):
         self.action: Final[SequentialTaskPolicy] = \
             SequentialTaskPolicy(action) if not isinstance(action, SequentialTaskPolicy) else action
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return (
             f'<{self.__class__.__name__:s} running={self.task is not None} coros={len(self.queue):d} '
             f'max_queue={self.max_queue:d} action={self.action.value}>'
@@ -113,7 +113,7 @@ class SequentialDeduplicatingTaskManager(SequentialTaskManagerBase):
         super().__init__()
         self.queue: Final[OrderedDict[Hashable, tuple[Coroutine, str | None]]] = OrderedDict()
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f'<{self.__class__.__name__:s} running={self.task is not None} queue={len(self.queue):d}>'
 
     @override

@@ -27,7 +27,7 @@ class AsyncScheduler(SchedulerBase):
         self.timer: asyncio.TimerHandle | None = None
         self.jobs: Final[deque[JobBase]] = deque()
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         next_run = f'{self.timer.when() - self._loop.time():.3f}s' if self.timer is not None else 'None'
         return f'<{self.__class__.__name__:s} jobs={len(self.jobs):d} next_run={next_run}>'
 

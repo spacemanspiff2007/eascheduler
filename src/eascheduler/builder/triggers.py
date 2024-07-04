@@ -29,7 +29,7 @@ if TYPE_CHECKING:
 
 # noinspection PyShadowingBuiltins,PyProtectedMember
 class TriggerObject:
-    def __init__(self, producer: DateTimeProducerBase):
+    def __init__(self, producer: DateTimeProducerBase) -> None:
         self._producer: Final[DateTimeProducerBase] = producer
 
     def offset(self, offset: int) -> TriggerObject:

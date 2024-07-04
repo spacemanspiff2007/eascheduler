@@ -12,7 +12,7 @@ if TYPE_CHECKING:
 
 
 class DateTimeJobControl(BaseControl):
-    def __init__(self, job: DateTimeJob):
+    def __init__(self, job: DateTimeJob) -> None:
         self._job: Final = job  # type: ignore[misc]
 
     def pause(self) -> Self:
