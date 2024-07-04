@@ -27,21 +27,22 @@ if TYPE_CHECKING:
     from eascheduler.producers.base import DateTimeProducerBase
 
 
-class ProducerObject:
+# noinspection PyShadowingBuiltins,PyProtectedMember
+class TriggerObject:
     def __init__(self, producer: DateTimeProducerBase):
         self._producer: Final[DateTimeProducerBase] = producer
 
-    def offset(self, offset: int) -> ProducerObject:
-        return ProducerObject(OffsetProducerOperation(self._producer, offset))
+    def offset(self, offset: int) -> TriggerObject:
+        return TriggerObject(OffsetProducerOperation(self._producer, offset))
 
-    def earliest(self, earliest: dt_time) -> ProducerObject:
-        return ProducerObject(EarliestProducerOperation(self._producer, earliest))
+    def earliest(self, earliest: dt_time) -> TriggerObject:
+        return TriggerObject(EarliestProducerOperation(self._producer, earliest))
 
-    def latest(self, latest: dt_time) -> ProducerObject:
-        return ProducerObject(LatestProducerOperation(self._producer, latest))
+    def latest(self, latest: dt_time) -> TriggerObject:
+        return TriggerObject(LatestProducerOperation(self._producer, latest))
 
-    def jitter(self, low: int, high: int | None = None) -> ProducerObject:
-        return ProducerObject(JitterProducerOperation(self._producer, low, high))
+    def jitter(self, low: int, high: int | None = None) -> TriggerObject:
+        return TriggerObject(JitterProducerOperation(self._producer, low, high))
 
     def only_on(self, filter: FilterObject):  # noqa: A002
         if self._producer._filter is not None:
@@ -52,35 +53,36 @@ class ProducerObject:
     only_at = only_on
 
 
-class ProducerBuilder:
+# noinspection PyProtectedMember
+class TriggerBuilder:
     @staticmethod
-    def dawn() -> ProducerObject:
-        return ProducerObject(DawnProducer())
+    def dawn() -> TriggerObject:
+        return TriggerObject(DawnProducer())
 
     @staticmethod
-    def sunrise() -> ProducerObject:
-        return ProducerObject(SunriseProducer())
+    def sunrise() -> TriggerObject:
+        return TriggerObject(SunriseProducer())
 
     @staticmethod
-    def noon() -> ProducerObject:
-        return ProducerObject(NoonProducer())
+    def noon() -> TriggerObject:
+        return TriggerObject(NoonProducer())
 
     @staticmethod
-    def sunset() -> ProducerObject:
-        return ProducerObject(SunsetProducer())
+    def sunset() -> TriggerObject:
+        return TriggerObject(SunsetProducer())
 
     @staticmethod
-    def dusk() -> ProducerObject:
-        return ProducerObject(DuskProducer())
+    def dusk() -> TriggerObject:
+        return TriggerObject(DuskProducer())
 
     @staticmethod
-    def group(*builders: ProducerObject) -> ProducerObject:
-        return ProducerObject(GroupProducer([b._producer for b in builders]))
+    def group(*builders: TriggerObject) -> TriggerObject:
+        return TriggerObject(GroupProducer([b._producer for b in builders]))
 
     @staticmethod
-    def interval(start: T_HINT, interval: dt_timedelta | int) -> ProducerObject:
-        return ProducerObject(IntervalProducer(get_utc(start), interval))
+    def interval(start: T_HINT, interval: dt_timedelta | int) -> TriggerObject:
+        return TriggerObject(IntervalProducer(get_utc(start), interval))
 
     @staticmethod
-    def time(time: dt_time) -> ProducerObject:
-        return ProducerObject(TimeProducer(time))
+    def time(time: dt_time) -> TriggerObject:
+        return TriggerObject(TimeProducer(time))

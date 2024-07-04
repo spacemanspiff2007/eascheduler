@@ -24,11 +24,10 @@ def caught_exceptions(monkeypatch):
     traceback = []
 
     def proc_exception(e: Exception):
-        if not isinstance(e, CancelledError):
-            exceptions.append(e)
-            traceback.append(format_exc())
+        exceptions.append(e)
+        traceback.append(format_exc())
 
-    monkeypatch.setattr(handler, 'HANDLER', proc_exception)
+    monkeypatch.setattr(handler, '_EXCEPTION_HANDLER', proc_exception)
 
     yield exceptions
 
@@ -37,4 +36,5 @@ def caught_exceptions(monkeypatch):
         for t in traceback:
             print('')
             print(t)
+
     assert not exceptions

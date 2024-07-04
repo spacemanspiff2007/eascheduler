@@ -9,6 +9,7 @@ from typing_extensions import Self, override
 from whenever import UTCDateTime
 
 from eascheduler.errors import ScheduledRunInThePastError
+from eascheduler.errors.errors import JobExecutionTimeIsNotSetError
 from eascheduler.errors.handler import process_exception
 from eascheduler.jobs.base import STATUS_RUNNING
 from eascheduler.schedulers.base import SchedulerBase
@@ -38,7 +39,9 @@ class AsyncScheduler(SchedulerBase):
         try:
             while jobs:
                 job = jobs[0]
-                if job.loop_time > loop.time():
+                if (loop_time := job.loop_time) is None:
+                    raise JobExecutionTimeIsNotSetError()  # noqa: TRY301
+                if loop_time > loop.time():
                     break
 
                 jobs.popleft()
@@ -65,7 +68,9 @@ class AsyncScheduler(SchedulerBase):
         if job is None:
             self.timer = None
         else:
-            self.timer = self._loop.call_at(job.loop_time, self.run_jobs)
+            if (loop_time := job.loop_time) is None:
+                raise JobExecutionTimeIsNotSetError()
+            self.timer = self._loop.call_at(loop_time, self.run_jobs)
 
     @override
     def set_job_time(self, job: JobBase, next_time: UTCDateTime | None) -> Self:

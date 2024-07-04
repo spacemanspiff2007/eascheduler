@@ -3,7 +3,6 @@ from time import monotonic
 
 from whenever import TimeDelta, UTCDateTime
 
-from eascheduler.const import local_tz
 from eascheduler.executor.base import SyncExecutor
 from eascheduler.jobs.base import STATUS_FINISHED
 from eascheduler.jobs.job_onetime import OneTimeJob

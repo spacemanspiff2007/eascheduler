@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING, Final
 
 from typing_extensions import override
 
+from eascheduler.errors.errors import JobNotLinkedToSchedulerError
 from eascheduler.jobs.base import IdType, JobBase
 
 
@@ -24,7 +25,9 @@ class OneTimeJob(JobBase):
 
     @override
     def update_first(self) -> None:
-        self._scheduler.set_job_time(self, self.execution_time)
+        if (scheduler := self._scheduler) is None:
+            raise JobNotLinkedToSchedulerError()
+        scheduler.set_job_time(self, self.execution_time)
 
     @override
     def job_pause(self):

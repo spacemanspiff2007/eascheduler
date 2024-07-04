@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING
 from typing_extensions import override
 from whenever import TimeDelta, UTCDateTime
 
+from eascheduler.errors.errors import JobNotLinkedToSchedulerError
 from eascheduler.jobs.base import IdType, JobBase
 
 
@@ -30,8 +31,11 @@ class CountdownJob(JobBase):
         self._seconds = secs
 
     def reset(self) -> None:
-        self._scheduler.set_job_time(self, UTCDateTime.now() + TimeDelta(seconds=self._seconds))
-        self._scheduler.update_job(self)
+        if (scheduler := self._scheduler) is None:
+            raise JobNotLinkedToSchedulerError()
+
+        scheduler.set_job_time(self, UTCDateTime.now() + TimeDelta(seconds=self._seconds))
+        scheduler.update_job(self)
 
     @override
     def job_resume(self):

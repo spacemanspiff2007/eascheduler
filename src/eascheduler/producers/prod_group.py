@@ -1,11 +1,13 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Final, Iterable
+from typing import TYPE_CHECKING, Final
 
 from .base import DateTimeProducerBase, not_infinite_loop
 
 
 if TYPE_CHECKING:
+    from collections.abc import Iterable
+
     from whenever import UTCDateTime
 
 

@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from asyncio import Task
-    from typing import Coroutine
+    from collections.abc import Coroutine
 
 
 class TaskManagerBase:

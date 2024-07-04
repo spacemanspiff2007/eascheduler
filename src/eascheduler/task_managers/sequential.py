@@ -124,7 +124,7 @@ class SequentialDeduplicatingTaskManager(SequentialTaskManagerBase):
 
     # noinspection PyMethodOverriding
     @override
-    def create_task(self, coro: Coroutine, key: Hashable, *, name: str | None = None) -> Task | None:
+    def create_task(self, coro: Coroutine, key: Hashable, *, name: str | None = None) -> Task | None:   # type: ignore[override]
         queue = self.queue
         if (rem_coro := queue.pop(key, None)) is not None:
             rem_coro[0].close()

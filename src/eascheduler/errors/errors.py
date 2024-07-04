@@ -2,7 +2,15 @@ class EaSchedulerError(Exception):
     pass
 
 
+class JobNotLinkedToSchedulerError(EaSchedulerError):
+    pass
+
+
 class JobAlreadyCanceledException(EaSchedulerError):
+    pass
+
+
+class JobExecutionTimeIsNotSetError(EaSchedulerError):
     pass
 
 

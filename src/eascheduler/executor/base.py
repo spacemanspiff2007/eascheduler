@@ -1,4 +1,5 @@
-from typing import Any, Awaitable, Callable, Final, Iterable, Mapping
+from collections.abc import Awaitable, Iterable, Mapping
+from typing import Any, Callable, Final
 
 from typing_extensions import override
 
@@ -30,10 +31,10 @@ DEFAULT_TASK_MANAGER: TaskManagerBase = ParallelTaskManager()
 
 
 class AsyncExecutor(ExecutorBase):
-    def __init__(self, coro: Callable[..., Awaitable[Any]],
+    def __init__(self, coro_func: Callable[..., Awaitable[Any]],
                  args: Iterable = (), kwargs: Mapping[str, Any] | None = None,
                  task_manager: TaskManagerBase | None = None) -> None:
-        self._func: Final = coro
+        self._func: Final = coro_func
         self._args: Final = args
         self._kwargs: Final = kwargs if kwargs is not None else {}
 

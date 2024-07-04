@@ -5,3 +5,4 @@ from .errors import (
     ScheduledRunInThePastError,
     UnknownWeekdayError,
 )
+from .handler import set_exception_handler

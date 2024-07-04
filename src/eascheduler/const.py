@@ -1,9 +1,6 @@
+from collections.abc import Iterable
 from datetime import date as dt_date
-from datetime import datetime, tzinfo
-from typing import Final, Iterable
-
-
-local_tz: Final[tzinfo] = datetime.now().astimezone().tzinfo
+from typing import Final
 
 
 DAY_NAMES: Final[dict[str, int]] = {}
@@ -11,7 +8,7 @@ MONTH_NAMES: Final[dict[str, int]] = {}
 
 
 def __create_names() -> None:
-    values = {}
+    values: dict[str, int] = {}
 
     def _set_in_values(key: str, value: int):
         if key in values and values[key] != value:

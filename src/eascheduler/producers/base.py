@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Generator, Literal
+from typing import TYPE_CHECKING, Literal, NoReturn
 
 from typing_extensions import override
 
@@ -8,6 +8,8 @@ from eascheduler.errors import InfiniteLoopDetectedError
 
 
 if TYPE_CHECKING:
+    from collections.abc import Generator
+
     from whenever import LocalSystemDateTime, UTCDateTime
 
 
@@ -52,7 +54,7 @@ class DateTimeProducerOperationBase(DateTimeProducerBase):
                 return value
 
 
-def not_infinite_loop() -> Generator[Literal[True], None, None]:
+def not_infinite_loop() -> Generator[int, None, NoReturn]:
     yield from range(1, 100_000)
 
     raise InfiniteLoopDetectedError()

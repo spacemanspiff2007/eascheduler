@@ -22,7 +22,7 @@ class JobEventHandler:
         return True
 
     def remove(self, callback: Callable[[JobBase], None]) -> bool:
-        if callback in self._callbacks:
+        if callback not in self._callbacks:
             return False
         self._callbacks = tuple(cb for cb in self._callbacks if cb is not callback)
         return True

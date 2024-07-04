@@ -1,7 +1,8 @@
 from __future__ import annotations
 
+from collections.abc import Hashable
 from enum import Enum
-from typing import TYPE_CHECKING, Final, Generic, Hashable, TypeVar, overload
+from typing import TYPE_CHECKING, Callable, Final, Generic, TypeVar, overload
 
 from typing_extensions import Self
 from whenever import UTCDateTime
@@ -15,6 +16,13 @@ if TYPE_CHECKING:
     from eascheduler.schedulers import SchedulerBase
 
 IdType = TypeVar('IdType', bound=Hashable)
+
+
+def _default_job_id_func(job: JobBase) -> Hashable:
+    return id(job)
+
+
+JOB_ID_FUNC: Callable[[JobBase], Hashable] = _default_job_id_func
 
 
 class JobStatusEnum(str, Enum):
@@ -34,7 +42,7 @@ class JobBase(Generic[IdType]):
     def __init__(self, executor: ExecutorBase, *, job_id: IdType | None = None) -> None:
         super().__init__()
         self.executor: Final = executor
-        self._id: Final[IdType] = job_id if job_id is not None else id(self)
+        self._id: Final[IdType] = job_id if job_id is not None else JOB_ID_FUNC(self)
         self._scheduler: SchedulerBase | None = None
 
         # Job status

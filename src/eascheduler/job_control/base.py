@@ -1,11 +1,12 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Hashable
+from typing import TYPE_CHECKING
 
 from typing_extensions import Self
 
 
 if TYPE_CHECKING:
+    from collections.abc import Hashable
     from datetime import datetime as dt_datetime
 
     from eascheduler.jobs.base import JobBase, JobStatusEnum

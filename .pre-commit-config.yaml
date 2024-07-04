@@ -16,7 +16,9 @@ repos:
     rev: v0.5.0
     hooks:
       - id: ruff
-        args: [ "--select", "I001", "--fix"]
+        #  I001 [*] Import block is un-sorted or un-formatted
+        # UP035 [*] Import from `collections.abc` instead:
+        args: [ "--select", "I001,UP035", "--fix"]
 
   - repo: meta
     hooks:

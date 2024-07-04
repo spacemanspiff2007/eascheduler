@@ -13,7 +13,7 @@ if TYPE_CHECKING:
 
 class CountdownJobControl(BaseControl):
     def __init__(self, job: CountdownJob):
-        self._job: Final[CountdownJob] = job
+        self._job: Final[CountdownJob] = job  # type: ignore[misc]
 
     def set_countdown(self, secs: float) -> Self:
         self._job.set_countdown(secs)
