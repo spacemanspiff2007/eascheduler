@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-from collections.abc import Hashable
+from collections.abc import Callable, Hashable
 from enum import Enum
-from typing import TYPE_CHECKING, Callable, Final, Generic, TypeVar, overload
+from typing import TYPE_CHECKING, Final, Generic, TypeVar, overload
 
 from typing_extensions import Self
 from whenever import UTCDateTime
@@ -95,16 +95,16 @@ class JobBase(Generic[IdType]):
     def update_first(self) -> None:
         self.update_next()
 
-    def update_next(self):
+    def update_next(self) -> None:
         raise NotImplementedError()
 
-    def execute(self):
+    def execute(self) -> JobStatusEnum:
         self.executor.execute()
         self.last_run = UTCDateTime.now()
         self.update_next()
         return self.status
 
-    def __lt__(self, other_job) -> bool:
+    def __lt__(self, other_job: object) -> bool:
         if (other := other_job.loop_time) is None:
             return True
         if (this := self.loop_time) is None:
@@ -114,7 +114,7 @@ class JobBase(Generic[IdType]):
     def __repr__(self) -> str:
         return f'<{self.__class__.__name__} id={self.id!r} status={self.status!s} next_run={self.next_run}>'
 
-    def job_finish(self):
+    def job_finish(self) -> Self:
         if self.status is STATUS_FINISHED:
             raise JobAlreadyFinishedError()
 
@@ -128,16 +128,18 @@ class JobBase(Generic[IdType]):
         self.on_finished.run(self)
         return self
 
-    def job_pause(self):
+    def job_pause(self) -> Self:
         if self.status is STATUS_FINISHED:
             raise JobAlreadyFinishedError()
 
         self._scheduler.remove_job(self)
         self.set_loop_time(None, None)
+        return self
 
-    def job_resume(self):
+    def job_resume(self) -> Self:
         if self.status is STATUS_FINISHED:
             raise JobAlreadyFinishedError()
 
         self.update_next()
         self._scheduler.update_job(self)
+        return self

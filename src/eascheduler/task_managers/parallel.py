@@ -41,7 +41,7 @@ class ParallelTaskManager(TaskManagerBase):
 class LimitingParallelTaskManager(TaskManagerBase):
     __slots__ = ('tasks', 'parallel', 'action')
 
-    def __init__(self, parallel: int, action: ParallelTaskPolicy | str = POLICY_SKIP):
+    def __init__(self, parallel: int, action: ParallelTaskPolicy | str = POLICY_SKIP) -> None:
         super().__init__()
         if not isinstance(parallel, int) or parallel < 1:
             raise ValueError()
@@ -63,7 +63,7 @@ class LimitingParallelTaskManager(TaskManagerBase):
             pass
 
     @override
-    def create_task(self, coro, *, name: str | None = None) -> Task | None:
+    def create_task(self, coro: Coroutine, *, name: str | None = None) -> Task | None:
         if len(self.tasks) >= self.parallel:
             if (action := self.action) is POLICY_SKIP:
                 coro.close()

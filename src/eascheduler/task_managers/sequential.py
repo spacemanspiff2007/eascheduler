@@ -72,7 +72,7 @@ class SequentialTaskManager(SequentialTaskManagerBase):
 class LimitingSequentialTaskManager(SequentialTaskManager):
     __slots__ = ('max_queue', 'action')
 
-    def __init__(self, max_queue: int, action: SequentialTaskPolicy | str = POLICY_SKIP):
+    def __init__(self, max_queue: int, action: SequentialTaskPolicy | str = POLICY_SKIP) -> None:
         super().__init__()
         if not isinstance(max_queue, int) or max_queue < 1:
             raise ValueError()

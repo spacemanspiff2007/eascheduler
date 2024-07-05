@@ -1,7 +1,7 @@
 from .errors import (
     BoundaryFunctionError,
     InfiniteLoopDetectedError,
-    JobAlreadyCanceledException,
+    JobAlreadyCanceledError,
     ScheduledRunInThePastError,
     UnknownWeekdayError,
 )

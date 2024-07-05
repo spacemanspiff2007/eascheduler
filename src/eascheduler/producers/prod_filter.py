@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Final
 
-from typing_extensions import override
+from typing_extensions import Self, override
 
 from .base import ProducerFilterBase
 
@@ -21,7 +21,7 @@ class ProducerFilterGroupBase(ProducerFilterBase):
         self._filters: tuple[ProducerFilterBase, ...] = () if filters is None else tuple(filters)
 
     # noinspection PyShadowingBuiltins
-    def add_filter(self, filter: ProducerFilterBase):  # noqa: A002
+    def add_filter(self, filter: ProducerFilterBase) -> Self:  # noqa: A002
         self._filters = (*self._filters, filter)
         return self
 
@@ -65,7 +65,7 @@ class TimeProducerFilter(ProducerFilterBase):
         if (lower := self._lower) is not None and time < lower:
             return False
 
-        if (upper := self._upper) is not None and time >= upper:
+        if (upper := self._upper) is not None and time >= upper:  # noqa: SIM103
             return False
 
         return True

@@ -6,11 +6,15 @@ class JobNotLinkedToSchedulerError(EaSchedulerError):
     pass
 
 
-class JobAlreadyCanceledException(EaSchedulerError):
+class JobAlreadyCanceledError(EaSchedulerError):
     pass
 
 
 class JobExecutionTimeIsNotSetError(EaSchedulerError):
+    pass
+
+
+class JobAlreadyFinishedError(EaSchedulerError):
     pass
 
 
@@ -30,5 +34,5 @@ class InfiniteLoopDetectedError(EaSchedulerError):
     pass
 
 
-class JobAlreadyFinishedError(EaSchedulerError):
+class LocationNotSetError(EaSchedulerError):
     pass

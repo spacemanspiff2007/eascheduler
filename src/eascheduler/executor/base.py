@@ -1,5 +1,5 @@
-from collections.abc import Awaitable, Iterable, Mapping
-from typing import Any, Callable, Final
+from collections.abc import Awaitable, Callable, Iterable, Mapping
+from typing import Any, Final
 
 from typing_extensions import override
 

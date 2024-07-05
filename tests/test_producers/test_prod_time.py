@@ -2,7 +2,6 @@ from datetime import time as dt_time
 
 import pytest
 from tzlocal import get_localzone_name
-from whenever import LocalSystemDateTime, UTCDateTime, ZonedDateTime
 
 from eascheduler.producers import TimeProducer
 from eascheduler.producers.prod_filter import DayOfWeekProducerFilter
@@ -29,7 +28,7 @@ def test_filter():
 
 
 @pytest.mark.skipif(get_localzone_name() != 'Europe/Berlin',
-                    reason=f"Only works in German timezone (is: {get_localzone_name()})")
+                    reason=f'Only works in German timezone (is: {get_localzone_name()})')
 def test_dst():
     producer = TimeProducer(dt_time(2, 30))
 

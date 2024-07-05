@@ -1,5 +1,5 @@
-from collections.abc import Awaitable
-from typing import Any, Callable, Final
+from collections.abc import Awaitable, Callable
+from typing import Any, Final
 
 from eascheduler.builder.triggers import TriggerObject
 from eascheduler.executor import ExecutorBase

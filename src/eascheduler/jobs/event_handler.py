@@ -1,11 +1,13 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Callable
+from typing import TYPE_CHECKING
 
 from eascheduler.errors.handler import process_exception
 
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
+
     from eascheduler.jobs.base import JobBase
 
 

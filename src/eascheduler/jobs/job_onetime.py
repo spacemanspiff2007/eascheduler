@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Final
+from typing import TYPE_CHECKING, Final, NoReturn
 
 from typing_extensions import override
 
@@ -30,9 +30,9 @@ class OneTimeJob(JobBase):
         scheduler.set_job_time(self, self.execution_time)
 
     @override
-    def job_pause(self):
+    def job_pause(self) -> NoReturn:
         raise NotImplementedError()
 
     @override
-    def job_resume(self):
+    def job_resume(self) -> NoReturn:
         raise NotImplementedError()

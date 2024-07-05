@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Final
 
+from typing_extensions import Self
+
 from eascheduler.builder.helper import T_HINT, get_utc
 from eascheduler.producers import (
     DawnProducer,
@@ -32,19 +34,19 @@ class TriggerObject:
     def __init__(self, producer: DateTimeProducerBase) -> None:
         self._producer: Final[DateTimeProducerBase] = producer
 
-    def offset(self, offset: int) -> TriggerObject:
-        return TriggerObject(OffsetProducerOperation(self._producer, offset))
+    def offset(self, offset: int) -> Self:
+        return self.__class__(OffsetProducerOperation(self._producer, offset))
 
-    def earliest(self, earliest: dt_time) -> TriggerObject:
-        return TriggerObject(EarliestProducerOperation(self._producer, earliest))
+    def earliest(self, earliest: dt_time) -> Self:
+        return self.__class__(EarliestProducerOperation(self._producer, earliest))
 
-    def latest(self, latest: dt_time) -> TriggerObject:
-        return TriggerObject(LatestProducerOperation(self._producer, latest))
+    def latest(self, latest: dt_time) -> Self:
+        return self.__class__(LatestProducerOperation(self._producer, latest))
 
-    def jitter(self, low: int, high: int | None = None) -> TriggerObject:
-        return TriggerObject(JitterProducerOperation(self._producer, low, high))
+    def jitter(self, low: int, high: int | None = None) -> Self:
+        return self.__class__(JitterProducerOperation(self._producer, low, high))
 
-    def only_on(self, filter: FilterObject):  # noqa: A002
+    def only_on(self, filter: FilterObject) -> Self:  # noqa: A002
         if self._producer._filter is not None:
             raise ValueError()
         self._producer._filter = filter._filter

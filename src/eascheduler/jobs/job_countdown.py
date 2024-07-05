@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from typing_extensions import override
+from typing_extensions import Self, override
 from whenever import TimeDelta, UTCDateTime
 
 from eascheduler.errors.errors import JobNotLinkedToSchedulerError
@@ -38,6 +38,6 @@ class CountdownJob(JobBase):
         scheduler.update_job(self)
 
     @override
-    def job_resume(self):
+    def job_resume(self) -> Self:
         # Should call reset
         raise NotImplementedError()

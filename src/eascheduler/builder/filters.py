@@ -34,11 +34,11 @@ class FilterBuilder:
         return FilterObject(AllGroupProducerFilter([f._filter for f in filters]))
 
     @staticmethod
-    def not_(filter: FilterObject):  # noqa: A002
+    def not_(filter: FilterObject) -> FilterObject:  # noqa: A002
         return FilterObject(InvertingProducerFilter(filter._filter))
 
     @staticmethod
-    def time(lower: dt_time | None = None, upper: dt_time | None = None):
+    def time(lower: dt_time | None = None, upper: dt_time | None = None) -> FilterObject:
         return FilterObject(TimeProducerFilter(lower, upper))
 
     @staticmethod

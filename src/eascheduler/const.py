@@ -10,7 +10,7 @@ MONTH_NAMES: Final[dict[str, int]] = {}
 def __create_names() -> None:
     values: dict[str, int] = {}
 
-    def _set_in_values(key: str, value: int):
+    def _set_in_values(key: str, value: int) -> None:
         if key in values and values[key] != value:
             msg = f'Duplicate value for key {key}: {values[key]} and {value}'
             raise ValueError(msg)
@@ -24,7 +24,7 @@ def __create_names() -> None:
 
     def to_dict(dst: dict) -> None:
         for key, value in sorted(values.items(), key=lambda x: (x[1], x[0])):
-            dst[key] = value
+            dst[key] = value  # noqa: PERF403
         values.clear()
 
     # Days in local timezone

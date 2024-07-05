@@ -17,8 +17,10 @@ repos:
     hooks:
       - id: ruff
         #  I001 [*] Import block is un-sorted or un-formatted
-        # UP035 [*] Import from `collections.abc` instead:
-        args: [ "--select", "I001,UP035", "--fix"]
+        # UP035 [*] Import from {target} instead: {names}
+        #  Q000 [*] Double quote found but single quotes preferred
+        #  Q001 [*] Double quote multiline found but single quotes preferred
+        args: [ "--select", "I001,UP035,Q000,Q001", "--fix"]
 
   - repo: meta
     hooks:

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from typing_extensions import Self
 
@@ -15,7 +15,7 @@ if TYPE_CHECKING:
 class BaseControl:
     _job: JobBase
 
-    def __eq__(self, other) -> bool:
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, BaseControl):
             return False
         return self._job is other._job

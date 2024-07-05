@@ -1,4 +1,3 @@
-from asyncio import CancelledError
 from traceback import format_exc
 
 import pytest
@@ -34,7 +33,7 @@ def caught_exceptions(monkeypatch):
     # in case we clear the exceptions (if we expected one)
     if exceptions and traceback:
         for t in traceback:
-            print('')
+            print()
             print(t)
 
     assert not exceptions

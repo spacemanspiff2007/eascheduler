@@ -64,7 +64,7 @@ class LatestProducerOperation(DateTimeProducerOperationBase):
 class JitterProducerOperation(DateTimeProducerOperationBase):
     __slots__ = ('low', 'high')
 
-    def __init__(self, producer: DateTimeProducerBase, low: int, high: int | None = None):
+    def __init__(self, producer: DateTimeProducerBase, low: int, high: int | None = None) -> None:
         super().__init__(producer)
         if high is None:
             high = low
