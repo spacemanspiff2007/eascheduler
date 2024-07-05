@@ -81,6 +81,7 @@ builtins-ignorelist = ["id", "input"]
 
     # https://docs.astral.sh/ruff/rules/#refactor-r
     "PLR2004",  # Magic value used in comparison, consider replacing {value} with a constant variable
+    "PLR0913",  # Too many arguments in function definition ({c_args} > {max_args})
 ]
 
 

@@ -7,8 +7,7 @@ from setuptools import find_packages, setup
 def load_version() -> str:
     version: dict[str, str] = {}
     with open('src/eascheduler/__version__.py') as fp:
-        exec(fp.read(), version)
-    assert version['__version__'], version
+        exec(fp.read(), version)  # noqa: S102
     return version['__version__']
 
 
@@ -35,7 +34,6 @@ setup(
     name='EAScheduler',
     version=__version__,
     author='spaceman_spiff',
-    # author_email="",
     description='Easy async scheduling with a nice interface',
     keywords=[
         'scheduler',
@@ -62,6 +60,5 @@ setup(
         'Programming Language :: Python :: 3.11',
         'Programming Language :: Python :: 3.12',
         'Programming Language :: Python :: 3 :: Only',
-        'Topic :: Office/Business :: Scheduling'
     ],
 )

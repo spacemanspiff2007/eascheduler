@@ -16,20 +16,20 @@ class JobBuilder:
         self._scheduler: Final = scheduler
         self._executor: Final = executor
 
-    def countdown(self, secs, coro_func: Callable[..., Awaitable[Any]],
-                  *args, job_id: IdType | None = None, **kwargs) -> CountdownJobControl:
+    def countdown(self, secs: float, coro_func: Callable[..., Awaitable[Any]],
+                  *args: Any, job_id: IdType | None = None, **kwargs: Any) -> CountdownJobControl:
         job = CountdownJob(self._executor(coro_func, args, kwargs), secs, job_id=job_id)
         job.link_scheduler(self._scheduler)
         return CountdownJobControl(job)
 
     def once(self, instant, coro_func: Callable[..., Awaitable[Any]],
-             *args, job_id: IdType | None = None, **kwargs) -> OneTimeJobControl:
+             *args: Any, job_id: IdType | None = None, **kwargs: Any) -> OneTimeJobControl:
         job = OneTimeJob(self._executor(coro_func, args, kwargs), instant, job_id=job_id)
         job.link_scheduler(self._scheduler)
         return OneTimeJobControl(job)
 
     def at(self, trigger: TriggerObject, coro_func: Callable[..., Awaitable[Any]],
-           *args, job_id: IdType | None = None, **kwargs) -> DateTimeJobControl:
+           *args: Any, job_id: IdType | None = None, **kwargs: Any) -> DateTimeJobControl:
         """Create a job that will run at a specified time.
 
         :param trigger:
