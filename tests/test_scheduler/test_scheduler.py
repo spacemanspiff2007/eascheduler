@@ -7,6 +7,7 @@ from eascheduler.executor.base import SyncExecutor
 from eascheduler.jobs.base import STATUS_FINISHED
 from eascheduler.jobs.job_onetime import OneTimeJob
 from eascheduler.schedulers.async_scheduler import AsyncScheduler
+from tests.helper import assert_called_at
 
 
 async def test_scheduler():
@@ -43,7 +44,7 @@ async def test_scheduler_update():
 
     await asyncio.sleep(0.1)
 
-    assert 0.02 < call_duration < 0.04
+    assert_called_at(call_duration, 0.02)
     assert s.timer is None
 
 

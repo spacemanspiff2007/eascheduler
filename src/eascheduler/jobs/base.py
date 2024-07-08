@@ -31,6 +31,18 @@ class JobStatusEnum(str, Enum):
     PAUSED = 'paused'
     FINISHED = 'finished'
 
+    @property
+    def is_running(self) -> bool:
+        return self is STATUS_RUNNING
+
+    @property
+    def is_paused(self) -> bool:
+        return self is STATUS_PAUSED
+
+    @property
+    def is_finished(self) -> bool:
+        return self is STATUS_FINISHED
+
 
 STATUS_CREATED: Final = JobStatusEnum.CREATED
 STATUS_RUNNING: Final = JobStatusEnum.RUNNING

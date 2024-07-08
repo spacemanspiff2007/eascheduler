@@ -3,12 +3,13 @@ from __future__ import annotations
 import re
 from datetime import datetime as dt_datetime
 from datetime import time as dt_time
+from datetime import timedelta as dt_timedelta
 from typing import TypeAlias
 
 from whenever import LocalSystemDateTime, TimeDelta, UTCDateTime
 
 
-T_HINT: TypeAlias = dt_datetime | dt_time | str | None
+T_HINT: TypeAlias = dt_datetime | dt_time | dt_timedelta | TimeDelta | str | None
 
 RE_TIME = re.compile(r'(?P<hour>[0-5]?\d)\s*:\s*(?P<minute>[0-5]?\d)(?:\s*:\s*(?P<second>[0-5]?\d))?')
 
@@ -20,6 +21,16 @@ def get_utc(value: T_HINT) -> UTCDateTime:
     if isinstance(value, dt_datetime):
         return LocalSystemDateTime.from_py_datetime(value).as_utc()
 
+    # ------------------------------------------------------------------------------------------------------------------
+    # timedelta
+    if isinstance(value, dt_timedelta):
+        return UTCDateTime.now() + TimeDelta.from_py_timedelta(value)
+
+    if isinstance(value, TimeDelta):
+        return UTCDateTime.now() + value
+
+    # ------------------------------------------------------------------------------------------------------------------
+    # time
     if isinstance(value, dt_time):
         now = LocalSystemDateTime.now()
         new = now.replace(

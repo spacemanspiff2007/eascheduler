@@ -6,6 +6,7 @@ from eascheduler.job_control import CountdownJobControl
 from eascheduler.jobs.base import STATUS_PAUSED, STATUS_RUNNING
 from eascheduler.jobs.job_countdown import CountdownJob
 from eascheduler.schedulers.async_scheduler import AsyncScheduler
+from tests.helper import CountDownHelper
 
 
 async def test_eq():
@@ -17,49 +18,37 @@ async def test_eq():
 
 
 async def test_countdown():
-
-    last_reset = 0
-    calls = []
-
-    def append():
-        calls.append(monotonic() - last_reset)
+    calls = CountDownHelper()
 
     s = AsyncScheduler()
-    job = CountdownJob(SyncExecutor(append), 1)
+    job = CountdownJob(SyncExecutor(calls), 1)
     job.link_scheduler(s)
 
-    ctrl = CountdownJobControl(job)
+    ctrl = calls.link_job(CountdownJobControl(job))
     ctrl.set_countdown(0.3)
 
-    ctrl.reset()
+    calls.reset()
     assert job.status is STATUS_RUNNING
 
     for _ in range(10):
         await asyncio.sleep(0.01)
-        ctrl.reset()
-        last_reset = monotonic()
+        calls.reset()
 
-    assert calls == []
+    calls.assert_not_called()
     await asyncio.sleep(0.35)
 
-    assert len(calls) == 1
-    assert 0.25 < calls[0] < 0.35
+    calls.assert_called()
     assert job.status is STATUS_PAUSED
 
 
 async def test_stop():
-
-    last_reset = 0
-    calls = []
-
-    def append():
-        calls.append(monotonic() - last_reset)
+    calls = CountDownHelper()
 
     s = AsyncScheduler()
-    job = CountdownJob(SyncExecutor(append), 1)
+    job = CountdownJob(SyncExecutor(calls), 1)
     job.link_scheduler(s)
 
-    ctrl = CountdownJobControl(job)
+    ctrl = calls.link_job(CountdownJobControl(job))
     ctrl.set_countdown(0.1)
 
     ctrl.reset()
@@ -70,14 +59,12 @@ async def test_stop():
     ctrl.stop()
     await asyncio.sleep(0.15)
 
-    assert calls == []
+    assert calls.assert_not_called()
     assert job.status is STATUS_PAUSED
 
-    ctrl.reset()
-    last_reset = monotonic()
+    calls.reset()
     assert job.status is STATUS_RUNNING
     await asyncio.sleep(0.15)
 
-    assert len(calls) == 1
-    assert 0.05 < calls[0] < 0.15
+    calls.assert_called()
     assert job.status is STATUS_PAUSED

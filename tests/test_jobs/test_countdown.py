@@ -1,68 +1,54 @@
 import asyncio
-from time import monotonic
 
 from eascheduler.executor.base import SyncExecutor
 from eascheduler.jobs.base import STATUS_PAUSED, STATUS_RUNNING
 from eascheduler.jobs.job_countdown import CountdownJob
 from eascheduler.schedulers.async_scheduler import AsyncScheduler
+from tests.helper import CountDownHelper
 
 
 async def test_countdown():
-
-    last_reset = 0
-    calls = []
-
-    def append():
-        calls.append(monotonic() - last_reset)
+    calls = CountDownHelper()
 
     s = AsyncScheduler()
-    job = CountdownJob(SyncExecutor(append), 0.3)
+    job = calls.link_job(CountdownJob(SyncExecutor(calls), 0.3))
     job.link_scheduler(s)
 
-    job.reset()
+    calls.reset()
     assert job.status is STATUS_RUNNING
 
     for _ in range(10):
         await asyncio.sleep(0.01)
-        job.reset()
-        last_reset = monotonic()
+        calls.reset()
 
-    assert calls == []
+    calls.assert_not_called()
     await asyncio.sleep(0.35)
 
-    assert len(calls) == 1
-    assert 0.25 < calls[0] < 0.35
+    calls.assert_called()
     assert job.status is STATUS_PAUSED
 
 
 async def test_stop():
-
-    last_reset = 0
-    calls = []
-
-    def append():
-        calls.append(monotonic() - last_reset)
+    calls = CountDownHelper()
 
     s = AsyncScheduler()
-    job = CountdownJob(SyncExecutor(append), 0.1)
+    job = calls.link_job(CountdownJob(SyncExecutor(calls), 0.1))
     job.link_scheduler(s)
 
     job.reset()
     for _ in range(10):
         await asyncio.sleep(0.005)
-        job.reset()
+        calls.reset()
 
     job.job_pause()
     await asyncio.sleep(0.15)
 
-    assert calls == []
+    calls.assert_not_called()
     assert job.status is STATUS_PAUSED
 
-    job.reset()
-    last_reset = monotonic()
+    calls.reset()
     assert job.status is STATUS_RUNNING
     await asyncio.sleep(0.15)
 
-    assert len(calls) == 1
-    assert 0.05 < calls[0] < 0.15
+    calls.assert_called()
     assert job.status is STATUS_PAUSED
