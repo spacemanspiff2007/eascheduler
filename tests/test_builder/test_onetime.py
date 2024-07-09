@@ -1,6 +1,6 @@
 import asyncio
 
-from whenever import LocalSystemDateTime, TimeDelta
+from whenever import SystemDateTime, TimeDelta
 
 from eascheduler.builder import JobBuilder
 from eascheduler.executor.base import SyncExecutor
@@ -12,12 +12,12 @@ async def test_onetime():
     calls = []
 
     def append():
-        calls.append(LocalSystemDateTime.now())
+        calls.append(SystemDateTime.now())
 
     builder = JobBuilder(AsyncScheduler(), SyncExecutor)
     builder.once(TimeDelta(seconds=0.01), append)
 
-    target = LocalSystemDateTime.now() + TimeDelta(seconds=0.01)
+    target = SystemDateTime.now() + TimeDelta(seconds=0.01)
 
     await asyncio.sleep(0.02)
 

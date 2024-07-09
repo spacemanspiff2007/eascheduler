@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from typing_extensions import Self, override
-from whenever import TimeDelta, UTCDateTime
+from whenever import Instant, TimeDelta
 
 from eascheduler.errors.errors import JobNotLinkedToSchedulerError
 from eascheduler.jobs.base import IdType, JobBase
@@ -34,7 +34,7 @@ class CountdownJob(JobBase):
         if (scheduler := self._scheduler) is None:
             raise JobNotLinkedToSchedulerError()
 
-        scheduler.set_job_time(self, UTCDateTime.now() + TimeDelta(seconds=self._seconds))
+        scheduler.set_job_time(self, Instant.now() + TimeDelta(seconds=self._seconds))
         scheduler.update_job(self)
 
     @override

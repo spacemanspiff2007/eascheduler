@@ -1,6 +1,6 @@
 import asyncio
 
-from whenever import TimeDelta, UTCDateTime
+from whenever import Instant, TimeDelta
 
 from eascheduler.executor.base import SyncExecutor
 from eascheduler.jobs.base import STATUS_PAUSED, STATUS_RUNNING
@@ -12,15 +12,15 @@ from eascheduler.schedulers.async_scheduler import AsyncScheduler
 async def test_datetime():
 
     # we have to start the test at the beginning of a second, otherwise we sleep too long and get too much calls
-    delay = 1 - UTCDateTime.now().microsecond / 100_000 - 0.1
+    delay = 1 - Instant.now().to_system_tz().nanosecond / 100_000_000 - 0.1
     await asyncio.sleep(delay)
 
     calls = []
 
     def append():
-        calls.append(UTCDateTime.now())
+        calls.append(Instant.now())
 
-    now = UTCDateTime.now().replace(microsecond=0)
+    now = Instant.now().to_system_tz().replace(nanosecond=0, disambiguate='raise').instant()
     producer = IntervalProducer(now, 1)
     s = AsyncScheduler()
     job = DateTimeJob(SyncExecutor(append), producer)

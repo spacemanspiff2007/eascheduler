@@ -5,7 +5,7 @@ from enum import Enum
 from typing import TYPE_CHECKING, Final, Generic, TypeVar, overload
 
 from typing_extensions import Self
-from whenever import UTCDateTime
+from whenever import Instant
 
 from eascheduler.errors.errors import JobAlreadyFinishedError
 from eascheduler.jobs.event_handler import JobEventHandler
@@ -64,8 +64,8 @@ class JobBase(Generic[IdType]):
         self.loop_time: float | None = None
 
         # for information only
-        self.next_run: UTCDateTime | None = None
-        self.last_run: UTCDateTime | None = None
+        self.next_run: Instant | None = None
+        self.last_run: Instant | None = None
 
         # callbacks
         self.on_update: Final = JobEventHandler()       # running | paused -> running | paused
@@ -93,7 +93,7 @@ class JobBase(Generic[IdType]):
         ...
 
     @overload
-    def set_loop_time(self, loop_time: float, next_run: UTCDateTime) -> Self:
+    def set_loop_time(self, loop_time: float, next_run: Instant) -> Self:
         ...
 
     def set_loop_time(self, loop_time, next_run) -> Self:
@@ -112,7 +112,7 @@ class JobBase(Generic[IdType]):
 
     def execute(self) -> JobStatusEnum:
         self.executor.execute()
-        self.last_run = UTCDateTime.now()
+        self.last_run = Instant.now()
         self.update_next()
         return self.status
 

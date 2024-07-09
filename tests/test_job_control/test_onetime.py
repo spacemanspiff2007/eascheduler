@@ -1,6 +1,6 @@
 from datetime import datetime as dt_datetime
 
-from whenever import TimeDelta, UTCDateTime
+from whenever import Instant, SystemDateTime, TimeDelta
 
 from eascheduler.executor.base import SyncExecutor
 from eascheduler.job_control import OneTimeJobControl
@@ -10,8 +10,8 @@ from eascheduler.schedulers.async_scheduler import AsyncScheduler
 
 
 async def test_eq():
-    job1 = OneTimeJob(SyncExecutor(lambda: 1/0), UTCDateTime.now() + TimeDelta(seconds=0.01))
-    job2 = OneTimeJob(SyncExecutor(lambda: 1/0), UTCDateTime.now() + TimeDelta(seconds=0.01))
+    job1 = OneTimeJob(SyncExecutor(lambda: 1/0), Instant.now() + TimeDelta(seconds=0.01))
+    job2 = OneTimeJob(SyncExecutor(lambda: 1/0), Instant.now() + TimeDelta(seconds=0.01))
 
     assert OneTimeJobControl(job1) == OneTimeJobControl(job1)
     assert OneTimeJobControl(job1) != OneTimeJobControl(job2)
@@ -20,7 +20,7 @@ async def test_eq():
 async def test_onetime():
 
     s = AsyncScheduler()
-    job = OneTimeJob(SyncExecutor(lambda: 1/0), UTCDateTime.now() + TimeDelta(seconds=0.01))
+    job = OneTimeJob(SyncExecutor(lambda: 1/0), Instant.now() + TimeDelta(seconds=0.01))
     job.link_scheduler(s)
 
     OneTimeJobControl(job).cancel()
@@ -29,14 +29,17 @@ async def test_onetime():
 
 async def test_base_properties():
 
-    target = (UTCDateTime.now() + TimeDelta(seconds=1)).replace(microsecond=0)
+    now = SystemDateTime.now().add(seconds=1)
+
     s = AsyncScheduler()
-    job = OneTimeJob(SyncExecutor(lambda: 1/0), target)
+    job = OneTimeJob(SyncExecutor(lambda: 1/0), now.instant())
     job.link_scheduler(s)
 
     ctrl = OneTimeJobControl(job)
-    assert ctrl.next_run_datetime == dt_datetime(year=target.year, month=target.month, day=target.day,
-                                                 hour=target.hour, minute=target.minute, second=target.second)
+    assert ctrl.next_run_datetime == dt_datetime(
+        year=now.year, month=now.month, day=now.day, hour=now.hour, minute=now.minute, second=now.second,
+        microsecond=now.nanosecond // 1000
+    )
 
     ctrl.cancel()
     assert ctrl.status == 'finished'

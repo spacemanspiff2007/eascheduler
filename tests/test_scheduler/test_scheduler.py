@@ -1,7 +1,7 @@
 import asyncio
 from time import monotonic
 
-from whenever import TimeDelta, UTCDateTime
+from whenever import Instant, TimeDelta
 
 from eascheduler.executor.base import SyncExecutor
 from eascheduler.jobs.base import STATUS_FINISHED
@@ -17,7 +17,7 @@ async def test_scheduler():
     def append():
         calls.append(1)
     s = AsyncScheduler()
-    job = OneTimeJob(SyncExecutor(append), UTCDateTime.now() + TimeDelta(seconds=0.01))
+    job = OneTimeJob(SyncExecutor(append), Instant.now() + TimeDelta(seconds=0.01))
     job.link_scheduler(s)
 
     await asyncio.sleep(0.1)
@@ -36,7 +36,7 @@ async def test_scheduler_update():
         call_duration = monotonic() - t
 
     s = AsyncScheduler()
-    job = OneTimeJob(SyncExecutor(append, (monotonic(), )), UTCDateTime.now() + TimeDelta(seconds=0.01))
+    job = OneTimeJob(SyncExecutor(append, (monotonic(), )), Instant.now() + TimeDelta(seconds=0.01))
     job.link_scheduler(s)
 
     job.loop_time = monotonic() + 0.02
@@ -53,7 +53,7 @@ async def test_scheduler_repr():
     s = AsyncScheduler()
     assert repr(s) == '<AsyncScheduler jobs=0 next_run=None>'
 
-    job = OneTimeJob(SyncExecutor(lambda: None), UTCDateTime.now() + TimeDelta(seconds=0.01))
+    job = OneTimeJob(SyncExecutor(lambda: None), Instant.now() + TimeDelta(seconds=0.01))
     job.link_scheduler(s)
     assert repr(s) == '<AsyncScheduler jobs=1 next_run=0.010s>'
 

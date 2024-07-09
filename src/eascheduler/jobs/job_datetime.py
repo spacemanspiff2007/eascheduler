@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Final
 
 from typing_extensions import override
-from whenever import UTCDateTime
+from whenever import Instant
 
 from eascheduler.errors.errors import JobNotLinkedToSchedulerError
 from eascheduler.jobs.base import IdType, JobBase
@@ -25,5 +25,5 @@ class DateTimeJob(JobBase):
         if (scheduler := self._scheduler) is None:
             raise JobNotLinkedToSchedulerError()
 
-        next_run = self.producer.get_next(UTCDateTime.now())
+        next_run = self.producer.get_next(Instant.now())
         scheduler.set_job_time(self, next_run)

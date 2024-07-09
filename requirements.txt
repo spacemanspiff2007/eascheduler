@@ -6,7 +6,7 @@ pytest          >= 7.4,   < 7.5
 pytest-asyncio  >= 0.21 , < 0.22
 
 # Ruff
-ruff == 0.5.0
+ruff == 0.5.1
 
 # Requests update
 pur == 7.3.2

@@ -8,7 +8,7 @@ from .base import DateTimeProducerBase, not_infinite_loop
 if TYPE_CHECKING:
     from collections.abc import Iterable
 
-    from whenever import UTCDateTime
+    from whenever import Instant
 
 
 class GroupProducer(DateTimeProducerBase):
@@ -18,7 +18,7 @@ class GroupProducer(DateTimeProducerBase):
         super().__init__()
         self._producers: Final = tuple(producers)
 
-    def get_next(self, dt: UTCDateTime) -> UTCDateTime:   # type: ignore[return]
+    def get_next(self, dt: Instant) -> Instant:   # type: ignore[return]
 
         next_dt = dt
 
@@ -28,5 +28,5 @@ class GroupProducer(DateTimeProducerBase):
             next_dt = values[0]
 
             for value in values:
-                if value > dt and ((f := self._filter) is None or f.allow(value.as_local())):
+                if value > dt and ((f := self._filter) is None or f.allow(value.to_system_tz())):
                     return value

@@ -6,7 +6,7 @@ from collections import deque
 from typing import TYPE_CHECKING, Final
 
 from typing_extensions import Self, override
-from whenever import UTCDateTime
+from whenever import Instant
 
 from eascheduler.errors import ScheduledRunInThePastError
 from eascheduler.errors.errors import JobExecutionTimeIsNotSetError
@@ -73,14 +73,14 @@ class AsyncScheduler(SchedulerBase):
             self.timer = self._loop.call_at(loop_time, self.run_jobs)
 
     @override
-    def set_job_time(self, job: JobBase, next_time: UTCDateTime | None) -> Self:
+    def set_job_time(self, job: JobBase, next_time: Instant | None) -> Self:
 
         if next_time is None:
             job.set_loop_time(None, None)
             return self
 
         loop_now = self._loop.time()
-        loop_next = loop_now + (next_time - UTCDateTime.now()).in_seconds()
+        loop_next = loop_now + (next_time - Instant.now()).in_seconds()
         if loop_next < loop_now - 0.1:
             raise ScheduledRunInThePastError()
 

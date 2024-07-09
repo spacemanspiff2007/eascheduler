@@ -1,4 +1,4 @@
-from whenever import UTCDateTime
+from whenever import Instant, SystemDateTime
 
 from eascheduler.executor.base import SyncExecutor
 from eascheduler.job_control import DateTimeJobControl
@@ -9,7 +9,7 @@ from eascheduler.schedulers.async_scheduler import AsyncScheduler
 
 
 async def test_eq():
-    now = UTCDateTime.now().replace(microsecond=0)
+    now = SystemDateTime.now().replace(nanosecond=0, disambiguate='raise').instant()
     job1 = DateTimeJob(SyncExecutor(lambda: 1/0), IntervalProducer(now, 1))
     job2 = DateTimeJob(SyncExecutor(lambda: 1/0), IntervalProducer(now, 1))
 
@@ -20,7 +20,7 @@ async def test_eq():
 async def test_datetime():
 
     s = AsyncScheduler()
-    job = DateTimeJob(SyncExecutor(lambda: 1/0), IntervalProducer(UTCDateTime.now(), 1))
+    job = DateTimeJob(SyncExecutor(lambda: 1/0), IntervalProducer(Instant.now(), 1))
     job.link_scheduler(s)
 
     ctrl = DateTimeJobControl(job)

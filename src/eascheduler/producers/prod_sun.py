@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING, Final
 
 from astral import Observer, sun
 from typing_extensions import override
-from whenever import UTCDateTime
+from whenever import Instant
 
 from eascheduler.errors.errors import LocationNotSetError
 from eascheduler.producers.base import DateTimeProducerBase, not_infinite_loop
@@ -60,7 +60,7 @@ class SunProducer(DateTimeProducerBase):
         self.func: Final = func
 
     @override
-    def get_next(self, dt: UTCDateTime) -> UTCDateTime:   # type: ignore[return]
+    def get_next(self, dt: Instant) -> Instant:   # type: ignore[return]
 
         new_dt = dt
         if (observer := OBSERVER) is None:
@@ -73,16 +73,16 @@ class SunProducer(DateTimeProducerBase):
             next_sun = None  # type: datetime | None
             while next_sun is None:
                 try:
-                    next_sun = self.func(observer, new_dt.date().py_date())
+                    next_sun = self.func(observer, new_dt.to_tz('UTC').date().py_date())
                 except ValueError:  # noqa: PERF203
-                    new_dt = new_dt.add(days=1)
+                    new_dt = new_dt.add(hours=24)
 
             # Date has to be in the future
-            new_dt = UTCDateTime.from_py_datetime(next_sun).replace(microsecond=0)
-            if new_dt > dt and ((f := self._filter) is None or f.allow(new_dt.as_local())):
+            new_dt = Instant.from_py_datetime(next_sun.replace(microsecond=0))
+            if new_dt > dt and ((f := self._filter) is None or f.allow(new_dt.to_system_tz())):
                 return new_dt
 
-            new_dt = new_dt.add(days=1)
+            new_dt = new_dt.add(hours=24)
 
 
 class DawnProducer(SunProducer):

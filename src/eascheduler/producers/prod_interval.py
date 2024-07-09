@@ -8,20 +8,20 @@ from .base import DateTimeProducerBase
 
 
 if TYPE_CHECKING:
-    from whenever import UTCDateTime
+    from whenever import Instant
 
 
 class IntervalProducer(DateTimeProducerBase):
     __slots__ = ('_interval', '_next', )
 
-    def __init__(self, start: UTCDateTime, interval: int) -> None:
+    def __init__(self, start: Instant, interval: int) -> None:
         super().__init__()
 
         self._interval: Final = interval
-        self._next: UTCDateTime = start
+        self._next: Instant = start
 
     @override
-    def get_next(self, dt: UTCDateTime) -> UTCDateTime:
+    def get_next(self, dt: Instant) -> Instant:
         interval = self._interval
         new_dt = self._next
 
@@ -30,7 +30,7 @@ class IntervalProducer(DateTimeProducerBase):
         while new_dt > dt:
             new_dt = new_dt.subtract(seconds=interval)
 
-        while new_dt <= dt or ((f := self._filter) is not None and not f.allow(new_dt.as_local())):
+        while new_dt <= dt or ((f := self._filter) is not None and not f.allow(new_dt.to_system_tz())):
             new_dt = new_dt.add(seconds=interval)
 
         self._next = new_dt
