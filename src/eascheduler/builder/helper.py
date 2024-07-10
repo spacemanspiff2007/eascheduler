@@ -1,25 +1,40 @@
 from __future__ import annotations
 
-import re
 from datetime import datetime as dt_datetime
 from datetime import time as dt_time
 from datetime import timedelta as dt_timedelta
 from typing import TypeAlias
 
-from whenever import Instant, SystemDateTime, TimeDelta
+from whenever import Instant, SystemDateTime, Time, TimeDelta
 
 
 T_HINT: TypeAlias = dt_datetime | dt_time | dt_timedelta | TimeDelta | str | None
 
-RE_TIME = re.compile(r'(?P<hour>[0-5]?\d)\s*:\s*(?P<minute>[0-5]?\d)(?:\s*:\s*(?P<second>[0-5]?\d))?')
+
+def get_time(value: dt_time | Time | str) -> Time:  # noqa: C901
+    if isinstance(value, dt_time):
+        return Time.from_py_time(value)
+
+    if isinstance(value, Time):
+        return value
+
+    if isinstance(value, str):
+        try:
+            return Time.parse_common_iso(value)
+        except ValueError:
+            pass
+
+    raise ValueError()
 
 
-def get_utc(value: T_HINT) -> Instant:
+def get_utc(value: T_HINT) -> Instant:  # noqa: C901
     if value is None:
         return Instant.now()
 
+    # ------------------------------------------------------------------------------------------------------------------
+    # datetime
     if isinstance(value, dt_datetime):
-        return SystemDateTime.from_py_datetime(value).to_utc()
+        return SystemDateTime.from_py_datetime(value).instant()
 
     # ------------------------------------------------------------------------------------------------------------------
     # timedelta
@@ -31,17 +46,25 @@ def get_utc(value: T_HINT) -> Instant:
 
     # ------------------------------------------------------------------------------------------------------------------
     # time
-    if isinstance(value, dt_time):
+    try:
+        time = get_time(value)
+    except ValueError:
+        pass
+    else:
         now = SystemDateTime.now()
-        new = now.replace(
-            hour=value.hour, minute=value.minute, second=value.second, microsecond=value.microsecond).to_utc()
+        new = now.replace_time(time)
         if new < now:
             new = new.add(days=1)
-        return new
+        return new.instant()
 
+    # ------------------------------------------------------------------------------------------------------------------
+    # str
     if isinstance(value, str):
-        if m := RE_TIME.fullmatch(value):
-            return SystemDateTime.now().replace(
-                hour=int(m['hour']), minute=int(m['minute']), second=int(m['second'] or 0)).as_utc()
+        for parser in (SystemDateTime.parse_common_iso, TimeDelta.parse_common_iso):
+            try:
+                obj = parser(value)
+            except ValueError:
+                continue
+            return get_utc(obj)
 
     raise ValueError()
