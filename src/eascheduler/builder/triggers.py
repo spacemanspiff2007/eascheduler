@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING, Final
 
 from typing_extensions import Self
 
-from eascheduler.builder.helper import T_HINT, get_utc
+from eascheduler.builder.helper import HINT_INSTANT, HINT_TIME, get_instant, get_time
 from eascheduler.producers import (
     DawnProducer,
     DuskProducer,
@@ -39,10 +39,10 @@ class TriggerObject:
     def offset(self, offset: int) -> Self:
         return self.__class__(OffsetProducerOperation(self._producer, offset))
 
-    def earliest(self, earliest: dt_time) -> Self:
+    def earliest(self, earliest: HINT_TIME) -> Self:
         return self.__class__(EarliestProducerOperation(self._producer, earliest))
 
-    def latest(self, latest: dt_time) -> Self:
+    def latest(self, latest: HINT_TIME) -> Self:
         return self.__class__(LatestProducerOperation(self._producer, latest))
 
     def jitter(self, low: int, high: int | None = None) -> Self:
@@ -84,9 +84,9 @@ class TriggerBuilder:
         return TriggerObject(GroupProducer([b._producer for b in builders]))
 
     @staticmethod
-    def interval(start: T_HINT, interval: dt_timedelta | int) -> TriggerObject:
-        return TriggerObject(IntervalProducer(get_utc(start), interval))
+    def interval(start: HINT_INSTANT, interval: dt_timedelta | int) -> TriggerObject:
+        return TriggerObject(IntervalProducer(get_instant(start), interval))
 
     @staticmethod
-    def time(time: Time) -> TriggerObject:
-        return TriggerObject(TimeProducer(time))
+    def time(time: HINT_TIME) -> TriggerObject:
+        return TriggerObject(TimeProducer(get_time(time)))

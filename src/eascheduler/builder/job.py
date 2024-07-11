@@ -1,7 +1,7 @@
 from collections.abc import Awaitable, Callable
 from typing import Any, Final
 
-from eascheduler.builder.helper import T_HINT, get_utc
+from eascheduler.builder.helper import HINT_INSTANT, get_instant
 from eascheduler.builder.triggers import TriggerObject
 from eascheduler.executor import ExecutorBase
 from eascheduler.job_control import CountdownJobControl, DateTimeJobControl, OneTimeJobControl
@@ -23,9 +23,9 @@ class JobBuilder:
         job.link_scheduler(self._scheduler)
         return CountdownJobControl(job)
 
-    def once(self, instant: T_HINT, coro_func: Callable[..., Awaitable[Any]],
+    def once(self, instant: HINT_INSTANT, coro_func: Callable[..., Awaitable[Any]],
              *args: Any, job_id: IdType | None = None, **kwargs: Any) -> OneTimeJobControl:
-        job = OneTimeJob(self._executor(coro_func, args, kwargs), get_utc(instant), job_id=job_id)
+        job = OneTimeJob(self._executor(coro_func, args, kwargs), get_instant(instant), job_id=job_id)
         job.link_scheduler(self._scheduler)
         return OneTimeJobControl(job)
 

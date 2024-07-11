@@ -1,6 +1,6 @@
 from datetime import time as dt_time
 
-from whenever import SystemDateTime
+from whenever import SystemDateTime, Time
 
 from eascheduler.producers.prod_filter import (
     AllGroupProducerFilter,
@@ -14,16 +14,16 @@ from eascheduler.producers.prod_filter import (
 
 
 def test_time_filter():
-    f = TimeProducerFilter(lower=dt_time(8))
+    f = TimeProducerFilter(lower=Time(8))
     assert not f.allow(SystemDateTime(2001, 1, 1, 7, 59))
     assert f.allow(SystemDateTime(2001, 1, 1, 8))
 
-    f = TimeProducerFilter(upper=dt_time(8))
+    f = TimeProducerFilter(upper=Time(8))
     assert f.allow(SystemDateTime(2001, 1, 1, 7, 59))
     assert not f.allow(SystemDateTime(2001, 1, 1, 8))
     assert not f.allow(SystemDateTime(2001, 1, 1, 8, 0, 1))
 
-    f = TimeProducerFilter(lower=dt_time(7), upper=dt_time(8))
+    f = TimeProducerFilter(lower=Time(7), upper=Time(8))
     assert not f.allow(SystemDateTime(2001, 1, 1, 6, 59))
     assert f.allow(SystemDateTime(2001, 1, 1, 7))
     assert f.allow(SystemDateTime(2001, 1, 1, 7, 59, 59))

@@ -8,10 +8,11 @@ from typing import TypeAlias
 from whenever import Instant, SystemDateTime, Time, TimeDelta
 
 
-T_HINT: TypeAlias = dt_datetime | dt_time | dt_timedelta | TimeDelta | str | None
+HINT_TIME: TypeAlias = dt_time | Time | str
+HINT_INSTANT: TypeAlias = dt_datetime | dt_timedelta | TimeDelta | str | None | HINT_TIME
 
 
-def get_time(value: dt_time | Time | str) -> Time:
+def get_time(value: HINT_TIME) -> Time:
     if isinstance(value, dt_time):
         return Time.from_py_time(value)
 
@@ -27,7 +28,7 @@ def get_time(value: dt_time | Time | str) -> Time:
     raise ValueError()
 
 
-def get_utc(value: T_HINT) -> Instant:  # noqa: C901
+def get_instant(value: HINT_INSTANT) -> Instant:  # noqa: C901
     if value is None:
         return Instant.now()
 
@@ -52,7 +53,7 @@ def get_utc(value: T_HINT) -> Instant:  # noqa: C901
         pass
     else:
         now = SystemDateTime.now()
-        new = now.replace_time(time)
+        new = now.replace_time(time, disambiguate='raise')
         if new < now:
             new = new.add(days=1)
         return new.instant()
@@ -65,6 +66,6 @@ def get_utc(value: T_HINT) -> Instant:  # noqa: C901
                 obj = parser(value)
             except ValueError:
                 continue
-            return get_utc(obj)
+            return get_instant(obj)
 
     raise ValueError()

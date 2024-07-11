@@ -11,7 +11,7 @@ if TYPE_CHECKING:
     from collections.abc import Iterable
     from datetime import time as dt_time
 
-    from whenever import SystemDateTime
+    from whenever import SystemDateTime, Time
 
 
 class ProducerFilterGroupBase(ProducerFilterBase):
@@ -53,19 +53,19 @@ class InvertingProducerFilter(ProducerFilterBase):
 class TimeProducerFilter(ProducerFilterBase):
     __slots__ = ('_lower', '_upper')
 
-    def __init__(self, lower: dt_time | None = None, upper: dt_time | None = None) -> None:
+    def __init__(self, lower: Time | None = None, upper: Time | None = None) -> None:
         super().__init__()
-        self._lower = lower
-        self._upper = upper
+        self._lower: Final = lower
+        self._upper: Final = upper
 
     @override
     def allow(self, dt: SystemDateTime) -> bool:
 
-        time = dt.py_datetime().time()
+        time = dt.time()
         if (lower := self._lower) is not None and time < lower:
             return False
 
-        if (upper := self._upper) is not None and time >= upper:  # noqa: SIM103
+        if (upper := self._upper) is not None and time >= upper:
             return False
 
         return True

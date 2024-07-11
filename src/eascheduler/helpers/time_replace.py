@@ -68,7 +68,7 @@ class TimeReplacer:
         return (f'<{self.__class__.__name__} {self._time!s}'
                 f' if_skipped={self._skipped.value:s} if_repeated={self._repeated.value:s}>')
 
-    def replace(self, dt: SystemDateTime) -> SystemDateTime | None:  # noqa: C901
+    def replace(self, dt: SystemDateTime) -> SystemDateTime:  # noqa: C901
         try:
             return dt.replace_time(self._time, disambiguate='raise')
         except SkippedTime:

@@ -16,7 +16,6 @@ async def test_onetime():
 
     builder = JobBuilder(AsyncScheduler(), SyncExecutor)
     builder.once(TimeDelta(seconds=0.01), append)
-
     target = SystemDateTime.now() + TimeDelta(seconds=0.01)
 
     await asyncio.sleep(0.02)
