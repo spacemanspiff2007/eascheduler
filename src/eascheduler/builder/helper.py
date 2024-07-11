@@ -11,7 +11,7 @@ from whenever import Instant, SystemDateTime, Time, TimeDelta
 T_HINT: TypeAlias = dt_datetime | dt_time | dt_timedelta | TimeDelta | str | None
 
 
-def get_time(value: dt_time | Time | str) -> Time:  # noqa: C901
+def get_time(value: dt_time | Time | str) -> Time:
     if isinstance(value, dt_time):
         return Time.from_py_time(value)
 

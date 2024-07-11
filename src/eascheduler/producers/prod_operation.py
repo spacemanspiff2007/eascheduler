@@ -4,10 +4,10 @@ from random import uniform
 from typing import TYPE_CHECKING, Final
 
 from typing_extensions import override
-from whenever import LocalDateTime, RepeatedTime, SkippedTime, SystemDateTime, Time, TimeDelta
+from whenever import LocalDateTime, SkippedTime, SystemDateTime, Time, TimeDelta
 
-from ..helpers import TimeReplacer, TimeSkippedError, TimeTwiceError
-from .base import DateTimeProducerBase, DateTimeProducerOperationBase
+from eascheduler.helpers import TimeReplacer, TimeSkippedError, TimeTwiceError
+from eascheduler.producers.base import DateTimeProducerBase, DateTimeProducerOperationBase
 
 
 if TYPE_CHECKING:

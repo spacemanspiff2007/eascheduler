@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from collections.abc import Iterable
 from typing import TYPE_CHECKING, Final
 
 from typing_extensions import override
@@ -10,6 +9,8 @@ from .base import DateTimeProducerBase, not_infinite_loop
 
 
 if TYPE_CHECKING:
+    from collections.abc import Iterable
+
     from whenever import Time
 
 

@@ -25,6 +25,8 @@ if TYPE_CHECKING:
     from datetime import time as dt_time
     from datetime import timedelta as dt_timedelta
 
+    from whenever import Time
+
     from eascheduler.builder.filters import FilterObject
     from eascheduler.producers.base import DateTimeProducerBase
 
@@ -86,5 +88,5 @@ class TriggerBuilder:
         return TriggerObject(IntervalProducer(get_utc(start), interval))
 
     @staticmethod
-    def time(time: dt_time) -> TriggerObject:
+    def time(time: Time) -> TriggerObject:
         return TriggerObject(TimeProducer(time))

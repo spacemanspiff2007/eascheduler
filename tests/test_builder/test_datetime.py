@@ -1,8 +1,8 @@
 import asyncio
 
-from whenever import SystemDateTime, Time, TimeDelta
+from whenever import SystemDateTime
 
-from eascheduler.builder import FilterBuilder, JobBuilder, TriggerBuilder
+from eascheduler.builder import JobBuilder, TriggerBuilder
 from eascheduler.executor.base import SyncExecutor
 from eascheduler.schedulers.async_scheduler import AsyncScheduler
 from tests.helper import assert_called_at
@@ -14,13 +14,15 @@ async def test_datetime():
     def append():
         calls.append(SystemDateTime.now())
 
+    now = SystemDateTime.now()
+    dst = now.add(seconds=1).replace(nanosecond=0, disambiguate='raise')
+
     builder = JobBuilder(AsyncScheduler(), SyncExecutor)
     builder.at(
-        TriggerBuilder.time(Time(8)),
+        TriggerBuilder.time(dst.time()),
         append
     )
 
+    await asyncio.sleep((dst - now).in_seconds() + 0.01)
 
-    await asyncio.sleep(0.02)
-
-    assert_called_at(calls, target)
+    assert_called_at(calls, dst)
