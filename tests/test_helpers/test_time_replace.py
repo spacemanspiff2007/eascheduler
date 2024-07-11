@@ -2,8 +2,16 @@ import pytest
 from tzlocal import get_localzone_name
 from whenever import SystemDateTime, Time
 
-from eascheduler.helpers.time_replace import RepeatedTimeBehavior, SkippedTimeBehavior, TimeReplacer
-from tests.helper import get_german_as_instant
+from eascheduler.helpers.time_replace import (
+    HINT_REPEATED,
+    HINT_SKIPPED,
+    RepeatedTimeBehavior,
+    SkippedTimeBehavior,
+    TimeReplacer,
+    TimeSkippedError,
+    TimeTwiceError,
+)
+from tests.helper import assert_literal_values_in_enum, get_german_as_instant
 
 
 pytestmark = pytest.mark.skipif(
@@ -30,47 +38,61 @@ def get_str(obj) -> str | tuple[str, str]:
 def test_skipped_skip():
     start = get_german_as_instant(3, 25, 1).to_system_tz()
     r = TimeReplacer(Time(2, 30), SkippedTimeBehavior.SKIP, RepeatedTimeBehavior.SKIP)
-    assert r.replace_dst(start) == ()
+    with pytest.raises(TimeSkippedError):
+        r.replace(start)
 
 
 def test_skipped_before():
     start = get_german_as_instant(3, 25, 1).to_system_tz()
     r = TimeReplacer(Time(2, 30), SkippedTimeBehavior.BEFORE, RepeatedTimeBehavior.SKIP)
-    assert get_str(r.replace_dst(start)) == '2001-03-25T01:30:00+01:00'
+    assert get_str(r.replace(start)) == '2001-03-25T01:30:00+01:00'
 
 
 def test_skipped_after():
     start = get_german_as_instant(3, 25, 1).to_system_tz()
     r = TimeReplacer(Time(2, 30), SkippedTimeBehavior.AFTER, RepeatedTimeBehavior.SKIP)
-    assert get_str(r.replace_dst(start)) == '2001-03-25T03:30:00+02:00'
+    assert get_str(r.replace(start)) == '2001-03-25T03:30:00+02:00'
 
 
 def test_skipped_close():
     start = get_german_as_instant(3, 25, 1).to_system_tz()
     r = TimeReplacer(Time(2, 30), SkippedTimeBehavior.CLOSE, RepeatedTimeBehavior.SKIP)
-    assert get_str(r.replace_dst(start)) == '2001-03-25T03:00:00+02:00'
+    assert get_str(r.replace(start)) == '2001-03-25T03:00:00+02:00'
 
 
 def test_repeated_skip():
     start = get_german_as_instant(10, 28, 1).to_system_tz()
     r = TimeReplacer(Time(2, 30), SkippedTimeBehavior.SKIP, RepeatedTimeBehavior.SKIP)
-    assert r.replace_dst(start) == ()
+    with pytest.raises(TimeSkippedError):
+        r.replace(start)
 
 
 def test_repeated_earlier():
     start = get_german_as_instant(10, 28, 1).to_system_tz()
     r = TimeReplacer(Time(2, 30), SkippedTimeBehavior.SKIP, RepeatedTimeBehavior.EARLIER)
-    assert get_str(r.replace_dst(start)) == '2001-10-28T02:30:00+02:00'
+    assert get_str(r.replace(start)) == '2001-10-28T02:30:00+02:00'
 
 
 def test_repeated_later():
     start = get_german_as_instant(10, 28, 1).to_system_tz()
     r = TimeReplacer(Time(2, 30), SkippedTimeBehavior.SKIP, RepeatedTimeBehavior.LATER)
-    assert get_str(r.replace_dst(start)) == '2001-10-28T02:30:00+01:00'
+    assert get_str(r.replace(start)) == '2001-10-28T02:30:00+01:00'
 
 
 def test_repeated_twice():
     start = get_german_as_instant(10, 28, 1).to_system_tz()
     r = TimeReplacer(Time(2, 30), SkippedTimeBehavior.SKIP, RepeatedTimeBehavior.TWICE)
-    assert get_str(r.replace_dst(start))                == ('2001-10-28T02:30:00+02:00', '2001-10-28T02:30:00+01:00')
-    assert get_str(r.replace_dst(start, reversed=True)) == ('2001-10-28T02:30:00+01:00', '2001-10-28T02:30:00+02:00')
+    with pytest.raises(TimeTwiceError) as e:
+        r.replace(start)
+    assert get_str(e.value.earlier) == '2001-10-28T02:30:00+02:00'
+    assert get_str(e.value.later) == '2001-10-28T02:30:00+01:00'
+
+
+def test_repr():
+    r = TimeReplacer(Time(2, 30), SkippedTimeBehavior.SKIP, RepeatedTimeBehavior.TWICE)
+    assert repr(r) == '<TimeReplacer 02:30:00 if_skipped=skip if_repeated=twice>'
+
+
+def test_enum_hints():
+    assert_literal_values_in_enum(HINT_SKIPPED)
+    assert_literal_values_in_enum(HINT_REPEATED)

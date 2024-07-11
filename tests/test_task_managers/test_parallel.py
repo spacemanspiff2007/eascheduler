@@ -2,6 +2,8 @@ import asyncio
 from typing import TypeVar
 
 from eascheduler.task_managers import LimitingParallelTaskManager, ParallelTaskManager, TaskManagerBase
+from eascheduler.task_managers.parallel import HINT_PARALLEL_TASK_POLICY
+from tests.helper import assert_literal_values_in_enum
 
 
 T = TypeVar('T', bound=TaskManagerBase)
@@ -88,3 +90,7 @@ async def test_parallel_cancel_last():
     await asyncio.sleep(0.1)
     assert len(t.tasks) == 0
     assert res == {0, 1, 9}
+
+
+def test_type_hints():
+    assert_literal_values_in_enum(HINT_PARALLEL_TASK_POLICY)

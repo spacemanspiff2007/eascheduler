@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 from enum import Enum
-from typing import TYPE_CHECKING, Final
+from typing import TYPE_CHECKING, Final, Literal, TypeAlias
 
 from whenever import LocalDateTime, RepeatedTime, SkippedTime
+
+from eascheduler.helpers.helpers import to_enum
 
 
 if TYPE_CHECKING:
@@ -17,11 +19,17 @@ class SkippedTimeBehavior(str, Enum):
     CLOSE = 'close'
 
 
+HINT_SKIPPED: TypeAlias = SkippedTimeBehavior | Literal['skip', 'before', 'after', 'close']
+
+
 class RepeatedTimeBehavior(str, Enum):
     SKIP = 'skip'
     EARLIER = 'earlier'
     LATER = 'later'
     TWICE = 'twice'
+
+
+HINT_REPEATED: TypeAlias = RepeatedTimeBehavior | Literal['skip', 'earlier', 'later', 'twice']
 
 
 def find_time_after_dst_switch(dt: SystemDateTime, time: Time) -> SystemDateTime:
@@ -37,56 +45,58 @@ def find_time_after_dst_switch(dt: SystemDateTime, time: Time) -> SystemDateTime
             continue
 
 
+class TimeSkippedError(Exception):
+    pass
+
+
+class TimeTwiceError(Exception):
+    def __init__(self, t1: SystemDateTime, t2: SystemDateTime) -> None:
+        self.earlier: Final = t1
+        self.later: Final = t2
+
+
 class TimeReplacer:
     __slots__ = ('_time', '_skipped', '_repeated')
 
-    def __init__(self, time: Time, if_skipped: SkippedTimeBehavior, if_repeated: RepeatedTimeBehavior) -> None:
+    def __init__(self, time: Time, if_skipped: HINT_SKIPPED, if_repeated: HINT_REPEATED) -> None:
         super().__init__()
         self._time: Final = time
+        self._skipped: Final[SkippedTimeBehavior] = to_enum(SkippedTimeBehavior, if_skipped)
+        self._repeated: Final[RepeatedTimeBehavior] = to_enum(RepeatedTimeBehavior, if_repeated)
 
-        if not isinstance(if_skipped, SkippedTimeBehavior):
-            if_skipped = SkippedTimeBehavior(if_skipped)
-        self._skipped: Final[SkippedTimeBehavior] = if_skipped
+    def __repr__(self) -> str:
+        return (f'<{self.__class__.__name__} {self._time!s}'
+                f' if_skipped={self._skipped.value:s} if_repeated={self._repeated.value:s}>')
 
-        if not isinstance(if_repeated, RepeatedTimeBehavior):
-            if_repeated = RepeatedTimeBehavior(if_repeated)
-        self._repeated: Final[RepeatedTimeBehavior] = if_repeated
-
-    def replace(self, dt: SystemDateTime) -> SystemDateTime | None:
+    def replace(self, dt: SystemDateTime) -> SystemDateTime | None:  # noqa: C901
         try:
             return dt.replace_time(self._time, disambiguate='raise')
-        except (SkippedTime, RepeatedTime):
-            return None
-
-    def replace_dst(self, dt: SystemDateTime, *, reversed: bool = False) -> tuple[SystemDateTime, ...]:  # noqa: C901, PLR0911
-        try:
-            return (dt.replace_time(self._time, disambiguate='raise'), )
         except SkippedTime:
             match self._skipped:
                 case SkippedTimeBehavior.SKIP:
-                    return ()
+                    raise TimeSkippedError() from None
                 case SkippedTimeBehavior.BEFORE:
-                    return (dt.replace_time(self._time, disambiguate='earlier'), )
+                    return dt.replace_time(self._time, disambiguate='earlier')
                 case SkippedTimeBehavior.AFTER:
-                    return (dt.replace_time(self._time, disambiguate='later'), )
+                    return dt.replace_time(self._time, disambiguate='later')
                 case SkippedTimeBehavior.CLOSE:
-                    return (find_time_after_dst_switch(dt, self._time), )
+                    return find_time_after_dst_switch(dt, self._time)
                 case _:
                     msg = f'Invalid value: {self._skipped!r}'
                     raise ValueError(msg) from None
         except RepeatedTime:
             match self._repeated:
                 case RepeatedTimeBehavior.SKIP:
-                    return ()
+                    raise TimeSkippedError() from None
                 case RepeatedTimeBehavior.EARLIER:
-                    return (dt.replace_time(self._time, disambiguate='earlier'), )
+                    return dt.replace_time(self._time, disambiguate='earlier')
                 case RepeatedTimeBehavior.LATER:
-                    return (dt.replace_time(self._time, disambiguate='later'), )
+                    return dt.replace_time(self._time, disambiguate='later')
                 case RepeatedTimeBehavior.TWICE:
-                    return (
-                        dt.replace_time(self._time, disambiguate='earlier' if not reversed else 'later'),
-                        dt.replace_time(self._time, disambiguate='later' if not reversed else 'earlier')
-                    )
+                    raise TimeTwiceError(
+                        dt.replace_time(self._time, disambiguate='earlier'),
+                        dt.replace_time(self._time, disambiguate='later'),
+                    ) from None
                 case _:
                     msg = f'Invalid value: {self._repeated!r}'
                     raise ValueError(msg) from None

@@ -8,6 +8,8 @@ from eascheduler.task_managers import (
     SequentialTaskManager,
     TaskManagerBase,
 )
+from eascheduler.task_managers.sequential import HINT_SEQUENTIAL_TASK_POLICY
+from tests.helper import assert_literal_values_in_enum
 
 
 T = TypeVar('T', bound=TaskManagerBase)
@@ -128,3 +130,7 @@ async def test_deduplicating_skip():
     await await_tasks(t)
 
     assert res == [0, 2, 3, 9]
+
+
+def test_type_hints():
+    assert_literal_values_in_enum(HINT_SEQUENTIAL_TASK_POLICY)

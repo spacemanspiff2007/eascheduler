@@ -2,10 +2,11 @@ from asyncio import Task, create_task
 from collections import deque
 from collections.abc import Coroutine
 from enum import Enum
-from typing import Final
+from typing import Final, Literal, TypeAlias
 
 from typing_extensions import override
 
+from eascheduler.helpers.helpers import to_enum
 from eascheduler.task_managers.base import TaskManagerBase
 
 
@@ -18,6 +19,9 @@ class ParallelTaskPolicy(str, Enum):
 POLICY_SKIP = ParallelTaskPolicy.SKIP
 POLICY_CANCEL_FIRST = ParallelTaskPolicy.CANCEL_FIRST
 POLICY_CANCEL_LAST = ParallelTaskPolicy.CANCEL_LAST
+
+
+HINT_PARALLEL_TASK_POLICY: TypeAlias = ParallelTaskPolicy | Literal['skip', 'cancel_first', 'cancel_last']
 
 
 class ParallelTaskManager(TaskManagerBase):
@@ -41,15 +45,14 @@ class ParallelTaskManager(TaskManagerBase):
 class LimitingParallelTaskManager(TaskManagerBase):
     __slots__ = ('tasks', 'parallel', 'action')
 
-    def __init__(self, parallel: int, action: ParallelTaskPolicy | str = POLICY_SKIP) -> None:
+    def __init__(self, parallel: int, action: HINT_PARALLEL_TASK_POLICY = POLICY_SKIP) -> None:
         super().__init__()
         if not isinstance(parallel, int) or parallel < 1:
             raise ValueError()
 
         self.tasks: Final[deque[Task]] = deque()
         self.parallel: Final = parallel
-        self.action: Final[ParallelTaskPolicy] = \
-            ParallelTaskPolicy(action) if not isinstance(action, ParallelTaskPolicy) else action
+        self.action: Final[ParallelTaskPolicy] = to_enum(ParallelTaskPolicy, action)
 
     def __repr__(self) -> str:
         ct = len(self.tasks)

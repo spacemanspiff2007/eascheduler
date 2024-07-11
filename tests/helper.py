@@ -1,5 +1,6 @@
+from enum import Enum
 from time import monotonic
-from typing import Final, TypeVar
+from typing import Final, TypeVar, Union, get_args, get_origin
 
 from whenever import Instant, SystemDateTime, TimeDelta, ZonedDateTime
 
@@ -96,3 +97,20 @@ def assert_called_at(value, target):
         return True
 
     raise ValueError()
+
+
+def assert_literal_values_in_enum(obj):
+    assert get_origin(obj) is Union
+    a, b = get_args(obj)
+
+    enum = a if hasattr(a, '__members__') else b
+    literal = b if hasattr(a, '__members__') else a
+
+    # cast all values to an enum
+    values_literal = set(get_args(literal))
+    values_enum = {v.value for v in enum}
+
+    assert values_literal == values_enum, f'\n{values_literal}\n{values_enum}'
+
+    for value in values_literal:
+        enum(value)

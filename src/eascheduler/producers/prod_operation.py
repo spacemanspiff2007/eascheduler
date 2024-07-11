@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING, Final
 from typing_extensions import override
 from whenever import LocalDateTime, RepeatedTime, SkippedTime, SystemDateTime, Time, TimeDelta
 
+from ..helpers import TimeReplacer, TimeSkippedError, TimeTwiceError
 from .base import DateTimeProducerBase, DateTimeProducerOperationBase
 
 
@@ -41,20 +42,20 @@ class OffsetProducerOperation(DateTimeProducerOperationBase):
 class EarliestProducerOperation(DateTimeProducerOperationBase):
     __slots__ = ('earliest',)
 
-    def __init__(self, producer: DateTimeProducerBase, earliest: Time) -> None:
+    def __init__(self, producer: DateTimeProducerBase, earliest: TimeReplacer) -> None:
         super().__init__(producer)
         self.earliest: Final = earliest
 
     @override
     def apply_operation(self, next_dt: Instant, dt: Instant) -> Instant:
         try:
-            earliest_dt = next_dt.to_system_tz().replace_time(self.earliest, disambiguate='raise').instant()
-        except SkippedTime:
-            earliest_dt = find_time_after_dst_switch(next_dt.to_system_tz(), self.earliest)
-        except RepeatedTime:
-            earliest_dt = next_dt.to_system_tz().replace_time(self.earliest, disambiguate='earlier').instant()
+            earliest_dt = self.earliest.replace(next_dt.to_system_tz()).instant()
+        except TimeSkippedError:
+            return next_dt
+        except TimeTwiceError as e:
+            earliest_dt = e.earlier.instant()
             if earliest_dt <= dt:
-                earliest_dt = next_dt.to_system_tz().replace_time(self.earliest, disambiguate='later').instant()
+                earliest_dt = e.later.instant()
 
         if next_dt < earliest_dt:
             return earliest_dt
@@ -64,20 +65,20 @@ class EarliestProducerOperation(DateTimeProducerOperationBase):
 class LatestProducerOperation(DateTimeProducerOperationBase):
     __slots__ = ('latest',)
 
-    def __init__(self, producer: DateTimeProducerBase, earliest: Time) -> None:
+    def __init__(self, producer: DateTimeProducerBase, earliest: TimeReplacer) -> None:
         super().__init__(producer)
         self.latest: Final = earliest
 
     @override
     def apply_operation(self, next_dt: Instant, dt: Instant) -> Instant:
         try:
-            latest_dt = next_dt.to_system_tz().replace_time(self.latest, disambiguate='raise').instant()
-        except SkippedTime:
-            latest_dt = find_time_after_dst_switch(next_dt.to_system_tz(), self.latest)
-        except RepeatedTime:
-            latest_dt = next_dt.to_system_tz().replace_time(self.latest, disambiguate='earlier').instant()
+            latest_dt = self.latest.replace(next_dt.to_system_tz()).instant()
+        except TimeSkippedError:
+            return next_dt
+        except TimeTwiceError as e:
+            latest_dt = e.earlier.instant()
             if latest_dt <= dt:
-                latest_dt = next_dt.to_system_tz().replace_time(self.latest, disambiguate='later').instant()
+                latest_dt = e.later.instant()
 
         if next_dt > latest_dt:
             return latest_dt

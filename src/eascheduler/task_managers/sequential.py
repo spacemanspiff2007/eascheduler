@@ -2,10 +2,11 @@ from asyncio import Task, create_task
 from collections import OrderedDict, deque
 from collections.abc import Coroutine, Hashable
 from enum import Enum
-from typing import Final
+from typing import Final, Literal, TypeAlias
 
 from typing_extensions import override
 
+from eascheduler.helpers.helpers import to_enum
 from eascheduler.task_managers.base import TaskManagerBase
 
 
@@ -18,6 +19,9 @@ class SequentialTaskPolicy(str, Enum):
 POLICY_SKIP = SequentialTaskPolicy.SKIP
 POLICY_SKIP_FIRST = SequentialTaskPolicy.SKIP_FIRST
 POLICY_SKIP_LAST = SequentialTaskPolicy.SKIP_LAST
+
+
+HINT_SEQUENTIAL_TASK_POLICY: TypeAlias = SequentialTaskPolicy | Literal['skip', 'skip_first', 'skip_last']
 
 
 class SequentialTaskManagerBase(TaskManagerBase):
@@ -72,14 +76,13 @@ class SequentialTaskManager(SequentialTaskManagerBase):
 class LimitingSequentialTaskManager(SequentialTaskManager):
     __slots__ = ('max_queue', 'action')
 
-    def __init__(self, max_queue: int, action: SequentialTaskPolicy | str = POLICY_SKIP) -> None:
+    def __init__(self, max_queue: int, action: HINT_SEQUENTIAL_TASK_POLICY = POLICY_SKIP) -> None:
         super().__init__()
         if not isinstance(max_queue, int) or max_queue < 1:
             raise ValueError()
 
         self.max_queue: Final = max_queue
-        self.action: Final[SequentialTaskPolicy] = \
-            SequentialTaskPolicy(action) if not isinstance(action, SequentialTaskPolicy) else action
+        self.action: Final[SequentialTaskPolicy] = to_enum(SequentialTaskPolicy, action)
 
     def __repr__(self) -> str:
         return (
