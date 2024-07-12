@@ -10,10 +10,10 @@ from eascheduler.helpers.time_replace import HINT_REPEATED, HINT_SKIPPED
 log = logging.getLogger('EAScheduler')
 
 
-def _iter_nr(nrs: Iterable[int], upper: int) -> Generator[int, None, None]:
+def _iter_nr(nrs: Iterable[int], lower: int, upper: int) -> Generator[int, None, None]:
     for nr in nrs:
         yield nr
-    for nr in range(upper):
+    for nr in range(lower, upper):
         if nr not in nrs:
             yield nr
 
@@ -24,8 +24,8 @@ def _iter_date(*, reverse: bool = False) -> Generator[tuple[SystemDateTime, Time
 
     now = SystemDateTime.now()
 
-    for month in _iter_nr(month_order if not reverse else reversed(month_order), 12):
-        for hour in _iter_nr(hour_order if not reverse else reversed(hour_order), 24):
+    for month in _iter_nr(month_order if not reverse else reversed(month_order), 1, 13):
+        for hour in _iter_nr(hour_order if not reverse else reversed(hour_order), 0, 24):
             start = SystemDateTime(now.year, month, 1)
             while start.month == month:
                 yield start, Time(hour, 30)
