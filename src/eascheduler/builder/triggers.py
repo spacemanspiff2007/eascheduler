@@ -8,8 +8,11 @@ from eascheduler.builder.helper import (
     HINT_CLOCK_BACKWARD,
     HINT_CLOCK_FORWARD,
     HINT_INSTANT,
+    HINT_INT,
     HINT_TIME,
     get_instant,
+    get_int,
+    get_interval,
     get_time_replacer,
 )
 from eascheduler.producers import (
@@ -29,8 +32,6 @@ from eascheduler.producers import (
 
 
 if TYPE_CHECKING:
-    from datetime import timedelta as dt_timedelta
-
     from eascheduler.builder.filters import FilterObject
     from eascheduler.producers.base import DateTimeProducerBase
 
@@ -40,11 +41,23 @@ class TriggerObject:
     def __init__(self, producer: DateTimeProducerBase) -> None:
         self._producer: Final[DateTimeProducerBase] = producer
 
-    def offset(self, offset: int) -> Self:
-        return self.__class__(OffsetProducerOperation(self._producer, offset))
+    def offset(self, offset: HINT_INT) -> Self:
+        """Offset the time returned by the trigger
+        :param offset: The offset (positive or negative)
+        """
+        return self.__class__(
+            OffsetProducerOperation(self._producer, get_int(offset))
+        )
 
     def earliest(self, earliest: HINT_TIME, *,
                  clock_forward: HINT_CLOCK_FORWARD = None, clock_backward: HINT_CLOCK_BACKWARD = None) -> Self:
+        """Set the earliest time of day the trigger can fire.
+        If the trigger would fire before the earliest time, the earliest time will be used instead.
+
+        :param earliest: The time of day before the trigger can not fire
+        :param clock_forward: How to handle the transition when the clock moves forward
+        :param clock_backward: How to handle the transition when the clock moves backward
+        """
         return self.__class__(
             EarliestProducerOperation(
                 self._producer,
@@ -54,6 +67,13 @@ class TriggerObject:
 
     def latest(self, latest: HINT_TIME, *,
                clock_forward: HINT_CLOCK_FORWARD = None, clock_backward: HINT_CLOCK_BACKWARD = None) -> Self:
+        """Set the latest time of day the trigger can fire.
+        If the trigger would fire after the latest time, the latest time will be used instead.
+
+        :param latest: The time of day before the trigger can not fire
+        :param clock_forward: How to handle the transition when the clock moves forward
+        :param clock_backward: How to handle the transition when the clock moves backward
+        """
         return self.__class__(
             LatestProducerOperation(
                 self._producer,
@@ -62,11 +82,20 @@ class TriggerObject:
         )
 
     def jitter(self, low: int, high: int | None = None) -> Self:
+        """Add jitter to the time returned by the trigger.
+
+        :param low: The lower bound of the jitter
+        :param high: The upper bound of the jitter. If not specified the jitter will be 0 .. low
+        """
         return self.__class__(
-            JitterProducerOperation(self._producer, low, high)
+            JitterProducerOperation(self._producer, get_int(low), get_int(high) if high is not None else None)
         )
 
     def only_on(self, filter: FilterObject) -> Self:  # noqa: A002
+        """Add a filter to the trigger which can be used to allow or disallow certain times.
+
+        :param filter: The filter to apply to the trigger
+        """
         if self._producer._filter is not None:
             raise ValueError()
         self._producer._filter = filter._filter
@@ -79,35 +108,51 @@ class TriggerObject:
 class TriggerBuilder:
     @staticmethod
     def dawn() -> TriggerObject:
+        """Triggers at dawn."""
         return TriggerObject(DawnProducer())
 
     @staticmethod
     def sunrise() -> TriggerObject:
+        """Triggers at sunrise."""
         return TriggerObject(SunriseProducer())
 
     @staticmethod
     def noon() -> TriggerObject:
+        """Triggers at noon."""
         return TriggerObject(NoonProducer())
 
     @staticmethod
     def sunset() -> TriggerObject:
+        """Triggers at sunset."""
         return TriggerObject(SunsetProducer())
 
     @staticmethod
     def dusk() -> TriggerObject:
+        """Triggers at dusk."""
         return TriggerObject(DuskProducer())
 
     @staticmethod
     def group(*builders: TriggerObject) -> TriggerObject:
+        """Group multiple triggers together. The triggers will be checked and the trigger that runs next will be used"""
         return TriggerObject(GroupProducer([b._producer for b in builders]))
 
     @staticmethod
-    def interval(start: HINT_INSTANT, interval: dt_timedelta | int) -> TriggerObject:
-        return TriggerObject(IntervalProducer(get_instant(start), interval))
+    def interval(start: HINT_INSTANT, interval: HINT_INT) -> TriggerObject:
+        """Triggers at a fixed interval from a given start time."""
+        return TriggerObject(
+            IntervalProducer(get_instant(start), get_interval(interval))
+        )
 
     @staticmethod
     def time(time: HINT_TIME, *,
              clock_forward: HINT_CLOCK_FORWARD = None, clock_backward: HINT_CLOCK_BACKWARD = None) -> TriggerObject:
+        """Triggers at a specific time of day. When the time of day is during a daylight saving time transition
+        it has to be explicitly specified how the transition should be handled.
+
+        :param time: The time of day the trigger should fire
+        :param clock_forward: How to handle the transition when the clock moves forward
+        :param clock_backward: How to handle the transition when the clock moves backward
+        """
         return TriggerObject(
             TimeProducer(
                 get_time_replacer(time, clock_forward=clock_forward, clock_backward=clock_backward)

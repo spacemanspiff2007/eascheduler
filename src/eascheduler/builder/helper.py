@@ -12,6 +12,21 @@ from eascheduler.helpers import HINT_CLOCK_BACKWARD, HINT_CLOCK_FORWARD, TimeRep
 
 HINT_TIME: TypeAlias = dt_time | Time | str
 HINT_INSTANT: TypeAlias = dt_datetime | dt_timedelta | TimeDelta | str | None | HINT_TIME
+HINT_INT: TypeAlias = dt_timedelta | TimeDelta | int | float
+
+
+def get_int(value: HINT_INT) -> int:
+    match value:
+        case dt_timedelta():
+            return int(value.total_seconds())
+        case TimeDelta():
+            return int(value.in_seconds())
+        case int():
+            return value
+        case float():
+            return int(value)
+        case _:
+            raise TypeError()
 
 
 def get_time(value: HINT_TIME) -> Time:
@@ -28,6 +43,14 @@ def get_time(value: HINT_TIME) -> Time:
             pass
 
     raise ValueError()
+
+
+def get_interval(value: HINT_INT) -> int:
+    value = get_int(value)
+    if value <= 0:
+        msg = 'Value must be positive.'
+        raise ValueError(msg)
+    return value
 
 
 def get_time_replacer(value: HINT_TIME, *,

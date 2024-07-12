@@ -79,8 +79,9 @@ class AsyncScheduler(SchedulerBase):
             job.set_loop_time(None, None)
             return self
 
+        now = Instant.now()
         loop_now = self._loop.time()
-        loop_next = loop_now + (next_time - Instant.now()).in_seconds()
+        loop_next = loop_now + (next_time - now).in_seconds()
         if loop_next < loop_now - 0.1:
             raise ScheduledRunInThePastError()
 
@@ -119,4 +120,10 @@ class AsyncScheduler(SchedulerBase):
     def update_job(self, job: JobBase) -> Self:
         self.remove_job(job)
         self.add_job(job)
+        return self
+
+    @override
+    def remove_all(self) -> Self:
+        for job in tuple(reversed(self.jobs)):
+            job.job_finish()
         return self

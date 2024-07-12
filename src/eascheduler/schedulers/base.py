@@ -25,3 +25,6 @@ class SchedulerBase:
 
     def set_job_time(self, job: JobBase, next_time: Instant | None) -> Self:
         raise NotImplementedError()
+
+    def remove_all(self) -> Self:
+        raise NotImplementedError()

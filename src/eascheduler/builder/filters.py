@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Final
 
+from eascheduler.builder.helper import HINT_TIME, get_time
 from eascheduler.producers import (
     AllGroupProducerFilter,
     AnyGroupProducerFilter,
@@ -38,8 +39,10 @@ class FilterBuilder:
         return FilterObject(InvertingProducerFilter(filter._filter))
 
     @staticmethod
-    def time(lower: dt_time | None = None, upper: dt_time | None = None) -> FilterObject:
-        return FilterObject(TimeProducerFilter(lower, upper))
+    def time(lower: HINT_TIME | None = None, upper: HINT_TIME | None = None) -> FilterObject:
+        return FilterObject(
+            TimeProducerFilter(get_time(lower), get_time(upper))
+        )
 
     @staticmethod
     def weekdays(*weekdays: int) -> FilterObject:
