@@ -4,7 +4,14 @@ from typing import TYPE_CHECKING, Final
 
 from typing_extensions import Self
 
-from eascheduler.builder.helper import HINT_INSTANT, HINT_TIME, get_instant, get_time
+from eascheduler.builder.helper import (
+    HINT_CLOCK_BACKWARD,
+    HINT_CLOCK_FORWARD,
+    HINT_INSTANT,
+    HINT_TIME,
+    get_instant,
+    get_time_replacer,
+)
 from eascheduler.producers import (
     DawnProducer,
     DuskProducer,
@@ -22,10 +29,7 @@ from eascheduler.producers import (
 
 
 if TYPE_CHECKING:
-    from datetime import time as dt_time
     from datetime import timedelta as dt_timedelta
-
-    from whenever import Time
 
     from eascheduler.builder.filters import FilterObject
     from eascheduler.producers.base import DateTimeProducerBase
@@ -39,14 +43,28 @@ class TriggerObject:
     def offset(self, offset: int) -> Self:
         return self.__class__(OffsetProducerOperation(self._producer, offset))
 
-    def earliest(self, earliest: HINT_TIME) -> Self:
-        return self.__class__(EarliestProducerOperation(self._producer, earliest))
+    def earliest(self, earliest: HINT_TIME, *,
+                 clock_forward: HINT_CLOCK_FORWARD = None, clock_backward: HINT_CLOCK_BACKWARD = None) -> Self:
+        return self.__class__(
+            EarliestProducerOperation(
+                self._producer,
+                get_time_replacer(earliest, clock_forward=clock_forward, clock_backward=clock_backward)
+            )
+        )
 
-    def latest(self, latest: HINT_TIME) -> Self:
-        return self.__class__(LatestProducerOperation(self._producer, latest))
+    def latest(self, latest: HINT_TIME, *,
+               clock_forward: HINT_CLOCK_FORWARD = None, clock_backward: HINT_CLOCK_BACKWARD = None) -> Self:
+        return self.__class__(
+            LatestProducerOperation(
+                self._producer,
+                get_time_replacer(latest, clock_forward=clock_forward, clock_backward=clock_backward)
+            )
+        )
 
     def jitter(self, low: int, high: int | None = None) -> Self:
-        return self.__class__(JitterProducerOperation(self._producer, low, high))
+        return self.__class__(
+            JitterProducerOperation(self._producer, low, high)
+        )
 
     def only_on(self, filter: FilterObject) -> Self:  # noqa: A002
         if self._producer._filter is not None:
@@ -88,5 +106,10 @@ class TriggerBuilder:
         return TriggerObject(IntervalProducer(get_instant(start), interval))
 
     @staticmethod
-    def time(time: HINT_TIME) -> TriggerObject:
-        return TriggerObject(TimeProducer(get_time(time)))
+    def time(time: HINT_TIME, *,
+             clock_forward: HINT_CLOCK_FORWARD = None, clock_backward: HINT_CLOCK_BACKWARD = None) -> TriggerObject:
+        return TriggerObject(
+            TimeProducer(
+                get_time_replacer(time, clock_forward=clock_forward, clock_backward=clock_backward)
+            )
+        )

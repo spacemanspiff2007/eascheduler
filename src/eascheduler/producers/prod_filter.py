@@ -65,7 +65,7 @@ class TimeProducerFilter(ProducerFilterBase):
         if (lower := self._lower) is not None and time < lower:
             return False
 
-        if (upper := self._upper) is not None and time >= upper:
+        if (upper := self._upper) is not None and time >= upper:  # noqa: SIM103
             return False
 
         return True

@@ -46,6 +46,9 @@ ignore = [
 
     # https://docs.astral.sh/ruff/rules/#warning-w_1
     "PLW0603",  # Using the global statement to update {name} is discouraged
+
+    # https://docs.astral.sh/ruff/rules/#flake8-logging-format-g
+    "G004",     # Logging statement uses f-string
 ]
 
 

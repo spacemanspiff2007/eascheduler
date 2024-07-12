@@ -1,7 +1,8 @@
 from enum import Enum
 from time import monotonic
-from typing import Final, TypeVar, Union, get_args, get_origin
+from typing import Final, Literal, TypeVar, Union, get_args, get_origin
 
+import pytest
 from whenever import Instant, SystemDateTime, TimeDelta, ZonedDateTime
 
 
@@ -53,8 +54,8 @@ class CountDownHelper:
         self._calls.append(monotonic() - self._last_reset)
 
     def reset(self):
-        self._job.reset()
         self._last_reset = monotonic()
+        self._job.reset()
         return self
 
     def assert_not_called(self):
@@ -73,6 +74,15 @@ class CountDownHelper:
         return self
 
 
+def _fmt_diff(value: TimeDelta | float) -> str:
+    if isinstance(value, TimeDelta):
+        value = value.in_seconds()
+    if abs(value) > 0.02:
+        return f'{value:.3f}s'
+    value *= 1000
+    return f'{value:.3f}ms'
+
+
 def assert_called_at(value, target):
     offset_lower = 0
     offset_upper = CLOCK_GRANULARITY * 1.5
@@ -85,15 +95,15 @@ def assert_called_at(value, target):
     if isinstance(value, float) and isinstance(target, float):
         target_lower = target - offset_lower
         target_upper = target + offset_upper
-        assert target_lower < value, f'\n{target_lower}\n{value}  {value-target_lower}'
-        assert value < target_upper, f'\n{value}\n{target_upper}  {target_upper-value}'
+        assert target_lower < value, f'\n{target_lower}\n{value}  {_fmt_diff(value-target_lower):s}'
+        assert value < target_upper, f'\n{value}  {_fmt_diff(value-target_upper):s}\n{target_upper}'
         return True
 
     if isinstance(value, (Instant, SystemDateTime)) and isinstance(target, (Instant, SystemDateTime)):
         target_lower = target - TimeDelta(seconds=offset_lower)
         target_upper = target + TimeDelta(seconds=offset_upper)
-        assert target_lower < value, f'\n{target_lower}\n{value}  {value-target_lower}'
-        assert value < target_upper, f'\n{value}\n{target_upper}  {target_upper-value}'
+        assert target_lower < value, f'\n{target_lower}\n{value}  {_fmt_diff(value-target_lower):s}'
+        assert value < target_upper, f'\n{value}  {_fmt_diff(value-target_upper):s}\n{target_upper}'
         return True
 
     raise ValueError()
@@ -114,3 +124,16 @@ def assert_literal_values_in_enum(obj):
 
     for value in values_literal:
         enum(value)
+
+
+def test_assert_literal_values_in_enum():
+    class TestEnum(Enum):
+        A = 1
+        B = 2
+
+    with pytest.raises(AssertionError):
+        assert_literal_values_in_enum(Literal[1] | TestEnum)
+    with pytest.raises(AssertionError):
+        assert_literal_values_in_enum(Literal[1, 2, 3] | TestEnum)
+
+    assert_literal_values_in_enum(Literal[1, 2] | TestEnum)

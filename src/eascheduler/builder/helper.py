@@ -7,6 +7,8 @@ from typing import TypeAlias
 
 from whenever import Instant, SystemDateTime, Time, TimeDelta
 
+from eascheduler.helpers import HINT_CLOCK_BACKWARD, HINT_CLOCK_FORWARD, TimeReplacer, check_dst_handling
+
 
 HINT_TIME: TypeAlias = dt_time | Time | str
 HINT_INSTANT: TypeAlias = dt_datetime | dt_timedelta | TimeDelta | str | None | HINT_TIME
@@ -26,6 +28,13 @@ def get_time(value: HINT_TIME) -> Time:
             pass
 
     raise ValueError()
+
+
+def get_time_replacer(value: HINT_TIME, *,
+                      clock_forward: HINT_CLOCK_FORWARD, clock_backward: HINT_CLOCK_BACKWARD) -> TimeReplacer:
+    time = get_time(value)
+    f, b = check_dst_handling(time, clock_forward, clock_backward)
+    return TimeReplacer(time, f, b)
 
 
 def get_instant(value: HINT_INSTANT) -> Instant:  # noqa: C901
