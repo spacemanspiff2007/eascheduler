@@ -1,10 +1,10 @@
-from eascheduler.jobs.event_handler import JobEventHandler
+from eascheduler.jobs.event_handler import JobCallbackHandler
 
 
 # noinspection PyTypeChecker
 def test_handler():
 
-    h = JobEventHandler()
+    h = JobCallbackHandler()
 
     calls_1 = []
     calls_2 = []

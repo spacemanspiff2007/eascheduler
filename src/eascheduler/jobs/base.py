@@ -8,7 +8,7 @@ from typing_extensions import Self
 from whenever import Instant
 
 from eascheduler.errors.errors import JobAlreadyFinishedError
-from eascheduler.jobs.event_handler import JobEventHandler
+from eascheduler.jobs.event_handler import JobCallbackHandler
 
 
 if TYPE_CHECKING:
@@ -68,8 +68,8 @@ class JobBase(Generic[IdType]):
         self.last_run: Instant | None = None
 
         # callbacks
-        self.on_update: Final = JobEventHandler()       # running | paused -> running | paused
-        self.on_finished: Final = JobEventHandler()     # running | paused -> -> finished
+        self.on_update: Final = JobCallbackHandler()       # running | paused -> running | paused
+        self.on_finished: Final = JobCallbackHandler()     # running | paused -> -> finished
 
     @property
     def id(self) -> IdType:

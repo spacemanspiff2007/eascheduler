@@ -16,13 +16,16 @@ class CountdownJobControl(BaseControl):
         self._job: Final[CountdownJob] = job  # type: ignore[misc]
 
     def set_countdown(self, secs: float) -> Self:
+        """Set the countdown time"""
         self._job.set_countdown(secs)
         return self
 
     def stop(self) -> Self:
+        """Stop the countdown"""
         self._job.job_pause()
         return self
 
     def reset(self) -> Self:
+        """Start the countdown again"""
         self._job.reset()
         return self

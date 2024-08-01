@@ -15,8 +15,6 @@ from eascheduler.producers import (
 
 
 if TYPE_CHECKING:
-    from datetime import time as dt_time
-
     from eascheduler.producers.base import ProducerFilterBase
 
 

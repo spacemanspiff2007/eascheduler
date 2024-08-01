@@ -30,7 +30,7 @@ def find_time_after_dst_switch(dt: SystemDateTime, time: Time) -> Instant:
 class OffsetProducerOperation(DateTimeProducerOperationBase):
     __slots__ = ('offset', )
 
-    def __init__(self, producer: DateTimeProducerBase, offset: int) -> None:
+    def __init__(self, producer: DateTimeProducerBase, offset: float) -> None:
         super().__init__(producer)
         self.offset: Final = offset
 
@@ -88,7 +88,7 @@ class LatestProducerOperation(DateTimeProducerOperationBase):
 class JitterProducerOperation(DateTimeProducerOperationBase):
     __slots__ = ('low', 'high')
 
-    def __init__(self, producer: DateTimeProducerBase, low: int, high: int | None = None) -> None:
+    def __init__(self, producer: DateTimeProducerBase, low: float, high: float | None = None) -> None:
         super().__init__(producer)
         if high is None:
             high = low
@@ -103,12 +103,12 @@ class JitterProducerOperation(DateTimeProducerOperationBase):
     @override
     def apply_operation(self, next_dt: Instant, dt: Instant) -> Instant:
         if (low := self.low) >= 0:
-            return next_dt.add(seconds=int(uniform(low, self.high)))
+            return next_dt.add(seconds=uniform(low, self.high))
 
         # We can use the whole interval because we will always
         lowest = (dt - next_dt).in_seconds()
         if lowest < low:
-            return next_dt.add(seconds=int(uniform(low, self.high)))
+            return next_dt.add(seconds=uniform(low, self.high))
 
         # shift the interval forward in time
         diff = lowest - low + 0.0001    # Add a small fraction, so we can be sure that we move forward in time

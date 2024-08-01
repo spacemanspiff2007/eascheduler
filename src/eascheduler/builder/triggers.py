@@ -8,12 +8,12 @@ from eascheduler.builder.helper import (
     HINT_CLOCK_BACKWARD,
     HINT_CLOCK_FORWARD,
     HINT_INSTANT,
-    HINT_INT,
     HINT_TIME,
+    HINT_TIMEDELTA,
     get_instant,
-    get_int,
-    get_interval,
+    get_pos_timedelta_secs,
     get_time_replacer,
+    get_timedelta,
 )
 from eascheduler.producers import (
     DawnProducer,
@@ -41,12 +41,12 @@ class TriggerObject:
     def __init__(self, producer: DateTimeProducerBase) -> None:
         self._producer: Final[DateTimeProducerBase] = producer
 
-    def offset(self, offset: HINT_INT) -> Self:
+    def offset(self, offset: HINT_TIMEDELTA) -> Self:
         """Offset the time returned by the trigger
         :param offset: The offset (positive or negative)
         """
         return self.__class__(
-            OffsetProducerOperation(self._producer, get_int(offset))
+            OffsetProducerOperation(self._producer, get_timedelta(offset).in_seconds())
         )
 
     def earliest(self, earliest: HINT_TIME, *,
@@ -81,14 +81,17 @@ class TriggerObject:
             )
         )
 
-    def jitter(self, low: int, high: int | None = None) -> Self:
+    def jitter(self, low: HINT_TIMEDELTA, high: HINT_TIMEDELTA | None = None) -> Self:
         """Add jitter to the time returned by the trigger.
 
         :param low: The lower bound of the jitter
         :param high: The upper bound of the jitter. If not specified the jitter will be 0 .. low
         """
         return self.__class__(
-            JitterProducerOperation(self._producer, get_int(low), get_int(high) if high is not None else None)
+            JitterProducerOperation(
+                self._producer,
+                get_pos_timedelta_secs(low), get_pos_timedelta_secs(high) if high is not None else None
+            )
         )
 
     def only_on(self, filter: FilterObject) -> Self:  # noqa: A002
@@ -137,10 +140,10 @@ class TriggerBuilder:
         return TriggerObject(GroupProducer([b._producer for b in builders]))
 
     @staticmethod
-    def interval(start: HINT_INSTANT, interval: HINT_INT) -> TriggerObject:
+    def interval(start: HINT_INSTANT, interval: HINT_TIMEDELTA) -> TriggerObject:
         """Triggers at a fixed interval from a given start time."""
         return TriggerObject(
-            IntervalProducer(get_instant(start), get_interval(interval))
+            IntervalProducer(get_instant(start), get_pos_timedelta_secs(interval))
         )
 
     @staticmethod

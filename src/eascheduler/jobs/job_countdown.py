@@ -34,7 +34,7 @@ class CountdownJob(JobBase):
         if (scheduler := self._scheduler) is None:
             raise JobNotLinkedToSchedulerError()
 
-        scheduler.set_job_time(self, Instant.now() + TimeDelta(seconds=self._seconds))
+        scheduler.set_job_time(self, Instant.now().add(seconds=self._seconds))
         scheduler.update_job(self)
 
     @override

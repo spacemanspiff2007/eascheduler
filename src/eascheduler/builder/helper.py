@@ -11,46 +11,41 @@ from eascheduler.helpers import HINT_CLOCK_BACKWARD, HINT_CLOCK_FORWARD, TimeRep
 
 
 HINT_TIME: TypeAlias = dt_time | Time | str
-HINT_INSTANT: TypeAlias = dt_datetime | dt_timedelta | TimeDelta | str | None | HINT_TIME
-HINT_INT: TypeAlias = dt_timedelta | TimeDelta | int | float
+HINT_TIMEDELTA: TypeAlias = dt_timedelta | TimeDelta | int | float | str
+HINT_INSTANT: TypeAlias = dt_datetime | None | str | HINT_TIME, HINT_TIMEDELTA
 
 
-def get_int(value: HINT_INT) -> int:
+def get_timedelta(value: HINT_TIMEDELTA) -> TimeDelta:
     match value:
         case dt_timedelta():
-            return int(value.total_seconds())
+            return TimeDelta.from_py_timedelta(value)
         case TimeDelta():
-            return int(value.in_seconds())
-        case int():
             return value
-        case float():
-            return int(value)
+        case int() | float():
+            return TimeDelta(seconds=value)
+        case str():
+            return TimeDelta.parse_common_iso(value)
         case _:
             raise TypeError()
 
 
-def get_time(value: HINT_TIME) -> Time:
-    if isinstance(value, dt_time):
-        return Time.from_py_time(value)
-
-    if isinstance(value, Time):
-        return value
-
-    if isinstance(value, str):
-        try:
-            return Time.parse_common_iso(value)
-        except ValueError:
-            pass
-
-    raise ValueError()
-
-
-def get_interval(value: HINT_INT) -> int:
-    value = get_int(value)
-    if value <= 0:
+def get_pos_timedelta_secs(value: HINT_TIMEDELTA) -> float:
+    if (value := get_timedelta(value).in_seconds()) <= 0:
         msg = 'Value must be positive.'
         raise ValueError(msg)
     return value
+
+
+def get_time(value: HINT_TIME) -> Time:
+    match value:
+        case Time():
+            return value
+        case dt_time():
+            return Time.from_py_time(value)
+        case str():
+            return Time.parse_common_iso(value)
+        case _:
+            raise TypeError()
 
 
 def get_time_replacer(value: HINT_TIME, *,
@@ -60,22 +55,24 @@ def get_time_replacer(value: HINT_TIME, *,
     return TimeReplacer(time, f, b)
 
 
-def get_instant(value: HINT_INSTANT) -> Instant:  # noqa: C901
-    if value is None:
-        return Instant.now()
+def get_instant(value: HINT_INSTANT) -> Instant:
 
-    # ------------------------------------------------------------------------------------------------------------------
-    # datetime
-    if isinstance(value, dt_datetime):
-        return SystemDateTime.from_py_datetime(value).instant()
+    match value:
+        case None:
+            return Instant.now()
+        case dt_datetime():
+            return SystemDateTime.from_py_datetime(value).instant()
+        case SystemDateTime():
+            return value.instant()
 
     # ------------------------------------------------------------------------------------------------------------------
     # timedelta
-    if isinstance(value, dt_timedelta):
-        return Instant.now() + TimeDelta.from_py_timedelta(value)
-
-    if isinstance(value, TimeDelta):
-        return Instant.now() + value
+    try:
+        timedelta = get_timedelta(value)
+    except ValueError:
+        pass
+    else:
+        return Instant.now() + timedelta
 
     # ------------------------------------------------------------------------------------------------------------------
     # time
@@ -89,15 +86,5 @@ def get_instant(value: HINT_INSTANT) -> Instant:  # noqa: C901
         if new < now:
             new = new.add(days=1)
         return new.instant()
-
-    # ------------------------------------------------------------------------------------------------------------------
-    # str
-    if isinstance(value, str):
-        for parser in (SystemDateTime.parse_common_iso, TimeDelta.parse_common_iso):
-            try:
-                obj = parser(value)
-            except ValueError:
-                continue
-            return get_instant(obj)
 
     raise ValueError()
