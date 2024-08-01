@@ -5,16 +5,16 @@ from whenever import Time
 from eascheduler.helpers import TimeReplacer
 from eascheduler.producers import TimeProducer
 from eascheduler.producers.prod_filter import DayOfWeekProducerFilter
-from tests.helper import get_ger_str, get_german_as_instant, get_local_as_instant
+from tests.helper import get_ger_str, get_german_as_instant, get_system_as_instant
 
 
 def test_simple():
     producer = TimeProducer(TimeReplacer(Time(8), 'close', 'earlier'))
 
     for _ in range(10):
-        assert producer.get_next(get_local_as_instant(1, 1, 7)) == get_local_as_instant(1, 1, 8)
-        assert producer.get_next(get_local_as_instant(1, 1, 8)) == get_local_as_instant(1, 2, 8)
-        assert producer.get_next(get_local_as_instant(1, 2, 8)) == get_local_as_instant(1, 3, 8)
+        assert producer.get_next(get_system_as_instant(1, 1, 7)) == get_system_as_instant(1, 1, 8)
+        assert producer.get_next(get_system_as_instant(1, 1, 8)) == get_system_as_instant(1, 2, 8)
+        assert producer.get_next(get_system_as_instant(1, 2, 8)) == get_system_as_instant(1, 3, 8)
 
 
 def test_filter():
@@ -22,9 +22,9 @@ def test_filter():
     producer._filter = DayOfWeekProducerFilter([6])
 
     for _ in range(10):
-        assert producer.get_next(get_local_as_instant(1, 1, 7)) == get_local_as_instant(1, 6, 8)
-        assert producer.get_next(get_local_as_instant(1, 6, 8)) == get_local_as_instant(1, 13, 8)
-        assert producer.get_next(get_local_as_instant(1, 13, 8)) == get_local_as_instant(1, 20, 8)
+        assert producer.get_next(get_system_as_instant(1, 1, 7)) == get_system_as_instant(1, 6, 8)
+        assert producer.get_next(get_system_as_instant(1, 6, 8)) == get_system_as_instant(1, 13, 8)
+        assert producer.get_next(get_system_as_instant(1, 13, 8)) == get_system_as_instant(1, 20, 8)
 
 
 @pytest.mark.skipif(get_localzone_name() != 'Europe/Berlin',

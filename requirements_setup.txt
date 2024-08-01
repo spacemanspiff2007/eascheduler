@@ -1,5 +1,5 @@
 # Requirements to install and use this library
-whenever == 0.6.2
+whenever == 0.6.6
 astral   == 3.2
 
 

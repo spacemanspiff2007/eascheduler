@@ -12,22 +12,10 @@ def get_german_as_instant(month=1, day=1, hour=0, minute=0, second=0, *, year=20
     ).instant()
 
 
-def get_local_as_instant(month=1, day=1, hour=0, minute=0, second=0, *, year=2001, microsecond=0) -> Instant:
+def get_system_as_instant(month=1, day=1, hour=0, minute=0, second=0, *, year=2001, microsecond=0) -> Instant:
     return SystemDateTime(
         year, month, day, hour, minute=minute, second=second, nanosecond=microsecond * 1000
     ).instant()
-
-
-def cmp_utc_with_local(obj, *args, **kwargs):
-    from_local = get_local_as_instant(*args, **kwargs)
-    assert obj == from_local, f'\n{obj}\n{from_local}'
-    return obj == from_local
-
-
-def cmp_utc_with_german(obj, *args, **kwargs):
-    from_german = get_local_as_instant(*args, **kwargs)
-    assert obj == from_german, f'\n{obj}\n{from_german}'
-    return obj == from_german
 
 
 def get_ger_str(obj: Instant) -> str:

@@ -12,7 +12,7 @@ from eascheduler.producers.prod_operation import (
     EarliestProducerOperation,
     LatestProducerOperation,
 )
-from tests.helper import get_ger_str, get_german_as_instant, get_local_as_instant
+from tests.helper import get_ger_str, get_german_as_instant, get_system_as_instant
 
 
 pytestmark = pytest.mark.skipif(
@@ -31,7 +31,7 @@ pytestmark = pytest.mark.skipif(
 )
 def test_earliest_forward(param: HINT_SKIPPED, target: list[str]):
     o = EarliestProducerOperation(
-        IntervalProducer(get_local_as_instant(3, 24, hour=0), 3600),
+        IntervalProducer(get_system_as_instant(3, 24, hour=0), 3600),
         TimeReplacer(Time(2, 30, 0), param, 'skip')
     )
 
@@ -56,7 +56,7 @@ def test_earliest_forward(param: HINT_SKIPPED, target: list[str]):
 )
 def test_earliest_backwards(param: HINT_REPEATED, target: list[str]):
     o = EarliestProducerOperation(
-        IntervalProducer(get_local_as_instant(10, 27, 0), 3600),
+        IntervalProducer(get_system_as_instant(10, 27, 0), 3600),
         TimeReplacer(Time(2, 30, 0), 'skip', param)
     )
     # one hour jump backwards
@@ -82,7 +82,7 @@ def test_earliest_backwards(param: HINT_REPEATED, target: list[str]):
 )
 def test_latest_forward(param: HINT_SKIPPED, target: list[str]):
     o = LatestProducerOperation(
-        IntervalProducer(get_local_as_instant(3, 24, hour=0), 3600),
+        IntervalProducer(get_system_as_instant(3, 24, hour=0), 3600),
         TimeReplacer(Time(2, 30, 0), param, 'twice')
     )
 
@@ -108,7 +108,7 @@ def test_latest_forward(param: HINT_SKIPPED, target: list[str]):
 )
 def test_latest_backwards(param: HINT_REPEATED, target: list[str]):
     o = LatestProducerOperation(
-        IntervalProducer(get_local_as_instant(3, 24, 0), 3600),
+        IntervalProducer(get_system_as_instant(3, 24, 0), 3600),
         TimeReplacer(Time(2, 30, 0), 'skip', param)
     )
 
