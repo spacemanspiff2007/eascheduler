@@ -1,10 +1,37 @@
 from collections.abc import Iterable
 from datetime import date as dt_date
+from difflib import get_close_matches
 from typing import Final
 
 
 DAY_NAMES: Final[dict[str, int]] = {}
 MONTH_NAMES: Final[dict[str, int]] = {}
+
+
+def __get_err_msg(name: str, value: str, possibilities: Iterable[str]) -> str:
+    value = value.strip()
+    msg = f'Unknown {name:s} name: {value}'
+    if suggestion := get_close_matches(value.lower(), possibilities, n=1):
+        msg = f'{msg:s}! Did you mean: {suggestion[0]:s}'
+    return msg
+
+
+def get_day_nr(day: str) -> int:
+    key = day.lower().strip()
+    if (nr := DAY_NAMES.get(key)) is not None:
+        return nr
+
+    msg = __get_err_msg('day', day, DAY_NAMES.keys())
+    raise ValueError(msg)
+
+
+def get_month_nr(month: str) -> int:
+    key = month.lower().strip()
+    if (nr := MONTH_NAMES.get(key)) is not None:
+        return nr
+
+    msg = __get_err_msg('month', month, MONTH_NAMES.keys())
+    raise ValueError(msg)
 
 
 def __create_names() -> None:
