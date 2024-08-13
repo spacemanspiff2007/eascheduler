@@ -1,5 +1,3 @@
-from datetime import time as dt_time
-
 from whenever import SystemDateTime, Time
 
 from eascheduler.producers.prod_filter import (

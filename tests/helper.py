@@ -125,3 +125,19 @@ def test_assert_literal_values_in_enum():
         assert_literal_values_in_enum(Literal[1, 2, 3] | TestEnum)
 
     assert_literal_values_in_enum(Literal[1, 2] | TestEnum)
+
+
+class AlwaysError:
+    def __call__(self, *args, **kwargs):  # noqa: ARG002
+        msg = 'Must not be called!'
+        raise ValueError(msg)
+
+    def __await__(self, *args, **kwargs):
+        return self()
+
+
+async def test_assert_always_error_raises():
+    with pytest.raises(ValueError, match='Must not be called!'):
+        AlwaysError()()
+    with pytest.raises(ValueError, match='Must not be called!'):
+        await AlwaysError()

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 from datetime import time as dt_time
 from datetime import timedelta as dt_timedelta
 
@@ -7,6 +8,7 @@ import pytest
 from whenever import Instant, SystemDateTime, Time, TimeDelta, patch_current_time
 
 from eascheduler.builder.helper import (
+    BuilderTypeValidator,
     get_days,
     get_instant,
     get_months,
@@ -112,3 +114,21 @@ def test_get_months():
         get_months('0')
     with pytest.raises(ValueError, match='Value 13 is not in the range 1-12'):
         get_months('13')
+
+
+def test_builder_type_validator():
+    class TestObj:
+        def __init__(self, val):
+            self.val = val
+
+    v = BuilderTypeValidator(TestObj, int, 'val')
+
+    assert str(v) == 'BuilderTypeValidator(TestObj, int, val)'
+
+    with pytest.raises(TypeError, match=re.escape('Expected type TestObj, got 1 (int)')):
+        v(1)
+
+    with pytest.raises(TypeError, match=re.escape('Expected an instance of int, got asdf (str)')):
+        v(TestObj('asdf'))
+
+    assert v(TestObj(1)) == 1

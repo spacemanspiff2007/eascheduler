@@ -4,7 +4,7 @@ from collections.abc import Callable, Iterable
 from datetime import datetime as dt_datetime
 from datetime import time as dt_time
 from datetime import timedelta as dt_timedelta
-from typing import TypeAlias
+from typing import Any, Final, Generic, TypeAlias, TypeVar
 
 from whenever import Instant, SystemDateTime, Time, TimeDelta
 
@@ -174,3 +174,30 @@ def get_days(*values: HINT_NAME_OR_NR) -> list[int]:
 
 def get_months(*values: HINT_NAME_OR_NR) -> list[int]:
     return sorted(_parse_values(values, get_month_nr, 1, 12))
+
+
+TYPE_OUT = TypeVar('TYPE_OUT')
+
+
+class BuilderTypeValidator(Generic[TYPE_OUT]):
+    __slots__ = ('type_in', 'type_out', 'var_name')
+
+    def __init__(self, type_in: type[object], type_out: type[TYPE_OUT], var_name: str) -> None:
+        self.type_in: Final = type_in
+        self.type_out: Final = type_out
+        self.var_name: Final = var_name
+
+    def __call__(self, obj: Any) -> TYPE_OUT:
+        if not isinstance(obj, self.type_in):
+            msg = f'Expected type {self.type_in.__name__}, got {obj} ({type(obj).__name__})'
+            raise TypeError(msg)
+
+        obj = getattr(obj, self.var_name)
+        if not isinstance(obj, self.type_out):
+            msg = f'Expected an instance of {self.type_out.__name__}, got {obj} ({type(obj).__name__})'
+            raise TypeError(msg)
+
+        return obj
+
+    def __repr__(self) -> str:
+        return f'{self.__class__.__name__}({self.type_in.__name__}, {self.type_out.__name__}, {self.var_name})'

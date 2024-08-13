@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Final, Generic, TypeAlias, TypeVar
+from typing import TYPE_CHECKING, Any, Final, Generic, TypeVar
 
 from eascheduler.jobs.base import JobBase
 

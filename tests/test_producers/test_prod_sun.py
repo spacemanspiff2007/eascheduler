@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 import pytest
-from whenever import Instant, SystemDateTime, ZonedDateTime
+from whenever import Instant, ZonedDateTime
 
 from eascheduler.producers import DayOfWeekProducerFilter
 from eascheduler.producers import prod_sun as prod_sun_module

@@ -9,7 +9,6 @@ from .base import ProducerFilterBase
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
-    from datetime import time as dt_time
 
     from whenever import SystemDateTime, Time
 

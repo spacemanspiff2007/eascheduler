@@ -1,8 +1,16 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Final
+from typing import Final
 
-from eascheduler.builder.helper import HINT_NAME_OR_NR, HINT_TIME, get_days, get_months, get_time, get_weekdays
+from eascheduler.builder.helper import (
+    HINT_NAME_OR_NR,
+    HINT_TIME,
+    BuilderTypeValidator,
+    get_days,
+    get_months,
+    get_time,
+    get_weekdays,
+)
 from eascheduler.producers import (
     AllGroupProducerFilter,
     AnyGroupProducerFilter,
@@ -12,10 +20,7 @@ from eascheduler.producers import (
     MonthOfYearProducerFilter,
     TimeProducerFilter,
 )
-
-
-if TYPE_CHECKING:
-    from eascheduler.producers.base import ProducerFilterBase
+from eascheduler.producers.base import ProducerFilterBase
 
 
 class FilterObject:
@@ -23,22 +28,25 @@ class FilterObject:
         self._filter: Final = filter
 
 
+_get_producer_filter = BuilderTypeValidator(FilterObject, ProducerFilterBase, '_filter')
+
+
 # noinspection PyProtectedMember,PyShadowingBuiltins
 class FilterBuilder:
     @staticmethod
     def any(*filters: FilterObject) -> FilterObject:
         """Passes an instant as soon as any of the filters passes it"""
-        return FilterObject(AnyGroupProducerFilter([f._filter for f in filters]))
+        return FilterObject(AnyGroupProducerFilter([_get_producer_filter(f) for f in filters]))
 
     @staticmethod
     def all(*filters: FilterObject) -> FilterObject:
         """Passes an instant only when all the filters pass it"""
-        return FilterObject(AllGroupProducerFilter([f._filter for f in filters]))
+        return FilterObject(AllGroupProducerFilter([_get_producer_filter(f) for f in filters]))
 
     @staticmethod
     def not_(filter: FilterObject) -> FilterObject:  # noqa: A002
         """Invert a filter"""
-        return FilterObject(InvertingProducerFilter(filter._filter))
+        return FilterObject(InvertingProducerFilter(_get_producer_filter(filter)))
 
     @staticmethod
     def time(lower: HINT_TIME | None = None, upper: HINT_TIME | None = None) -> FilterObject:

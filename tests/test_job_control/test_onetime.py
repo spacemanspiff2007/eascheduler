@@ -7,11 +7,12 @@ from eascheduler.job_control import OneTimeJobControl
 from eascheduler.jobs.base import STATUS_FINISHED
 from eascheduler.jobs.job_onetime import OneTimeJob
 from eascheduler.schedulers.async_scheduler import AsyncScheduler
+from tests.helper import AlwaysError
 
 
 async def test_eq():
-    job1 = OneTimeJob(SyncExecutor(lambda: 1/0), Instant.now() + TimeDelta(seconds=0.01))
-    job2 = OneTimeJob(SyncExecutor(lambda: 1/0), Instant.now() + TimeDelta(seconds=0.01))
+    job1 = OneTimeJob(SyncExecutor(AlwaysError()), Instant.now() + TimeDelta(seconds=0.01))
+    job2 = OneTimeJob(SyncExecutor(AlwaysError()), Instant.now() + TimeDelta(seconds=0.01))
 
     assert OneTimeJobControl(job1) == OneTimeJobControl(job1)
     assert OneTimeJobControl(job1) != OneTimeJobControl(job2)
@@ -20,7 +21,7 @@ async def test_eq():
 async def test_onetime():
 
     s = AsyncScheduler()
-    job = OneTimeJob(SyncExecutor(lambda: 1/0), Instant.now() + TimeDelta(seconds=0.01))
+    job = OneTimeJob(SyncExecutor(AlwaysError()), Instant.now() + TimeDelta(seconds=0.01))
     job.link_scheduler(s)
 
     OneTimeJobControl(job).cancel()
@@ -32,7 +33,7 @@ async def test_base_properties():
     now = SystemDateTime.now().add(seconds=1)
 
     s = AsyncScheduler()
-    job = OneTimeJob(SyncExecutor(lambda: 1/0), now.instant())
+    job = OneTimeJob(SyncExecutor(AlwaysError()), now.instant())
     job.link_scheduler(s)
 
     ctrl = OneTimeJobControl(job)

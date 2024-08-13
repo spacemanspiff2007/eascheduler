@@ -10,6 +10,7 @@ from eascheduler.builder.helper import (
     HINT_INSTANT,
     HINT_TIME,
     HINT_TIMEDELTA,
+    BuilderTypeValidator,
     get_instant,
     get_pos_timedelta_secs,
     get_time_replacer,
@@ -29,11 +30,11 @@ from eascheduler.producers import (
     SunsetProducer,
     TimeProducer,
 )
+from eascheduler.producers.base import DateTimeProducerBase
 
 
 if TYPE_CHECKING:
     from eascheduler.builder.filters import FilterObject
-    from eascheduler.producers.base import DateTimeProducerBase
 
 
 # noinspection PyShadowingBuiltins,PyProtectedMember
@@ -137,7 +138,7 @@ class TriggerBuilder:
     @staticmethod
     def group(*builders: TriggerObject) -> TriggerObject:
         """Group multiple triggers together. The triggers will be checked and the trigger that runs next will be used"""
-        return TriggerObject(GroupProducer([b._producer for b in builders]))
+        return TriggerObject(GroupProducer([_get_producer(b) for b in builders]))
 
     @staticmethod
     def interval(start: HINT_INSTANT, interval: HINT_TIMEDELTA) -> TriggerObject:
@@ -161,3 +162,6 @@ class TriggerBuilder:
                 get_time_replacer(time, clock_forward=clock_forward, clock_backward=clock_backward)
             )
         )
+
+
+_get_producer = BuilderTypeValidator(TriggerObject, DateTimeProducerBase, '_producer')

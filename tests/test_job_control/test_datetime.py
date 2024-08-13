@@ -6,12 +6,13 @@ from eascheduler.jobs.base import STATUS_FINISHED, STATUS_PAUSED, STATUS_RUNNING
 from eascheduler.jobs.job_datetime import DateTimeJob
 from eascheduler.producers import IntervalProducer
 from eascheduler.schedulers.async_scheduler import AsyncScheduler
+from tests.helper import AlwaysError
 
 
 async def test_eq():
     now = SystemDateTime.now().replace(nanosecond=0, disambiguate='raise').instant()
-    job1 = DateTimeJob(SyncExecutor(lambda: 1/0), IntervalProducer(now, 1))
-    job2 = DateTimeJob(SyncExecutor(lambda: 1/0), IntervalProducer(now, 1))
+    job1 = DateTimeJob(SyncExecutor(AlwaysError()), IntervalProducer(now, 1))
+    job2 = DateTimeJob(SyncExecutor(AlwaysError()), IntervalProducer(now, 1))
 
     assert DateTimeJobControl(job1) == DateTimeJobControl(job1)
     assert DateTimeJobControl(job1) != DateTimeJobControl(job2)
@@ -20,7 +21,7 @@ async def test_eq():
 async def test_datetime():
 
     s = AsyncScheduler()
-    job = DateTimeJob(SyncExecutor(lambda: 1/0), IntervalProducer(Instant.now(), 1))
+    job = DateTimeJob(SyncExecutor(AlwaysError()), IntervalProducer(Instant.now(), 1))
     job.link_scheduler(s)
 
     ctrl = DateTimeJobControl(job)

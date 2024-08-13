@@ -1,17 +1,16 @@
 import asyncio
-from time import monotonic
 
 from eascheduler.executor.base import SyncExecutor
 from eascheduler.job_control import CountdownJobControl
 from eascheduler.jobs.base import STATUS_PAUSED, STATUS_RUNNING
 from eascheduler.jobs.job_countdown import CountdownJob
 from eascheduler.schedulers.async_scheduler import AsyncScheduler
-from tests.helper import CountDownHelper
+from tests.helper import AlwaysError, CountDownHelper
 
 
 async def test_eq():
-    job1 = CountdownJob(SyncExecutor(lambda: 1/0), 1)
-    job2 = CountdownJob(SyncExecutor(lambda: 1/0), 1)
+    job1 = CountdownJob(SyncExecutor(AlwaysError()), 1)
+    job2 = CountdownJob(SyncExecutor(AlwaysError()), 1)
 
     assert CountdownJobControl(job1) == CountdownJobControl(job1)
     assert CountdownJobControl(job1) != CountdownJobControl(job2)
