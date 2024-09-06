@@ -6,6 +6,8 @@ from eascheduler.jobs.base import JobBase
 
 
 if TYPE_CHECKING:
+    from collections.abc import dict_items
+
     from eascheduler.schedulers import SchedulerBase
 
 
@@ -20,7 +22,7 @@ class SimpleJobIdStore(Generic[KEY_TYPE, JOB_TYPE]):
         self._scheduler: Final = scheduler
         self._jobs: Final[dict[KEY_TYPE, JOB_TYPE]] = {}
 
-    def add_job(self, job: JOB_TYPE):
+    def add_job(self, job: JOB_TYPE) -> JOB_TYPE:
         # remove job from scheduler if it already exists
         if (job_id := job.id) in self._jobs:
             msg = f'Duplicate key: {job_id}'
@@ -28,6 +30,7 @@ class SimpleJobIdStore(Generic[KEY_TYPE, JOB_TYPE]):
 
         self._jobs[job_id] = job
         self._scheduler.add_job(job)
+        return job
 
     def remove_job(self, job: JOB_TYPE) -> JOB_TYPE:
         job = self._jobs.pop(job.id)
@@ -51,5 +54,5 @@ class SimpleJobIdStore(Generic[KEY_TYPE, JOB_TYPE]):
     def __contains__(self, item: KEY_TYPE) -> bool:
         return item in self._jobs
 
-    def items(self):
+    def items(self) -> dict_items[KEY_TYPE, JOB_TYPE]:
         return self._jobs.items()

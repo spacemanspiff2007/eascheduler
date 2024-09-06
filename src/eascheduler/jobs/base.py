@@ -69,7 +69,7 @@ class JobBase(Generic[IdType]):
 
         # callbacks
         self.on_update: Final = JobCallbackHandler()       # running | paused -> running | paused
-        self.on_finished: Final = JobCallbackHandler()     # running | paused -> -> finished
+        self.on_finished: Final = JobCallbackHandler()     # running | paused -> finished
 
     @property
     def id(self) -> IdType:

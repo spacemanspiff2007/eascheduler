@@ -30,7 +30,7 @@ async def test_call():
     assert_called_at(calls, dst)
 
 
-@pytest.fixture()
+@pytest.fixture
 async def builder():
     with patch_current_time(SystemDateTime(2001, 1, 1, 12), keep_ticking=False):
         s = AsyncScheduler()
