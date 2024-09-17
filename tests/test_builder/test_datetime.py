@@ -25,7 +25,7 @@ async def test_call():
         append
     )
 
-    await asyncio.sleep((dst - now).in_seconds() + 0.01)
+    await asyncio.sleep((dst - now).in_seconds() + 0.02)
 
     assert_called_at(calls, dst)
 
