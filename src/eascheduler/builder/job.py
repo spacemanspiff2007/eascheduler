@@ -2,7 +2,7 @@ from collections.abc import Awaitable, Callable
 from typing import Any, Final
 
 from eascheduler.builder.helper import HINT_INSTANT, HINT_TIMEDELTA, get_instant, get_pos_timedelta_secs
-from eascheduler.builder.triggers import TriggerObject
+from eascheduler.builder.triggers import TriggerObject, _get_producer
 from eascheduler.executor import ExecutorBase
 from eascheduler.job_control import CountdownJobControl, DateTimeJobControl, OneTimeJobControl
 from eascheduler.jobs import CountdownJob, DateTimeJob, OneTimeJob
@@ -58,6 +58,6 @@ class JobBuilder:
         :param kwargs: |param_scheduled_cb_kwargs|
         :return: Created job
         """
-        job = DateTimeJob(self._executor(coro_func, args, kwargs), trigger._producer, job_id=job_id)
+        job = DateTimeJob(self._executor(coro_func, args, kwargs), _get_producer(trigger), job_id=job_id)
         job.link_scheduler(self._scheduler)
         return DateTimeJobControl(job)

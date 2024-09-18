@@ -124,7 +124,7 @@ class JobBase(Generic[IdType]):
         return this < other
 
     def __repr__(self) -> str:
-        return f'<{self.__class__.__name__} id={self.id!r} status={self.status!s} next_run={self.next_run}>'
+        return f'<{self.__class__.__name__} id={self.id!r} status={self.status.value} next_run={self.next_run}>'
 
     def job_finish(self) -> Self:
         if self.status is STATUS_FINISHED:
