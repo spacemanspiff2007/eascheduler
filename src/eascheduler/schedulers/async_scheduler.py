@@ -8,7 +8,6 @@ from typing import TYPE_CHECKING, Final
 from typing_extensions import Self, override
 from whenever import Instant
 
-from eascheduler.errors import ScheduledRunInThePastError
 from eascheduler.errors.errors import JobExecutionTimeIsNotSetError
 from eascheduler.errors.handler import process_exception
 from eascheduler.jobs.base import STATUS_RUNNING
@@ -34,14 +33,13 @@ class AsyncScheduler(SchedulerBase):
     def run_jobs(self) -> None:
         self.timer = None
         jobs = self.jobs
-        loop = self._loop
 
         try:
             while jobs:
                 job = jobs[0]
-                if (loop_time := job.loop_time) is None:
+                if (next_run := job.next_run) is None:
                     raise JobExecutionTimeIsNotSetError()  # noqa: TRY301
-                if loop_time > loop.time():
+                if next_run > Instant.now():
                     break
 
                 jobs.popleft()
@@ -59,47 +57,37 @@ class AsyncScheduler(SchedulerBase):
             process_exception(e)
 
         if jobs:
-            self._set_timer(jobs[0])
+            self._set_timer()
 
-    def _set_timer(self, job: JobBase | None) -> None:
+    def _set_timer(self) -> None:
         if (timer := self.timer) is not None:
+            self.timer = None
             timer.cancel()
 
-        if job is None:
-            self.timer = None
+        if not (jobs := self.jobs):
+            return None
+
+        if (next_run := jobs[0].next_run) is None:
+            raise JobExecutionTimeIsNotSetError()
+
+        diff = (next_run - Instant.now()).in_seconds()
+        if diff <= 0:
+            self.run_jobs()
         else:
-            if (loop_time := job.loop_time) is None:
-                raise JobExecutionTimeIsNotSetError()
-            self.timer = self._loop.call_at(loop_time, self.run_jobs)
-
-    @override
-    def set_job_time(self, job: JobBase, next_time: Instant | None) -> Self:
-
-        if next_time is None:
-            job.set_loop_time(None, None)
-            return self
-
-        now = Instant.now()
-        loop_now = self._loop.time()
-        loop_next = loop_now + (next_time - now).in_seconds()
-        if loop_next < loop_now - 0.1:
-            raise ScheduledRunInThePastError()
-
-        job.set_loop_time(loop_next, next_time)
-        return self
+            self.timer = self._loop.call_at(self._loop.time() + diff, self.run_jobs)
 
     @override
     def add_job(self, job: JobBase) -> Self:
         if job.status is STATUS_RUNNING:
             insort(self.jobs, job)
             if job is self.jobs[0]:
-                self._set_timer(job)
+                self._set_timer()
         return self
 
     @override
     def remove_job(self, job: JobBase) -> Self:
         if not (jobs := self.jobs):
-            self._set_timer(None)
+            self._set_timer()
             return self
 
         is_first = job is self.jobs[0]
@@ -109,11 +97,11 @@ class AsyncScheduler(SchedulerBase):
             pass
 
         if not jobs:
-            self._set_timer(None)
+            self._set_timer()
             return self
 
         if is_first:
-            self._set_timer(jobs[0])
+            self._set_timer()
         return self
 
     @override

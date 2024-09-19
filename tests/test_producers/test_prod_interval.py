@@ -3,9 +3,19 @@ from eascheduler.producers.prod_interval import IntervalProducer
 from tests.helper import get_ger_str, get_german_as_instant, get_system_as_instant
 
 
+def test_first():
+    p = IntervalProducer(get_system_as_instant(1, 1, 8), 5)
+    assert p.get_next(get_system_as_instant(1, 1, 8, second=3)) == get_system_as_instant(1, 1, 8, second=5)
+
+    p = IntervalProducer(get_system_as_instant(1, 1, 8), 5)
+    assert p.get_next(get_system_as_instant(1, 1, 8, second=5)) == get_system_as_instant(1, 1, 8, second=10)
+
+    p = IntervalProducer(None, 5)
+    assert p.get_next(get_system_as_instant(1, 1, 8)) == get_system_as_instant(1, 1, 8, microsecond=1)
+
+
 def test_simple():
     dt_now = get_system_as_instant(1, 1, 0)
-
     p = IntervalProducer(get_system_as_instant(1, 1, 8), 3600 * 5)
 
     for v in range(3, 100, 5):

@@ -14,16 +14,19 @@ if TYPE_CHECKING:
 class IntervalProducer(DateTimeProducerBase):
     __slots__ = ('_interval', '_next', )
 
-    def __init__(self, start: Instant, interval: float) -> None:
+    def __init__(self, start: Instant | None, interval: float) -> None:
         super().__init__()
 
+        self._next: Instant | None = start
         self._interval: Final = interval
-        self._next: Instant = start
 
     @override
     def get_next(self, dt: Instant) -> Instant:
         interval = self._interval
-        new_dt = self._next
+
+        # Possibility to immediately start the interval
+        if (new_dt := self._next) is None:
+            new_dt = dt.add(microseconds=1)
 
         # The producer should be stateless. We still need the DateTime in case we have odd intervals.
         # That's why we move backwards in time here

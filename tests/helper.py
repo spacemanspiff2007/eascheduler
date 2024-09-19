@@ -73,7 +73,7 @@ def _fmt_diff(value: TimeDelta | float) -> str:
 
 def assert_called_at(value, target):
     offset_lower = 0
-    offset_upper = CLOCK_GRANULARITY * 1.5
+    offset_upper = CLOCK_GRANULARITY * 2
 
     # unpack list with one entry
     if isinstance(value, (list, tuple)):

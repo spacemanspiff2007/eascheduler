@@ -27,7 +27,7 @@ class OneTimeJob(JobBase):
     def update_first(self) -> None:
         if (scheduler := self._scheduler) is None:
             raise JobNotLinkedToSchedulerError()
-        scheduler.set_job_time(self, self.execution_time)
+        self.set_next_run(self.execution_time)
 
     @override
     def job_pause(self) -> NoReturn:

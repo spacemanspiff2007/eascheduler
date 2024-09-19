@@ -144,7 +144,7 @@ class TriggerBuilder:
     def interval(start: HINT_INSTANT, interval: HINT_TIMEDELTA) -> TriggerObject:
         """Triggers at a fixed interval from a given start time."""
         return TriggerObject(
-            IntervalProducer(get_instant(start), get_pos_timedelta_secs(interval))
+            IntervalProducer(get_instant(start) if start is not None else None, get_pos_timedelta_secs(interval))
         )
 
     @staticmethod

@@ -26,4 +26,4 @@ class DateTimeJob(JobBase):
             raise JobNotLinkedToSchedulerError()
 
         next_run = self.producer.get_next(Instant.now())
-        scheduler.set_job_time(self, next_run)
+        self.set_next_run(next_run)

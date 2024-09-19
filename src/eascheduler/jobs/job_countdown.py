@@ -21,7 +21,7 @@ class CountdownJob(JobBase):
 
     @override
     def update_next(self) -> None:
-        self.set_loop_time(None, None)
+        self.set_next_run(None)
 
     def set_countdown(self, secs: float) -> None:
         if not isinstance(secs, (int, float)):
@@ -34,7 +34,7 @@ class CountdownJob(JobBase):
         if (scheduler := self._scheduler) is None:
             raise JobNotLinkedToSchedulerError()
 
-        scheduler.set_job_time(self, Instant.now().add(seconds=self._seconds))
+        self.set_next_run(Instant.now().add(seconds=self._seconds))
         scheduler.update_job(self)
 
     @override
