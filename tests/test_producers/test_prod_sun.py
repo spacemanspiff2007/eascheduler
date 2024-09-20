@@ -16,7 +16,7 @@ from eascheduler.producers import (
 )
 from eascheduler.producers import prod_sun as prod_sun_module
 from eascheduler.producers.prod_sun import SunProducer, get_azimuth_and_elevation
-from tests.helper import get_ger_str, get_system_as_instant
+from tests.helper import get_ger_str, get_german_as_instant, get_system_as_instant
 
 
 if TYPE_CHECKING:
@@ -66,15 +66,15 @@ def get_params() -> Generator[ParameterSet, None, None]:
         id='Dusk-15',
     )
     yield pytest.param(
-        SunElevationProducer(-6, 'setting'), get_system_as_instant(5, 15, 12, year=2024), '2024-05-15T21:40:46+02:00',
+        SunElevationProducer(-6, 'setting'), get_german_as_instant(5, 15, 12, year=2024), '2024-05-15T21:40:46+02:00',
         id='Elevation-15',
     )
     yield pytest.param(
-        SunAzimuthProducer(269.73), get_system_as_instant(5, 15, 1, year=2024), '2024-05-15T18:00:00+02:00',
+        SunAzimuthProducer(269.73), get_german_as_instant(5, 15, 1, year=2024), '2024-05-15T18:00:00+02:00',
         id='Azimuth-15-high',
     )
     yield pytest.param(
-        SunAzimuthProducer(28.49), get_system_as_instant(5, 15, 1, year=2024), '2024-05-15T02:59:59+02:00',
+        SunAzimuthProducer(28.49), get_german_as_instant(5, 15, 1, year=2024), '2024-05-15T02:59:59+02:00',
         id='Azimuth-15-low',
     )
 
@@ -128,7 +128,7 @@ def test_sun_cache_eviction():
 
 
 def test_sun_pos_calc():
-    i = get_system_as_instant(5, 15, 12, year=2024)
+    i = get_german_as_instant(5, 15, 12, year=2024)
     result = (153.94, 54.35)
 
     # actual implementation
