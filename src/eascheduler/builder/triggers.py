@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Final
+from typing import TYPE_CHECKING, Final, Literal
 
 from typing_extensions import Self
 
@@ -26,6 +26,8 @@ from eascheduler.producers import (
     LatestProducerOperation,
     NoonProducer,
     OffsetProducerOperation,
+    SunAzimuthProducer,
+    SunElevationProducer,
     SunriseProducer,
     SunsetProducer,
     TimeProducer,
@@ -134,6 +136,23 @@ class TriggerBuilder:
     def dusk() -> TriggerObject:
         """Triggers at dusk."""
         return TriggerObject(DuskProducer())
+
+    @staticmethod
+    def sun_elevation(elevation: float, direction: Literal['rising', 'setting']) -> TriggerObject:
+        """Triggers at a specific sun elevation
+
+        :param elevation: Sun elevation in degrees
+        :param direction: rising or falling
+        """
+        return TriggerObject(SunElevationProducer(elevation, direction))
+
+    @staticmethod
+    def sun_azimuth(azimuth: float) -> TriggerObject:
+        """Triggers at a specific sun azimuth
+
+        :param azimuth: Sun azimuth in degrees
+        """
+        return TriggerObject(SunAzimuthProducer(azimuth))
 
     @staticmethod
     def group(*builders: TriggerObject) -> TriggerObject:

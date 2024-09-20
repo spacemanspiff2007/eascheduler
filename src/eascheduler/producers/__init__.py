@@ -16,5 +16,13 @@ from .prod_operation import (
     LatestProducerOperation,
     OffsetProducerOperation,
 )
-from .prod_sun import DawnProducer, DuskProducer, NoonProducer, SunriseProducer, SunsetProducer
+from .prod_sun import (
+    DawnProducer,
+    DuskProducer,
+    NoonProducer,
+    SunAzimuthProducer,
+    SunElevationProducer,
+    SunriseProducer,
+    SunsetProducer,
+)
 from .prod_time import TimeProducer

@@ -7,8 +7,10 @@ from eascheduler.producers import prod_sun as sun_module
 
 
 @pytest.fixture(autouse=True)
-def _reset_values():
+def _reset_values(monkeypatch):
     sun_module.set_location(52.51870523376821, 13.376072914752532)
+
+    monkeypatch.setattr(sun_module, 'SUN_CACHE', sun_module.SUN_CACHE.__class__())
 
     yield
 

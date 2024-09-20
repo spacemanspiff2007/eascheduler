@@ -47,6 +47,9 @@ ignore = [
     # https://docs.astral.sh/ruff/rules/#warning-w_1
     "PLW0603",  # Using the global statement to update {name} is discouraged
 
+    # https://docs.astral.sh/ruff/rules/#refactor-r
+    "PLR2004",  # Magic value used in comparison, consider replacing {value} with a constant variable
+
     # https://docs.astral.sh/ruff/rules/#flake8-logging-format-g
     "G004",     # Logging statement uses f-string
 ]
@@ -83,7 +86,6 @@ builtins-ignorelist = ["id", "input"]
     "S101",     # Use of assert detected
 
     # https://docs.astral.sh/ruff/rules/#refactor-r
-    "PLR2004",  # Magic value used in comparison, consider replacing {value} with a constant variable
     "PLR0913",  # Too many arguments in function definition ({c_args} > {max_args})
 ]
 

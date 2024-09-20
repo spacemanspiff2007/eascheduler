@@ -42,8 +42,8 @@ class CountDownHelper:
         self._calls.append(monotonic() - self._last_reset)
 
     def reset(self):
-        self._last_reset = monotonic()
         self._job.reset()
+        self._last_reset = monotonic()
         return self
 
     def assert_not_called(self):
