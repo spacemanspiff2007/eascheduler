@@ -4,6 +4,7 @@ from .prod_filter import (
     AnyGroupProducerFilter,
     DayOfMonthProducerFilter,
     DayOfWeekProducerFilter,
+    HolidayProducerFilter,
     InvertingProducerFilter,
     MonthOfYearProducerFilter,
     TimeProducerFilter,

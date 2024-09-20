@@ -36,3 +36,7 @@ class InfiniteLoopDetectedError(EaSchedulerError):
 
 class LocationNotSetError(EaSchedulerError):
     pass
+
+
+class HolidaysNotSetError(EaSchedulerError):
+    pass

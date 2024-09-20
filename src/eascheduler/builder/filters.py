@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from typing import Final
 
+from holidays import HolidayBase as _HolidayBase
+
 from eascheduler.builder.helper import (
     HINT_NAME_OR_NR,
     HINT_TIME,
@@ -16,6 +18,7 @@ from eascheduler.producers import (
     AnyGroupProducerFilter,
     DayOfMonthProducerFilter,
     DayOfWeekProducerFilter,
+    HolidayProducerFilter,
     InvertingProducerFilter,
     MonthOfYearProducerFilter,
     TimeProducerFilter,
@@ -69,3 +72,14 @@ class FilterBuilder:
     def months(*months: HINT_NAME_OR_NR) -> FilterObject:
         """Let only certain months pass through"""
         return FilterObject(MonthOfYearProducerFilter(get_months(months)))
+
+    @staticmethod
+    def holidays(holidays: _HolidayBase | None = None) -> FilterObject:
+        """Let only holidays pass through
+
+        :param holidays:
+            Optional holiday object to use. If not provided the default holiday object will be used
+            Userful if you want to use holidays from e.g. another country or another subdivision
+        """
+
+        return FilterObject(HolidayProducerFilter(holidays))
