@@ -63,6 +63,19 @@ async def test_scheduler_repr():
     assert repr(s) == '<AsyncScheduler jobs=0 next_run=None>'
 
 
+async def test_scheduler_enabled():
+
+    s = AsyncScheduler(enabled=False)
+    job = OneTimeJob(SyncExecutor(lambda: None), Instant.now() + TimeDelta(seconds=0.01))
+    job.link_scheduler(s)
+
+    assert repr(s) == '<AsyncScheduler enabled=False jobs=1 next_run=None>'
+    s.set_enabled(True)
+    assert repr(s) == '<AsyncScheduler jobs=1 next_run=0.010s>'
+    s.set_enabled(False)
+    assert repr(s) == '<AsyncScheduler enabled=False jobs=1 next_run=None>'
+
+
 async def test_scheduler_calls():
 
     calls = []

@@ -19,16 +19,26 @@ if TYPE_CHECKING:
 
 
 class AsyncScheduler(SchedulerBase):
-    __slots__ = ('_loop', 'timer', 'jobs')
+    __slots__ = ('_loop', 'timer', 'jobs', '_enabled')
 
-    def __init__(self, event_loop: asyncio.AbstractEventLoop | None = None) -> None:
+    def __init__(self, event_loop: asyncio.AbstractEventLoop | None = None, *, enabled: bool = True) -> None:
         self._loop: Final = event_loop if event_loop is not None else asyncio.get_running_loop()
+        self._enabled: bool = enabled
         self.timer: asyncio.TimerHandle | None = None
         self.jobs: Final[deque[JobBase]] = deque()
 
     def __repr__(self) -> str:
         next_run = f'{self.timer.when() - self._loop.time():.3f}s' if self.timer is not None else 'None'
-        return f'<{self.__class__.__name__:s} jobs={len(self.jobs):d} next_run={next_run}>'
+        enabled = '' if self._enabled else f' enabled={self._enabled}'
+        return f'<{self.__class__.__name__:s}{enabled:s} jobs={len(self.jobs):d} next_run={next_run}>'
+
+    def set_enabled(self, enabled: bool) -> Self:  # noqa: FBT001
+        if enabled == self._enabled:
+            return self
+
+        self._enabled = enabled
+        self._set_timer()
+        return self
 
     def run_jobs(self) -> None:
         self.timer = None
@@ -64,7 +74,7 @@ class AsyncScheduler(SchedulerBase):
             self.timer = None
             timer.cancel()
 
-        if not (jobs := self.jobs):
+        if not (jobs := self.jobs) or not self._enabled:
             return None
 
         if (next_run := jobs[0].next_run) is None:
