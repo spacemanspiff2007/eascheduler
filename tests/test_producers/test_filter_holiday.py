@@ -11,7 +11,7 @@ from eascheduler.producers.prod_filter_holiday import HolidayProducerFilter, is_
 @pytest.fixture(autouse=True)
 def patch_holidays(monkeypatch):
     monkeypatch.setattr(prod_filter_holiday_module, 'HOLIDAYS', None)
-    setup_holidays('DE', 'BE')
+    setup_holidays('DE', 'BE', language='de')
 
 
 def test_holiday_setup():
