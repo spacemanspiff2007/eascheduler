@@ -1,12 +1,13 @@
 from __future__ import annotations
 
 from collections.abc import Callable, Iterable
+from datetime import date as dt_date
 from datetime import datetime as dt_datetime
 from datetime import time as dt_time
 from datetime import timedelta as dt_timedelta
 from typing import Any, Final, Generic, TypeAlias, TypeVar
 
-from whenever import Instant, SystemDateTime, Time, TimeDelta
+from whenever import Date, Instant, SystemDateTime, Time, TimeDelta
 
 from eascheduler.const import get_day_nr, get_month_nr
 from eascheduler.helpers import HINT_CLOCK_BACKWARD, HINT_CLOCK_FORWARD, TimeReplacer, check_dst_handling
@@ -16,6 +17,7 @@ HINT_TIME: TypeAlias = dt_time | Time | str
 HINT_TIMEDELTA: TypeAlias = dt_timedelta | TimeDelta | int | float | str
 HINT_INSTANT: TypeAlias = dt_datetime | None | str | HINT_TIME | HINT_TIMEDELTA
 HINT_NAME_OR_NR: TypeAlias = int | str | Iterable[int | str]
+HINT_DATE: TypeAlias = dt_date | dt_datetime | str | None | Date | SystemDateTime | Instant
 
 
 def get_timedelta(value: HINT_TIMEDELTA) -> TimeDelta:
@@ -47,6 +49,30 @@ def get_time(value: HINT_TIME) -> Time:
             return Time.from_py_time(value)
         case str():
             return Time.parse_common_iso(value)
+        case _:
+            raise TypeError()
+
+
+def get_pydate(value: HINT_DATE) -> dt_date:  # noqa: PLR0911
+
+    match value:
+        case dt_datetime():
+            return value.date()
+        case dt_date():
+            return value
+
+        case None:
+            return SystemDateTime.now().date().py_date()
+        case str():
+            return Date.parse_common_iso(value).py_date()
+
+        case Date():
+            return value.py_date()
+        case SystemDateTime():
+            return value.date().py_date()
+        case Instant():
+            return value.to_system_tz().date().py_date()
+
         case _:
             raise TypeError()
 
@@ -87,7 +113,7 @@ def get_instant(value: HINT_INSTANT) -> Instant:
         now = SystemDateTime.now()
         new = now.replace_time(time, disambiguate='raise')
         if new < now:
-            new = new.add(days=1)
+            new = new.add(hours=24)
         return new.instant()
 
     raise ValueError()

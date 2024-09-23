@@ -4,11 +4,11 @@ from .prod_filter import (
     AnyGroupProducerFilter,
     DayOfMonthProducerFilter,
     DayOfWeekProducerFilter,
-    HolidayProducerFilter,
     InvertingProducerFilter,
     MonthOfYearProducerFilter,
     TimeProducerFilter,
 )
+from .prod_filter_holiday import HolidayProducerFilter
 from .prod_group import GroupProducer
 from .prod_interval import IntervalProducer
 from .prod_operation import (

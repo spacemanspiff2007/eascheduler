@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import re
+from datetime import date as dt_date
+from datetime import datetime as dt_datetime
 from datetime import time as dt_time
 from datetime import timedelta as dt_timedelta
 
@@ -13,6 +15,7 @@ from eascheduler.builder.helper import (
     get_instant,
     get_months,
     get_pos_timedelta_secs,
+    get_pydate,
     get_time,
     get_timedelta,
     get_weekdays,
@@ -132,3 +135,24 @@ def test_builder_type_validator():
         v(TestObj('asdf'))
 
     assert v(TestObj(1)) == 1
+
+
+def test_get_pydate():
+    target = dt_date(2024, 4, 1)
+    py_dt = dt_datetime(2024, 4, 1, 12, 30)
+
+    assert get_pydate(target) == target
+    assert get_pydate(py_dt) == target
+
+    sys_dt = SystemDateTime(2024, 4, 1, 12, 30)
+    with patch_current_time(sys_dt, keep_ticking=False):
+        assert get_pydate(None) == target
+
+    assert get_pydate('2024-04-01') == target
+
+    assert get_pydate(sys_dt.date())
+    assert get_pydate(sys_dt)
+    assert get_pydate(sys_dt.instant())
+
+    with pytest.raises(TypeError):
+        assert get_pydate(1)

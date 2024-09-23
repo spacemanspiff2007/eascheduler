@@ -38,5 +38,5 @@ class LocationNotSetError(EaSchedulerError):
     pass
 
 
-class HolidaysNotSetError(EaSchedulerError):
+class HolidaysNotSetUpError(EaSchedulerError):
     pass
