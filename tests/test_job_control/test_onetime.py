@@ -10,7 +10,7 @@ from eascheduler.schedulers.async_scheduler import AsyncScheduler
 from tests.helper import AlwaysError
 
 
-async def test_eq():
+async def test_eq() -> None:
     job1 = OneTimeJob(SyncExecutor(AlwaysError()), Instant.now() + TimeDelta(seconds=0.01))
     job2 = OneTimeJob(SyncExecutor(AlwaysError()), Instant.now() + TimeDelta(seconds=0.01))
 
@@ -18,7 +18,7 @@ async def test_eq():
     assert OneTimeJobControl(job1) != OneTimeJobControl(job2)
 
 
-async def test_onetime():
+async def test_onetime() -> None:
 
     s = AsyncScheduler()
     job = OneTimeJob(SyncExecutor(AlwaysError()), Instant.now() + TimeDelta(seconds=0.01))
@@ -28,7 +28,7 @@ async def test_onetime():
     assert job.status is STATUS_FINISHED
 
 
-async def test_base_properties():
+async def test_base_properties() -> None:
 
     now = SystemDateTime.now().add(seconds=1)
 

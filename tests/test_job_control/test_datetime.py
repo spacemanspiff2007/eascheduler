@@ -9,7 +9,7 @@ from eascheduler.schedulers.async_scheduler import AsyncScheduler
 from tests.helper import AlwaysError
 
 
-async def test_eq():
+async def test_eq() -> None:
     now = SystemDateTime.now().replace(nanosecond=0, disambiguate='raise').instant()
     job1 = DateTimeJob(SyncExecutor(AlwaysError()), IntervalProducer(now, 1))
     job2 = DateTimeJob(SyncExecutor(AlwaysError()), IntervalProducer(now, 1))
@@ -18,7 +18,7 @@ async def test_eq():
     assert DateTimeJobControl(job1) != DateTimeJobControl(job2)
 
 
-async def test_datetime():
+async def test_datetime() -> None:
 
     s = AsyncScheduler()
     job = DateTimeJob(SyncExecutor(AlwaysError()), IntervalProducer(Instant.now(), 1))

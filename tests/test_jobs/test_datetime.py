@@ -9,7 +9,7 @@ from eascheduler.producers import IntervalProducer
 from eascheduler.schedulers.async_scheduler import AsyncScheduler
 
 
-async def test_datetime():
+async def test_datetime() -> None:
 
     # we have to start the test at the beginning of a second, otherwise we sleep too long and get too much calls
     delay = 1 - Instant.now().to_system_tz().nanosecond / 100_000_000 - 0.1
@@ -17,7 +17,7 @@ async def test_datetime():
 
     calls = []
 
-    def append():
+    def append() -> None:
         calls.append(Instant.now())
 
     now = Instant.now().to_system_tz().replace(nanosecond=0, disambiguate='raise').instant()

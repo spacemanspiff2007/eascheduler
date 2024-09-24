@@ -12,7 +12,7 @@ T = TypeVar('T', bound=TaskManagerBase)
 def create_tasks(manager: T) -> tuple[T, set]:
     res = set()
 
-    async def test(value):
+    async def test(value) -> None:
         await asyncio.sleep(0.05)
         res.add(value)
 
@@ -22,10 +22,10 @@ def create_tasks(manager: T) -> tuple[T, set]:
     return manager, res
 
 
-async def test_repr():
+async def test_repr() -> None:
     m = ParallelTaskManager()
 
-    async def tmp():
+    async def tmp() -> None:
         await asyncio.sleep(0)
 
     assert repr(m) == '<ParallelTaskManager 0 Tasks>'
@@ -39,7 +39,7 @@ async def test_repr():
     await asyncio.sleep(0.01)
 
 
-async def test_parallel():
+async def test_parallel() -> None:
     t, res = create_tasks(ParallelTaskManager())
 
     assert len(t.tasks) == 10
@@ -48,10 +48,10 @@ async def test_parallel():
     assert res == set(range(10))
 
 
-async def test_repr_limiting():
+async def test_repr_limiting() -> None:
     m = LimitingParallelTaskManager(3)
 
-    async def tmp():
+    async def tmp() -> None:
         await asyncio.sleep(0)
 
     assert repr(m) == '<LimitingParallelTaskManager 0/3 Tasks action=skip>'
@@ -65,7 +65,7 @@ async def test_repr_limiting():
     await asyncio.sleep(0.01)
 
 
-async def test_parallel_limiting():
+async def test_parallel_limiting() -> None:
     t, res = create_tasks(LimitingParallelTaskManager(3))
 
     assert len(t.tasks) == 3
@@ -74,7 +74,7 @@ async def test_parallel_limiting():
     assert res == set(range(3))
 
 
-async def test_parallel_cancel_first():
+async def test_parallel_cancel_first() -> None:
     t, res = create_tasks(LimitingParallelTaskManager(3, 'cancel_first'))
 
     assert len(t.tasks) == 3
@@ -83,7 +83,7 @@ async def test_parallel_cancel_first():
     assert res == {7, 8, 9}
 
 
-async def test_parallel_cancel_last():
+async def test_parallel_cancel_last() -> None:
     t, res = create_tasks(LimitingParallelTaskManager(3, 'cancel_last'))
 
     assert len(t.tasks) == 3
@@ -92,5 +92,5 @@ async def test_parallel_cancel_last():
     assert res == {0, 1, 9}
 
 
-def test_type_hints():
+def test_type_hints() -> None:
     assert_literal_values_in_enum(HINT_PARALLEL_TASK_POLICY)

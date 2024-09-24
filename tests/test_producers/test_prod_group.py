@@ -4,7 +4,7 @@ from eascheduler.producers.prod_interval import IntervalProducer
 from tests.helper import get_system_as_instant
 
 
-def test_simple():
+def test_simple() -> None:
 
     p1 = IntervalProducer(get_system_as_instant(1, 1, 8), 3600 * 5)   # 8, 13, 18, 23
     p2 = IntervalProducer(get_system_as_instant(1, 1, 8), 3600 * 3)   # 8, 11, 14, 17
@@ -21,7 +21,7 @@ def test_simple():
         assert p.get_next(get_system_as_instant(1, 1, 17)) == get_system_as_instant(1, 1, 18)
 
 
-def test_filter():
+def test_filter() -> None:
     p1 = IntervalProducer(get_system_as_instant(1, 1, 8), 3600 * 5)   # 8, 13, 18, 23, 4, 9
     p2 = IntervalProducer(get_system_as_instant(1, 1, 8), 3600 * 3)   # 8, 11, 14, 17, 20, 23, 2, 5
 

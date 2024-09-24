@@ -20,7 +20,7 @@ def create_tasks(manager: T, arg_func: Callable[[int], Any] | None = None) -> tu
 
     count = 10
 
-    async def test(value):
+    async def test(value) -> None:
         await asyncio.sleep((count - value) * 0.005)
         res.append(value)
 
@@ -33,13 +33,13 @@ def create_tasks(manager: T, arg_func: Callable[[int], Any] | None = None) -> tu
     return manager, res
 
 
-async def await_tasks(m: SequentialTaskManager | SequentialDeduplicatingTaskManager):
+async def await_tasks(m: SequentialTaskManager | SequentialDeduplicatingTaskManager) -> None:
     await asyncio.sleep(0.01)
     while m.task:
         await asyncio.sleep(0.01)
 
 
-async def test_sequential():
+async def test_sequential() -> None:
     t, res = create_tasks(SequentialTaskManager())
 
     await await_tasks(t)
@@ -47,11 +47,11 @@ async def test_sequential():
     assert res == list(range(10))
 
 
-async def test_repr():
+async def test_repr() -> None:
     m = SequentialTaskManager()
     assert repr(m) == '<SequentialTaskManager running=False queue=0>'
 
-    async def tmp():
+    async def tmp() -> None:
         await asyncio.sleep(0.01)
 
     m.create_task(tmp())
@@ -63,11 +63,11 @@ async def test_repr():
     await await_tasks(m)
 
 
-async def test_limiting_repr():
+async def test_limiting_repr() -> None:
     m = LimitingSequentialTaskManager(2)
     assert repr(m) == '<LimitingSequentialTaskManager running=False coros=0 max_queue=2 action=skip>'
 
-    async def tmp():
+    async def tmp() -> None:
         await asyncio.sleep(0.01)
 
     m.create_task(tmp())
@@ -79,7 +79,7 @@ async def test_limiting_repr():
     await await_tasks(m)
 
 
-async def test_limiting_skip():
+async def test_limiting_skip() -> None:
     t, res = create_tasks(LimitingSequentialTaskManager(3, 'skip'))
 
     await await_tasks(t)
@@ -87,7 +87,7 @@ async def test_limiting_skip():
     assert res == [0, 1, 2, 3]
 
 
-async def test_limiting_skip_first():
+async def test_limiting_skip_first() -> None:
     t, res = create_tasks(LimitingSequentialTaskManager(3, 'skip_first'))
 
     await await_tasks(t)
@@ -95,7 +95,7 @@ async def test_limiting_skip_first():
     assert res == [0, 7, 8, 9]
 
 
-async def test_limiting_skip_last():
+async def test_limiting_skip_last() -> None:
     t, res = create_tasks(LimitingSequentialTaskManager(3, 'skip_last'))
 
     await await_tasks(t)
@@ -103,11 +103,11 @@ async def test_limiting_skip_last():
     assert res == [0, 1, 2, 9]
 
 
-async def test_deduplicating_repr():
+async def test_deduplicating_repr() -> None:
     m = SequentialDeduplicatingTaskManager()
     assert repr(m) == '<SequentialDeduplicatingTaskManager running=False queue=0>'
 
-    async def tmp():
+    async def tmp() -> None:
         await asyncio.sleep(0.01)
 
     m.create_task(tmp(), 1)
@@ -120,7 +120,7 @@ async def test_deduplicating_repr():
     await await_tasks(m)
 
 
-async def test_deduplicating_skip():
+async def test_deduplicating_skip() -> None:
     d = {k: 1 for k in range(10)}
     d[2] = 2
     d[3] = 3
@@ -132,5 +132,5 @@ async def test_deduplicating_skip():
     assert res == [0, 2, 3, 9]
 
 
-def test_type_hints():
+def test_type_hints() -> None:
     assert_literal_values_in_enum(HINT_SEQUENTIAL_TASK_POLICY)

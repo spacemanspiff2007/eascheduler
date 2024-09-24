@@ -8,7 +8,7 @@ from eascheduler.producers.prod_filter import DayOfWeekProducerFilter
 from tests.helper import get_ger_str, get_german_as_instant, get_system_as_instant
 
 
-def test_simple():
+def test_simple() -> None:
     producer = TimeProducer(TimeReplacer(Time(8), 'close', 'earlier'))
 
     for _ in range(10):
@@ -17,7 +17,7 @@ def test_simple():
         assert producer.get_next(get_system_as_instant(1, 2, 8)) == get_system_as_instant(1, 3, 8)
 
 
-def test_filter():
+def test_filter() -> None:
     producer = TimeProducer(TimeReplacer(Time(8), 'close', 'earlier'))
     producer._filter = DayOfWeekProducerFilter([6])
 
@@ -29,7 +29,7 @@ def test_filter():
 
 @pytest.mark.skipif(get_localzone_name() != 'Europe/Berlin',
                     reason=f'Only works in German timezone (is: {get_localzone_name()})')
-def test_dst_skip():
+def test_dst_skip() -> None:
     producer = TimeProducer(TimeReplacer(Time(2, 30), 'skip', 'earlier'))
 
     # one hour jump forward
@@ -47,7 +47,7 @@ def test_dst_skip():
 
 @pytest.mark.skipif(get_localzone_name() != 'Europe/Berlin',
                     reason=f'Only works in German timezone (is: {get_localzone_name()})')
-def test_dst_close():
+def test_dst_close() -> None:
     producer = TimeProducer(TimeReplacer(Time(2, 30), 'close', 'skip'))
 
     # one hour jump forward
@@ -65,7 +65,7 @@ def test_dst_close():
 
 @pytest.mark.skipif(get_localzone_name() != 'Europe/Berlin',
                     reason=f'Only works in German timezone (is: {get_localzone_name()})')
-def test_dst_twice():
+def test_dst_twice() -> None:
     producer = TimeProducer(TimeReplacer(Time(2, 30), 'skip', 'twice'))
 
     # one hour jump backwards

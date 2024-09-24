@@ -12,11 +12,11 @@ from eascheduler.schedulers.async_scheduler import AsyncScheduler
 from tests.helper import assert_called_at
 
 
-async def test_scheduler():
+async def test_scheduler() -> None:
 
     calls = []
 
-    def append():
+    def append() -> None:
         calls.append(1)
     s = AsyncScheduler()
     job = OneTimeJob(SyncExecutor(append), Instant.now() + TimeDelta(seconds=0.01))
@@ -29,11 +29,11 @@ async def test_scheduler():
     assert job.status is STATUS_FINISHED
 
 
-async def test_scheduler_update():
+async def test_scheduler_update() -> None:
 
     call_duration = 99
 
-    def append(t):
+    def append(t) -> None:
         nonlocal call_duration
         call_duration = monotonic() - t
 
@@ -50,7 +50,7 @@ async def test_scheduler_update():
     assert s.timer is None
 
 
-async def test_scheduler_repr():
+async def test_scheduler_repr() -> None:
 
     s = AsyncScheduler()
     assert repr(s) == '<AsyncScheduler jobs=0 next_run=None>'
@@ -63,7 +63,7 @@ async def test_scheduler_repr():
     assert repr(s) == '<AsyncScheduler jobs=0 next_run=None>'
 
 
-async def test_scheduler_enabled():
+async def test_scheduler_enabled() -> None:
 
     s = AsyncScheduler(enabled=False)
     job = OneTimeJob(SyncExecutor(lambda: None), Instant.now() + TimeDelta(seconds=0.01))
@@ -76,12 +76,12 @@ async def test_scheduler_enabled():
     assert repr(s) == '<AsyncScheduler enabled=False jobs=1 next_run=None>'
 
 
-async def test_scheduler_calls():
+async def test_scheduler_calls() -> None:
 
     calls = []
     start = monotonic()
 
-    def append():
+    def append() -> None:
         calls.append(monotonic())
 
     s = AsyncScheduler()

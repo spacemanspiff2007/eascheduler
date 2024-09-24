@@ -13,7 +13,7 @@ repos:
       - id: trailing-whitespace
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.6.5
+    rev: v0.6.7
     hooks:
       - id: ruff
         name: ruff unused imports
@@ -26,6 +26,13 @@ repos:
         #  Q000 [*] Double quote found but single quotes preferred
         #  Q001 [*] Double quote multiline found but single quotes preferred
         args: [ "--select", "I001,UP035,Q000,Q001", "--fix"]
+
+  - repo: https://github.com/JelleZijlstra/autotyping
+    rev: 24.9.0
+    hooks:
+      - id: autotyping
+        types: [python]
+        args: [--safe]
 
   - repo: meta
     hooks:

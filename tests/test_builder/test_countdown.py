@@ -6,7 +6,7 @@ from eascheduler.schedulers.async_scheduler import AsyncScheduler
 from tests.helper import CountDownHelper
 
 
-async def test_countdown():
+async def test_countdown() -> None:
 
     calls = CountDownHelper()
 

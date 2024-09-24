@@ -14,7 +14,7 @@ from tests.helper import get_system_as_instant
 
 
 class PatchedUniform:
-    def __init__(self):
+    def __init__(self) -> None:
         self.ctr = 0
 
     def __call__(self, low, high):
@@ -32,11 +32,11 @@ class PatchedUniform:
 
 
 @pytest.fixture(autouse=True)
-def _patch_uniform(monkeypatch):
+def _patch_uniform(monkeypatch) -> None:
     monkeypatch.setattr(prod_operation_module, 'uniform', PatchedUniform())
 
 
-def test_offset():
+def test_offset() -> None:
 
     o = OffsetProducerOperation(IntervalProducer(get_system_as_instant(1, 1, 0), 3600), -3600 * 10)
 
@@ -60,7 +60,7 @@ def test_offset():
         assert o.get_next(get_system_as_instant(1, 1, 5)) == get_system_as_instant(1, 1, 5, 55)
 
 
-def test_earliest():
+def test_earliest() -> None:
 
     o = EarliestProducerOperation(IntervalProducer(
         get_system_as_instant(1, 1, 0), 3600),
@@ -74,7 +74,7 @@ def test_earliest():
         assert o.get_next(get_system_as_instant(1, 1, 23)) == get_system_as_instant(1, 2, 8)
 
 
-def test_latest():
+def test_latest() -> None:
 
     o = LatestProducerOperation(
         IntervalProducer(get_system_as_instant(1, 1, 0, 30), 3600),
@@ -87,7 +87,7 @@ def test_latest():
         assert o.get_next(get_system_as_instant(1, 1, 8)) == get_system_as_instant(1, 2, 0, 30)
 
 
-def test_jitter():
+def test_jitter() -> None:
 
     o = JitterProducerOperation(IntervalProducer(get_system_as_instant(1, 1, 1), 3600), 60)
 
@@ -99,7 +99,7 @@ def test_jitter():
         assert o.get_next(start) == get_system_as_instant(1, 1, 1, 1)
 
 
-def test_jitter_low_ok():
+def test_jitter_low_ok() -> None:
 
     o = JitterProducerOperation(IntervalProducer(get_system_as_instant(1, 1, 1), 3600), -60, 60)
 
@@ -111,7 +111,7 @@ def test_jitter_low_ok():
         assert o.get_next(start) == get_system_as_instant(1, 1, 1, 1)
 
 
-def test_jitter_shift_forward():
+def test_jitter_shift_forward() -> None:
 
     o = JitterProducerOperation(IntervalProducer(get_system_as_instant(1, 1, 1), 3600), -60, 60)
 

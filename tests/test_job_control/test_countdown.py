@@ -8,7 +8,7 @@ from eascheduler.schedulers.async_scheduler import AsyncScheduler
 from tests.helper import AlwaysError, CountDownHelper
 
 
-async def test_eq():
+async def test_eq() -> None:
     job1 = CountdownJob(SyncExecutor(AlwaysError()), 1)
     job2 = CountdownJob(SyncExecutor(AlwaysError()), 1)
 
@@ -16,7 +16,7 @@ async def test_eq():
     assert CountdownJobControl(job1) != CountdownJobControl(job2)
 
 
-async def test_countdown():
+async def test_countdown() -> None:
     calls = CountDownHelper()
 
     s = AsyncScheduler()
@@ -40,7 +40,7 @@ async def test_countdown():
     assert job.status is STATUS_PAUSED
 
 
-async def test_stop():
+async def test_stop() -> None:
     calls = CountDownHelper()
 
     s = AsyncScheduler()

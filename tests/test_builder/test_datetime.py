@@ -10,10 +10,10 @@ from eascheduler.schedulers.async_scheduler import AsyncScheduler
 from tests.helper import AlwaysError, assert_called_at
 
 
-async def test_call():
+async def test_call() -> None:
     calls = []
 
-    def append():
+    def append() -> None:
         calls.append(SystemDateTime.now())
 
     now = SystemDateTime.now()
@@ -38,22 +38,22 @@ async def builder():
         s.remove_all()
 
 
-async def test_build(builder):
+async def test_build(builder) -> None:
     job = builder.at(TriggerBuilder.time('14:00:00'), AlwaysError())
     assert job.next_run_datetime == datetime(2001, 1, 1, 14, 0, 0)
 
 
-async def test_build_action(builder):
+async def test_build_action(builder) -> None:
     job = builder.at(TriggerBuilder.time('14:00:00').offset('PT1H'), AlwaysError())
     assert job.next_run_datetime == datetime(2001, 1, 1, 15, 0, 0)
 
 
-async def test_build_filter(builder):
+async def test_build_filter(builder) -> None:
     job = builder.at(TriggerBuilder.time('14:00:00').only_on(FilterBuilder.days('2')), AlwaysError())
     assert job.next_run_datetime == datetime(2001, 1, 2, 14, 0, 0)
 
 
-async def test_build_action_filter(builder):
+async def test_build_action_filter(builder) -> None:
     job = builder.at(
         TriggerBuilder.time('14:00:00').offset('PT1H').only_on(FilterBuilder.days('2')),
         AlwaysError()
@@ -61,7 +61,7 @@ async def test_build_action_filter(builder):
     assert job.next_run_datetime == datetime(2001, 1, 2, 15, 0, 0)
 
 
-async def test_build_action_filter_all(builder):
+async def test_build_action_filter_all(builder) -> None:
     job = builder.at(
         TriggerBuilder.time('14:00:00').offset('PT1H').only_on(
             FilterBuilder.all(FilterBuilder.days('2-7'), FilterBuilder.weekdays('Wed'))
@@ -71,7 +71,7 @@ async def test_build_action_filter_all(builder):
     assert job.next_run_datetime == datetime(2001, 1, 3, 15, 0, 0)
 
 
-async def test_build_action_filter_any(builder):
+async def test_build_action_filter_any(builder) -> None:
     job = builder.at(
         TriggerBuilder.time('14:00:00').offset('PT1H').only_on(
             FilterBuilder.any(FilterBuilder.days('2-7'), FilterBuilder.weekdays('Wed'))
@@ -81,7 +81,7 @@ async def test_build_action_filter_any(builder):
     assert job.next_run_datetime == datetime(2001, 1, 2, 15, 0, 0)
 
 
-async def test_build_many(builder):
+async def test_build_many(builder) -> None:
     job = builder.at(
         TriggerBuilder.group(
             TriggerBuilder.time('14:00:00'), TriggerBuilder.time('15:00:00')

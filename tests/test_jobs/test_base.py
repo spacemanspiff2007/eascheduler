@@ -5,7 +5,7 @@ from eascheduler.jobs.base import JobBase
 from tests.helper import AlwaysError
 
 
-async def test_cmp():
+async def test_cmp() -> None:
     a = JobBase(SyncExecutor(AlwaysError()))
     b = JobBase(SyncExecutor(AlwaysError()))
 

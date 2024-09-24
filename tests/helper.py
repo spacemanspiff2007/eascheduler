@@ -29,7 +29,7 @@ CLOCK_GRANULARITY: Final = 0.0156
 
 
 class CountDownHelper:
-    def __init__(self):
+    def __init__(self) -> None:
         self._calls: list[float] = []
         self._last_reset = monotonic()
         self._job = None
@@ -38,7 +38,7 @@ class CountDownHelper:
         self._job = job
         return job
 
-    def __call__(self):
+    def __call__(self) -> None:
         self._calls.append(monotonic() - self._last_reset)
 
     def reset(self):
@@ -71,7 +71,7 @@ def _fmt_diff(value: TimeDelta | float) -> str:
     return f'{value:.3f}ms'
 
 
-def assert_called_at(value, target):
+def assert_called_at(value, target) -> bool:
     offset_lower = 0
     offset_upper = CLOCK_GRANULARITY * 2
 
@@ -97,7 +97,7 @@ def assert_called_at(value, target):
     raise ValueError()
 
 
-def assert_literal_values_in_enum(obj):
+def assert_literal_values_in_enum(obj) -> None:
     assert get_origin(obj) is Union
     a, b = get_args(obj)
 
@@ -114,7 +114,7 @@ def assert_literal_values_in_enum(obj):
         enum(value)
 
 
-def test_assert_literal_values_in_enum():
+def test_assert_literal_values_in_enum() -> None:
     class TestEnum(Enum):
         A = 1
         B = 2
@@ -136,7 +136,7 @@ class AlwaysError:
         return self()
 
 
-async def test_assert_always_error_raises():
+async def test_assert_always_error_raises() -> None:
     with pytest.raises(ValueError, match='Must not be called!'):
         AlwaysError()()
     with pytest.raises(ValueError, match='Must not be called!'):

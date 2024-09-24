@@ -8,27 +8,27 @@ from eascheduler.producers.prod_filter_holiday import setup_holidays
 
 
 @pytest.fixture(autouse=True)
-def patch_holidays(monkeypatch):
+def patch_holidays(monkeypatch) -> None:
     monkeypatch.setattr(prod_filter_holiday_module, 'HOLIDAYS', None)
     setup_holidays('DE', 'BE', language='de')
 
 
-def test_is_holiday():
+def test_is_holiday() -> None:
     assert is_holiday('2024-03-08')
     assert not is_holiday('2024-03-09')
 
 
-def test_pop_holiday():
+def test_pop_holiday() -> None:
     assert pop_holiday('2024-03-08') == 'Internationaler Frauentag'
     assert pop_holiday('2024-03-08') is None
 
 
-def test_get_holiday_name():
+def test_get_holiday_name() -> None:
     assert get_holiday_name('2024-03-08') == 'Internationaler Frauentag'
     assert get_holiday_name('2024-03-08') == 'Internationaler Frauentag'
 
 
-def test_add_and_get_by_name():
+def test_add_and_get_by_name() -> None:
     assert get_holidays_by_name('EAScheduler') == []
     add_holiday('2024-01-02', 'EAScheduler Day')
     assert get_holidays_by_name('EAScheduler') == [dt_date(2024, 1, 2)]

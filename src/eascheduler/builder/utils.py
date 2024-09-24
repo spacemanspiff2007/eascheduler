@@ -13,8 +13,8 @@ from eascheduler.producers.prod_sun import get_azimuth_and_elevation
 def get_sun_position(instant: HINT_INSTANT) -> tuple[float, float]:
     """Return the sun position (azimuth and elevation) at a given instant.
 
-    :param instant: instant to get the sun position at or None for now
-    :return: azimuth and elevation of the sun at the specified instant
+    :param instant: Instant to get the sun position at or None for now
+    :return: Azimuth and elevation of the sun at the specified instant
     """
     return get_azimuth_and_elevation(get_instant(instant))
 
@@ -100,7 +100,7 @@ def add_holiday(date: HINT_DATE, name: str | None = None) -> None:
     """Add a new holiday. If the date is already a holiday the names will be joined together
     with a semicolon as separator.
 
-    :param date: date for the new holiday.
+    :param date: Date for the new holiday.
     :param name: Name of the Holiday, if not provided it will be set to "Holiday"
     """
     return _add_holiday(get_pydate(date), name)

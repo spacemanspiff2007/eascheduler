@@ -11,7 +11,7 @@ from eascheduler.producers.prod_filter import (
 )
 
 
-def test_time_filter():
+def test_time_filter() -> None:
     f = TimeProducerFilter(lower=Time(8))
     assert not f.allow(SystemDateTime(2001, 1, 1, 7, 59))
     assert f.allow(SystemDateTime(2001, 1, 1, 8))
@@ -28,7 +28,7 @@ def test_time_filter():
     assert not f.allow(SystemDateTime(2001, 1, 1, 8, 0))
 
 
-def test_dow_filter():
+def test_dow_filter() -> None:
     f = DayOfWeekProducerFilter([2, 3, 4, 5, 6, 7])
     assert not f.allow(SystemDateTime(2001, 1, 1))
 
@@ -38,7 +38,7 @@ def test_dow_filter():
     assert not f.allow(SystemDateTime(2001, 1, 8))
 
 
-def test_dom_filter():
+def test_dom_filter() -> None:
     f = DayOfMonthProducerFilter(list(range(2, 31)))
     assert not f.allow(SystemDateTime(2001, 1, 1))
 
@@ -48,7 +48,7 @@ def test_dom_filter():
     assert not f.allow(SystemDateTime(2001, 2, 1))
 
 
-def test_moy_filter():
+def test_moy_filter() -> None:
     f = MonthOfYearProducerFilter([1, 3, 4])
     assert f.allow(SystemDateTime(2001, 1, 31))
 
@@ -58,7 +58,7 @@ def test_moy_filter():
     assert f.allow(SystemDateTime(2001, 3, 1))
 
 
-def test_inverting_filter():
+def test_inverting_filter() -> None:
     f = InvertingProducerFilter(DayOfWeekProducerFilter([2, 3, 4, 5, 6, 7]))
     assert f.allow(SystemDateTime(2001, 1, 1))
 
@@ -68,7 +68,7 @@ def test_inverting_filter():
     assert f.allow(SystemDateTime(2001, 1, 8))
 
 
-def test_or_group():
+def test_or_group() -> None:
     f = AnyGroupProducerFilter([DayOfWeekProducerFilter([3, 4, 5, 6, 7]), DayOfWeekProducerFilter([1, 4, 5, 6, 7])])
     assert f.allow(SystemDateTime(2001, 1, 1))
     assert not f.allow(SystemDateTime(2001, 1, 2))
@@ -76,7 +76,7 @@ def test_or_group():
     assert f.allow(SystemDateTime(2001, 1, 4))
 
 
-def test_and_group():
+def test_and_group() -> None:
     f = AllGroupProducerFilter([DayOfWeekProducerFilter([3, 4, 5, 6, 7]), DayOfWeekProducerFilter([1, 4, 5, 6, 7])])
     assert not f.allow(SystemDateTime(2001, 1, 1))
     assert not f.allow(SystemDateTime(2001, 1, 2))

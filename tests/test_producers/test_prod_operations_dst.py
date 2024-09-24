@@ -29,7 +29,7 @@ pytestmark = pytest.mark.skipif(
         ('close',   ['2001-03-25T03:00:00+02:00', '2001-03-25T04:00:00+02:00', '2001-03-25T05:00:00+02:00']),
     ]
 )
-def test_earliest_forward(param: HINT_SKIPPED, target: list[str]):
+def test_earliest_forward(param: HINT_SKIPPED, target: list[str]) -> None:
     o = EarliestProducerOperation(
         IntervalProducer(get_system_as_instant(3, 24, hour=0), 3600),
         TimeReplacer(Time(2, 30, 0), param, 'skip')
@@ -54,7 +54,7 @@ def test_earliest_forward(param: HINT_SKIPPED, target: list[str]):
         ('twice',   ['2001-10-28T02:30:00+02:00', '2001-10-28T02:30:00+01:00', '2001-10-28T03:00:00+01:00', '2001-10-28T04:00:00+01:00']),  # noqa: E501
     ]
 )
-def test_earliest_backwards(param: HINT_REPEATED, target: list[str]):
+def test_earliest_backwards(param: HINT_REPEATED, target: list[str]) -> None:
     o = EarliestProducerOperation(
         IntervalProducer(get_system_as_instant(10, 27, 0), 3600),
         TimeReplacer(Time(2, 30, 0), 'skip', param)
@@ -80,7 +80,7 @@ def test_earliest_backwards(param: HINT_REPEATED, target: list[str]):
         ('close',   ['2001-03-25T01:00:00+01:00', '2001-03-25T03:00:00+02:00', '2001-03-26T00:00:00+02:00', '2001-03-26T01:00:00+02:00']),  # noqa: E501
     ]
 )
-def test_latest_forward(param: HINT_SKIPPED, target: list[str]):
+def test_latest_forward(param: HINT_SKIPPED, target: list[str]) -> None:
     o = LatestProducerOperation(
         IntervalProducer(get_system_as_instant(3, 24, hour=0), 3600),
         TimeReplacer(Time(2, 30, 0), param, 'twice')
@@ -106,7 +106,7 @@ def test_latest_forward(param: HINT_SKIPPED, target: list[str]):
         ('twice',   ['2001-10-28T02:00:00+02:00', '2001-10-28T02:30:00+02:00', '2001-10-28T02:00:00+01:00', '2001-10-28T02:30:00+01:00', '2001-10-29T00:00:00+01:00']),  # noqa: E501
     ]
 )
-def test_latest_backwards(param: HINT_REPEATED, target: list[str]):
+def test_latest_backwards(param: HINT_REPEATED, target: list[str]) -> None:
     o = LatestProducerOperation(
         IntervalProducer(get_system_as_instant(3, 24, 0), 3600),
         TimeReplacer(Time(2, 30, 0), 'skip', param)

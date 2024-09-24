@@ -8,10 +8,10 @@ from eascheduler.schedulers.async_scheduler import AsyncScheduler
 from tests.helper import assert_called_at
 
 
-async def test_onetime():
+async def test_onetime() -> None:
     calls = []
 
-    def append():
+    def append() -> None:
         calls.append(SystemDateTime.now())
 
     builder = JobBuilder(AsyncScheduler(), SyncExecutor)

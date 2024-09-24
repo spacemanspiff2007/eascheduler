@@ -22,7 +22,7 @@ from eascheduler.builder.helper import (
 )
 
 
-def test_get_timedelta():
+def test_get_timedelta() -> None:
     assert get_timedelta(dt_timedelta(seconds=3.5)) == TimeDelta(seconds=3.5)
     assert get_timedelta(TimeDelta(seconds=3.7)) == TimeDelta(seconds=3.7)
     assert get_timedelta(3.5) == TimeDelta(seconds=3.5)
@@ -34,13 +34,13 @@ def test_get_timedelta():
         get_pos_timedelta_secs(dt_timedelta(seconds=-3.5))
 
 
-def test_get_time():
+def test_get_time() -> None:
     assert get_time(dt_time(12, 34, 56)) == Time(12, 34, 56)
     assert get_time(Time(12, 34, 56)) == Time(12, 34, 56)
     assert get_time('12:34:56') == Time(12, 34, 56)
 
 
-def test_get_instant():
+def test_get_instant() -> None:
     i = Instant.from_utc(2001, 1, 1)
 
     with patch_current_time(i, keep_ticking=False):
@@ -52,7 +52,7 @@ def test_get_instant():
         assert get_instant('08:00:00') == SystemDateTime(2001, 1, 1, 8).instant()
 
 
-def test_get_weekdays():
+def test_get_weekdays() -> None:
     assert get_weekdays(1) == [1]
     assert get_weekdays('Mo') == [1]
     assert get_weekdays('1') == [1]
@@ -79,7 +79,7 @@ def test_get_weekdays():
     assert get_weekdays('5-3') == [1, 2, 3, 5, 6, 7]
 
 
-def test_get_days():
+def test_get_days() -> None:
     assert get_days(1) == [1]
     assert get_days('1') == [1]
     assert get_days('1, 2, 3') == [1, 2, 3]
@@ -96,7 +96,7 @@ def test_get_days():
     assert get_days('30-3') == [1, 2, 3, 30, 31]
 
 
-def test_get_months():
+def test_get_months() -> None:
     assert get_months(1) == [1]
     assert get_months('January') == [1]
 
@@ -119,9 +119,9 @@ def test_get_months():
         get_months('13')
 
 
-def test_builder_type_validator():
+def test_builder_type_validator() -> None:
     class TestObj:
-        def __init__(self, val):
+        def __init__(self, val) -> None:
             self.val = val
 
     v = BuilderTypeValidator(TestObj, int, 'val')
@@ -137,7 +137,7 @@ def test_builder_type_validator():
     assert v(TestObj(1)) == 1
 
 
-def test_get_pydate():
+def test_get_pydate() -> None:
     target = dt_date(2024, 4, 1)
     py_dt = dt_datetime(2024, 4, 1, 12, 30)
 

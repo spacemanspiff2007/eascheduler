@@ -3,7 +3,7 @@ from eascheduler.producers.prod_interval import IntervalProducer
 from tests.helper import get_ger_str, get_german_as_instant, get_system_as_instant
 
 
-def test_first():
+def test_first() -> None:
     p = IntervalProducer(get_system_as_instant(1, 1, 8), 5)
     assert p.get_next(get_system_as_instant(1, 1, 8, second=3)) == get_system_as_instant(1, 1, 8, second=5)
 
@@ -14,7 +14,7 @@ def test_first():
     assert p.get_next(get_system_as_instant(1, 1, 8)) == get_system_as_instant(1, 1, 8, microsecond=1)
 
 
-def test_simple():
+def test_simple() -> None:
     dt_now = get_system_as_instant(1, 1, 0)
     p = IntervalProducer(get_system_as_instant(1, 1, 8), 3600 * 5)
 
@@ -26,7 +26,7 @@ def test_simple():
         dt_now = get_system_as_instant(1, 1 + days, hours)
 
 
-def test_filter():
+def test_filter() -> None:
     producer = IntervalProducer(get_system_as_instant(1, 1, 8), 3600 * 12)
 
     for _ in range(10):
@@ -41,7 +41,7 @@ def test_filter():
         assert producer.get_next(get_system_as_instant(1, 6, 20)) == get_system_as_instant(1, 13, 8)
 
 
-def test_dst():
+def test_dst() -> None:
     # one hour jump forward
     start = get_german_as_instant(3, 25, 0, 30)
     producer = IntervalProducer(start, 3600)

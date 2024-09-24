@@ -80,12 +80,12 @@ def get_params() -> Generator[ParameterSet, None, None]:
 
 
 @pytest.mark.parametrize(('producer', 'dt', 'result'), get_params())
-def test_sun(producer: SunProducer, dt: Instant, result: str):
+def test_sun(producer: SunProducer, dt: Instant, result: str) -> None:
     for _ in range(50):
         assert get_ger_str(producer.get_next(dt)) == result
 
 
-def test_no_sun_pos():
+def test_no_sun_pos() -> None:
     # http://suncalc.net/#/69.6529,18.9565,10/2024.05.16/13:11
     prod_sun_module.set_location(69.6529, 18.9565, 10)
     tz = 'Europe/Oslo'
@@ -99,7 +99,7 @@ def test_no_sun_pos():
     assert producer.get_next(result.instant()).to_tz(tz) == ZonedDateTime(2024, 7, 27, 1, 30, 56, tz=tz)
 
 
-def test_filter():
+def test_filter() -> None:
     dt = ZonedDateTime(2001, 1, 1, tz=tz)
     producer = SunriseProducer()
 
@@ -112,7 +112,7 @@ def test_filter():
         assert producer.get_next(dt.instant()).to_tz(tz) == ZonedDateTime(2001, 1, 6, 8, 16, 20, tz=tz)
 
 
-def test_sun_cache_eviction():
+def test_sun_cache_eviction() -> None:
 
     producer = SunriseProducer()
     max_entries = 0
@@ -127,7 +127,7 @@ def test_sun_cache_eviction():
     assert max_entries > len(prod_sun_module.SUN_CACHE) + 3
 
 
-def test_sun_pos_calc():
+def test_sun_pos_calc() -> None:
     i = get_german_as_instant(5, 15, 12, year=2024)
     result = (153.94, 54.35)
 

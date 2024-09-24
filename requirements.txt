@@ -2,15 +2,15 @@
 -r requirements_setup.txt
 
 # Testing
-pytest          >= 7.4,   < 7.5
-pytest-asyncio  >= 0.21 , < 0.22
+pytest          == 8.3.3
+pytest-asyncio  == 0.24.0
 
 # Ruff
-ruff == 0.6.5
+ruff == 0.6.7
 
 # Requests update
 pur == 7.3.2
 
-autotyping == 24.3.0
+autotyping == 24.9.0
 
 tzlocal == 5.2

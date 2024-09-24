@@ -24,7 +24,7 @@ def caught_exceptions(monkeypatch):
     exceptions = []
     traceback = []
 
-    def proc_exception(e: Exception):
+    def proc_exception(e: Exception) -> None:
         exceptions.append(e)
         traceback.append(format_exc())
 

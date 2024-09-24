@@ -9,12 +9,12 @@ from eascheduler.producers.prod_filter_holiday import HolidayProducerFilter, is_
 
 
 @pytest.fixture(autouse=True)
-def patch_holidays(monkeypatch):
+def patch_holidays(monkeypatch) -> None:
     monkeypatch.setattr(prod_filter_holiday_module, 'HOLIDAYS', None)
     setup_holidays('DE', 'BE', language='de')
 
 
-def test_holiday_setup():
+def test_holiday_setup() -> None:
     prod_filter_holiday_module.HOLIDAYS = None
     setup_holidays('DE', 'BE', observed=True, language='de')
 
@@ -25,17 +25,17 @@ def test_holiday_setup():
     setup_holidays('DE', observed=False, language='BE', categories=('catholic', 'public'))
 
 
-def test_holiday_filter():
+def test_holiday_filter() -> None:
     f = HolidayProducerFilter()
     assert f.allow(SystemDateTime(2024, 3, 8))      # Internationaler Frauentag
     assert not f.allow(SystemDateTime(2024, 1, 6))  # Heilige Drei Könige nicht
 
 
-def test_is_holiday():
+def test_is_holiday() -> None:
     assert is_holiday(dt_date(2024, 3, 8))
     assert not is_holiday(dt_date(2024, 3, 9))
 
 
-def test_holiday_remove():
+def test_holiday_remove() -> None:
     assert pop_holiday(dt_date(2024, 3, 8)) == 'Internationaler Frauentag'
     assert pop_holiday(dt_date(2024, 3, 9)) is None

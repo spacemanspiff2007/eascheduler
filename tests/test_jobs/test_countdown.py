@@ -7,7 +7,7 @@ from eascheduler.schedulers.async_scheduler import AsyncScheduler
 from tests.helper import CountDownHelper
 
 
-async def test_countdown():
+async def test_countdown() -> None:
     calls = CountDownHelper()
 
     s = AsyncScheduler()
@@ -28,7 +28,7 @@ async def test_countdown():
     assert job.status is STATUS_PAUSED
 
 
-async def test_stop():
+async def test_stop() -> None:
     calls = CountDownHelper()
 
     s = AsyncScheduler()

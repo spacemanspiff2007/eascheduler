@@ -8,11 +8,11 @@ from eascheduler.jobs.job_onetime import OneTimeJob
 from eascheduler.schedulers.async_scheduler import AsyncScheduler
 
 
-async def test_onetime():
+async def test_onetime() -> None:
 
     calls = []
 
-    def append():
+    def append() -> None:
         calls.append(1)
 
     s = AsyncScheduler()

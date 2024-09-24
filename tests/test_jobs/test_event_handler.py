@@ -2,17 +2,17 @@ from eascheduler.jobs.event_handler import JobCallbackHandler
 
 
 # noinspection PyTypeChecker
-def test_handler():
+def test_handler() -> None:
 
     h = JobCallbackHandler()
 
     calls_1 = []
     calls_2 = []
 
-    def cb_1(job):
+    def cb_1(job) -> None:
         calls_1.append(job)
 
-    def cb_2(job):
+    def cb_2(job) -> None:
         calls_2.append(job)
 
     # run without callbacks
