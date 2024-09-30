@@ -13,13 +13,13 @@ if TYPE_CHECKING:
 
 
 class SkippedTimeBehavior(str, Enum):
-    SKIP = 'skip'
-    BEFORE = 'before'
-    AFTER = 'after'
-    CLOSE = 'close'
+    SKIP = 'skip'           # skip job execution entirely
+    EARLIER = 'earlier'     # execute job one hour earlier preserving minutes and seconds
+    LATER = 'later'         # execute job one hour later preserving minutes and seconds
+    AFTER = 'after'         # execute the job directly after the dst change
 
 
-HINT_SKIPPED: TypeAlias = SkippedTimeBehavior | Literal['skip', 'before', 'after', 'close']
+HINT_SKIPPED: TypeAlias = SkippedTimeBehavior | Literal['skip', 'earlier', 'later', 'after']
 
 
 class RepeatedTimeBehavior(str, Enum):
@@ -75,11 +75,11 @@ class TimeReplacer:
             match self._skipped:
                 case SkippedTimeBehavior.SKIP:
                     raise TimeSkippedError() from None
-                case SkippedTimeBehavior.BEFORE:
+                case SkippedTimeBehavior.EARLIER:
                     return dt.replace_time(self._time, disambiguate='earlier')
-                case SkippedTimeBehavior.AFTER:
+                case SkippedTimeBehavior.LATER:
                     return dt.replace_time(self._time, disambiguate='later')
-                case SkippedTimeBehavior.CLOSE:
+                case SkippedTimeBehavior.AFTER:
                     return find_time_after_dst_switch(dt, self._time)
                 case _:
                     msg = f'Invalid value: {self._skipped!r}'

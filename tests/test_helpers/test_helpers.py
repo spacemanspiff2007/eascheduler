@@ -22,7 +22,7 @@ def test_dst_param() -> None:
     # during dst but we supplied, so no suggestion needed
     assert check_dst_handling(Time(2, 30), 'skip', 'skip') == ('skip', 'skip')
 
-    assert check_dst_handling(Time(8), None, None) == ('close', 'earlier')
+    assert check_dst_handling(Time(8), None, None) == ('after', 'earlier')
 
 
 @pytest.mark.skipif(get_localzone_name() != 'Europe/Berlin',

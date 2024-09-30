@@ -64,7 +64,7 @@ def test_earliest() -> None:
 
     o = EarliestProducerOperation(IntervalProducer(
         get_system_as_instant(1, 1, 0), 3600),
-        TimeReplacer(Time(8, 0, 0), 'close', 'twice')
+        TimeReplacer(Time(8, 0, 0), 'after', 'twice')
     )
 
     for _ in range(10):
@@ -78,7 +78,7 @@ def test_latest() -> None:
 
     o = LatestProducerOperation(
         IntervalProducer(get_system_as_instant(1, 1, 0, 30), 3600),
-        TimeReplacer(Time(8, 0, 0), 'close', 'twice')
+        TimeReplacer(Time(8, 0, 0), 'after', 'twice')
     )
 
     for _ in range(10):

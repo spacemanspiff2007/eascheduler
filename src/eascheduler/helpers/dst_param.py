@@ -4,7 +4,7 @@ from typing import Final, Literal, TypeAlias
 
 from whenever import RepeatedTime, SkippedTime, SystemDateTime, Time
 
-from eascheduler.helpers.time_replace import HINT_REPEATED, HINT_SKIPPED
+from eascheduler.helpers.time_replace import HINT_REPEATED, HINT_SKIPPED, RepeatedTimeBehavior, SkippedTimeBehavior
 
 
 log = logging.getLogger('EAScheduler')
@@ -156,11 +156,11 @@ def check_dst_handling(t: Time, forward: HINT_CLOCK_FORWARD,
         if TIME_FORWARD.required(t):
             msg = 'Time is during a forward DST transition but no behavior set'
             raise ValueError(msg)
-        forward = 'close'
+        forward = SkippedTimeBehavior.AFTER
     if backward is None:
         if TIME_BACKWARD.required(t):
             msg = 'Time is during a backward DST transition but no behavior set'
             raise ValueError(msg)
-        backward = 'earlier'
+        backward = RepeatedTimeBehavior.EARLIER
 
     return forward, backward

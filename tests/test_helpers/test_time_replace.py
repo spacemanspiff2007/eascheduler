@@ -44,19 +44,19 @@ def test_skipped_skip() -> None:
 
 def test_skipped_before() -> None:
     start = get_german_as_instant(3, 25, 1).to_system_tz()
-    r = TimeReplacer(Time(2, 30), SkippedTimeBehavior.BEFORE, RepeatedTimeBehavior.SKIP)
+    r = TimeReplacer(Time(2, 30), SkippedTimeBehavior.EARLIER, RepeatedTimeBehavior.SKIP)
     assert get_str(r.replace(start)) == '2001-03-25T01:30:00+01:00'
 
 
 def test_skipped_after() -> None:
     start = get_german_as_instant(3, 25, 1).to_system_tz()
-    r = TimeReplacer(Time(2, 30), SkippedTimeBehavior.AFTER, RepeatedTimeBehavior.SKIP)
+    r = TimeReplacer(Time(2, 30), SkippedTimeBehavior.LATER, RepeatedTimeBehavior.SKIP)
     assert get_str(r.replace(start)) == '2001-03-25T03:30:00+02:00'
 
 
 def test_skipped_close() -> None:
     start = get_german_as_instant(3, 25, 1).to_system_tz()
-    r = TimeReplacer(Time(2, 30), SkippedTimeBehavior.CLOSE, RepeatedTimeBehavior.SKIP)
+    r = TimeReplacer(Time(2, 30), SkippedTimeBehavior.AFTER, RepeatedTimeBehavior.SKIP)
     assert get_str(r.replace(start)) == '2001-03-25T03:00:00+02:00'
 
 

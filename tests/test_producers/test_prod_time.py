@@ -9,7 +9,7 @@ from tests.helper import get_ger_str, get_german_as_instant, get_system_as_insta
 
 
 def test_simple() -> None:
-    producer = TimeProducer(TimeReplacer(Time(8), 'close', 'earlier'))
+    producer = TimeProducer(TimeReplacer(Time(8), 'after', 'earlier'))
 
     for _ in range(10):
         assert producer.get_next(get_system_as_instant(1, 1, 7)) == get_system_as_instant(1, 1, 8)
@@ -18,7 +18,7 @@ def test_simple() -> None:
 
 
 def test_filter() -> None:
-    producer = TimeProducer(TimeReplacer(Time(8), 'close', 'earlier'))
+    producer = TimeProducer(TimeReplacer(Time(8), 'after', 'earlier'))
     producer._filter = DayOfWeekProducerFilter([6])
 
     for _ in range(10):
@@ -48,7 +48,7 @@ def test_dst_skip() -> None:
 @pytest.mark.skipif(get_localzone_name() != 'Europe/Berlin',
                     reason=f'Only works in German timezone (is: {get_localzone_name()})')
 def test_dst_close() -> None:
-    producer = TimeProducer(TimeReplacer(Time(2, 30), 'close', 'skip'))
+    producer = TimeProducer(TimeReplacer(Time(2, 30), 'after', 'skip'))
 
     # one hour jump forward
     start = get_german_as_instant(3, 24, 1)
