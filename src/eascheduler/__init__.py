@@ -1,4 +1,4 @@
-from eascheduler import errors
+from eascheduler import errors, task_managers
 from eascheduler.__version__ import __version__
 from eascheduler.builder import (
     add_holiday,

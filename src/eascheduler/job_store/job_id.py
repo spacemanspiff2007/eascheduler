@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Final, Generic, TypeVar
+from typing import TYPE_CHECKING, Any, Final, TypeVar
 
 from eascheduler.jobs.base import JobBase
 
@@ -15,8 +15,7 @@ KEY_TYPE = TypeVar('KEY_TYPE')
 JOB_TYPE = TypeVar('JOB_TYPE', bound=JobBase)
 
 
-class SimpleJobIdStore(Generic[KEY_TYPE, JOB_TYPE]):
-    __slots__ = ('_scheduler', '_jobs')
+class AsyncJobStoreBase:
 
     def __init__(self, scheduler: SchedulerBase) -> None:
         self._scheduler: Final = scheduler

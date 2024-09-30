@@ -51,6 +51,12 @@ def test_get_instant() -> None:
         # Time test
         assert get_instant('08:00:00') == SystemDateTime(2001, 1, 1, 8).instant()
 
+    # datetime test
+    d = SystemDateTime(2001, 1, 1, 12, 30).add(seconds=0.5).instant()
+    dt_with_tz_utc = d.py_datetime()
+    assert get_instant(dt_with_tz_utc) == d
+    assert get_instant(dt_datetime(2001, 1, 1, 12, 30, 0, 500_000)) == d
+
 
 def test_get_weekdays() -> None:
     assert get_weekdays(1) == [1]

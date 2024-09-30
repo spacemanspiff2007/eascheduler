@@ -107,7 +107,6 @@ class SunProducer(DateTimeProducerBase):
         sun_cache[key] = instant
         return instant
 
-
     @override
     def get_next(self, dt: Instant) -> Instant:   # type: ignore[return]
 

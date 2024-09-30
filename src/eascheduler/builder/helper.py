@@ -90,7 +90,11 @@ def get_instant(value: HINT_INSTANT) -> Instant:
         case None:
             return Instant.now()
         case dt_datetime():
-            return SystemDateTime.from_py_datetime(value).instant()
+            if value.tzinfo is not None:
+                return SystemDateTime.from_py_datetime(value).instant()
+            # We assume it's the system datetime because that's what datetime is normally used for
+            return SystemDateTime(value.year, value.month, value.day, value.hour, value.minute,
+                                  value.second, nanosecond=value.microsecond * 1_000).instant()
         case SystemDateTime():
             return value.instant()
 
