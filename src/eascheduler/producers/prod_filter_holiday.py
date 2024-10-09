@@ -17,22 +17,37 @@ if TYPE_CHECKING:
     from whenever import SystemDateTime
 
 
-class HolidayProducerFilter(ProducerFilterBase):
+class HolidayProducerFilterBase(ProducerFilterBase):
     __slots__ = ('_holidays', )
 
     def __init__(self, holidays: _HolidayBase | None = None) -> None:
         super().__init__()
+        self._holidays: Final = _get_holiday_obj(holidays)
 
-        if holidays is None:
-            if HOLIDAYS is None:
-                raise HolidaysNotSetUpError()
-            holidays = HOLIDAYS
 
-        self._holidays: Final = holidays
-
+class HolidayProducerFilter(HolidayProducerFilterBase):
     @override
     def allow(self, dt: SystemDateTime) -> bool:
         return dt.date().py_date() in self._holidays
+
+
+class WorkingDayProducerFilter(HolidayProducerFilterBase):
+
+    @override
+    def allow(self, dt: SystemDateTime) -> bool:
+        return self._holidays.is_workday(dt.date().py_date())
+
+
+def _get_holiday_obj(holidays: _HolidayBase | None = None) -> _HolidayBase:
+    if holidays is None:
+        if HOLIDAYS is None:
+            raise HolidaysNotSetUpError()
+        return HOLIDAYS
+
+    if isinstance(holidays, _HolidayBase):
+        return holidays
+
+    raise TypeError()
 
 
 HOLIDAYS: _HolidayBase | None = None

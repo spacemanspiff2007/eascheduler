@@ -22,7 +22,7 @@ class DateTimeJob(JobBase):
 
     @override
     def update_next(self) -> None:
-        if (scheduler := self._scheduler) is None:
+        if self._scheduler is None:
             raise JobNotLinkedToSchedulerError()
 
         next_run = self.producer.get_next(Instant.now())

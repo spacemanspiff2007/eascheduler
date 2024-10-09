@@ -25,7 +25,7 @@ class OneTimeJob(JobBase):
 
     @override
     def update_first(self) -> None:
-        if (scheduler := self._scheduler) is None:
+        if self._scheduler is None:
             raise JobNotLinkedToSchedulerError()
         self.set_next_run(self.execution_time)
 

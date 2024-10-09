@@ -1,8 +1,6 @@
 from __future__ import annotations
 
-from typing import Final
-
-from holidays import HolidayBase as _HolidayBase
+from typing import TYPE_CHECKING, Final
 
 from eascheduler.builder.helper import (
     HINT_NAME_OR_NR,
@@ -22,8 +20,13 @@ from eascheduler.producers import (
     InvertingProducerFilter,
     MonthOfYearProducerFilter,
     TimeProducerFilter,
+    WorkingDayProducerFilter,
 )
 from eascheduler.producers.base import ProducerFilterBase
+
+
+if TYPE_CHECKING:
+    from holidays import HolidayBase as _HolidayBase
 
 
 class FilterObject:
@@ -83,3 +86,14 @@ class FilterBuilder:
         """
 
         return FilterObject(HolidayProducerFilter(holidays))
+
+    @staticmethod
+    def working_days(holidays: _HolidayBase | None = None) -> FilterObject:
+        """Let only working days pass through
+
+        :param holidays:
+            Optional holiday object to use. If not provided the default holiday object will be used
+            Userful if you want to use holidays from e.g. another country or another subdivision
+        """
+
+        return FilterObject(WorkingDayProducerFilter(holidays))
