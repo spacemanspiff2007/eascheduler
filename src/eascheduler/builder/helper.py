@@ -15,7 +15,7 @@ from eascheduler.helpers import HINT_CLOCK_BACKWARD, HINT_CLOCK_FORWARD, TimeRep
 
 HINT_TIME: TypeAlias = dt_time | Time | str
 HINT_TIMEDELTA: TypeAlias = dt_timedelta | TimeDelta | int | float | str
-HINT_INSTANT: TypeAlias = dt_datetime | None | str | HINT_TIME | HINT_TIMEDELTA
+HINT_INSTANT: TypeAlias = dt_datetime | None | str | HINT_TIME | HINT_TIMEDELTA | SystemDateTime
 HINT_NAME_OR_NR: TypeAlias = int | str | Iterable[int | str]
 HINT_DATE: TypeAlias = dt_date | dt_datetime | str | None | Date | SystemDateTime | Instant
 

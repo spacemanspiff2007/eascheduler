@@ -31,7 +31,13 @@ class HolidayProducerFilter(HolidayProducerFilterBase):
         return dt.date().py_date() in self._holidays
 
 
-class WorkingDayProducerFilter(HolidayProducerFilterBase):
+class NotWorkDayProducerFilter(HolidayProducerFilterBase):
+    @override
+    def allow(self, dt: SystemDateTime) -> bool:
+        return not self._holidays.is_workday(dt.date().py_date())
+
+
+class WorkDayProducerFilter(HolidayProducerFilterBase):
 
     @override
     def allow(self, dt: SystemDateTime) -> bool:

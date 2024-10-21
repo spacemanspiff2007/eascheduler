@@ -6,7 +6,8 @@ from whenever import SystemDateTime
 import eascheduler.producers.prod_filter_holiday as prod_filter_holiday_module
 from eascheduler.producers.prod_filter_holiday import (
     HolidayProducerFilter,
-    WorkingDayProducerFilter,
+    NotWorkDayProducerFilter,
+    WorkDayProducerFilter,
     is_holiday,
     pop_holiday,
     setup_holidays,
@@ -47,10 +48,19 @@ def test_holiday_remove() -> None:
 
 
 def test_working_day_filter() -> None:
-    f = WorkingDayProducerFilter()
-    assert f.allow(SystemDateTime(2024, 10, 2))      # Wednesday
-    assert not f.allow(SystemDateTime(2024, 10, 3))  # Tag der Deutschen Einheit
-    assert f.allow(SystemDateTime(2024, 10, 4))      # Friday
-    assert not f.allow(SystemDateTime(2024, 10, 5))  # Saturday
-    assert not f.allow(SystemDateTime(2024, 10, 6))  # Sunday
-    assert f.allow(SystemDateTime(2024, 10, 7))      # Monday
+    f = WorkDayProducerFilter()
+    not_f = NotWorkDayProducerFilter()
+
+    def allow(obj: SystemDateTime) -> bool:
+        a = f.allow(obj)
+        b = not_f.allow(obj)
+        assert a != b
+        return a
+
+    assert allow(SystemDateTime(2024, 10, 2))       # Wednesday
+    assert allow(SystemDateTime(2024, 10, 2))       # Wednesday
+    assert not allow(SystemDateTime(2024, 10, 3))   # Tag der Deutschen Einheit
+    assert allow(SystemDateTime(2024, 10, 4))       # Friday
+    assert not allow(SystemDateTime(2024, 10, 5))   # Saturday
+    assert not allow(SystemDateTime(2024, 10, 6))   # Sunday
+    assert allow(SystemDateTime(2024, 10, 7))       # Monday

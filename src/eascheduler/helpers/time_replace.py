@@ -36,13 +36,17 @@ def find_time_after_dst_switch(dt: SystemDateTime, time: Time) -> SystemDateTime
     # DST changes typically occur on the full minute
     local = LocalDateTime(dt.year, dt.month, dt.day, time.hour, time.minute)
 
-    while True:
+    # dst is typically 1 hour, but who knows
+    for _ in range(121):
         local = local.add(minutes=1, ignore_dst=True)
 
         try:
             return dt.replace_time(local.time(), disambiguate='raise')
         except SkippedTime:
             continue
+
+    msg = 'Could not find a time after the DST switch'
+    raise ValueError(msg)
 
 
 class TimeSkippedError(Exception):

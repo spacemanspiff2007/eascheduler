@@ -19,8 +19,9 @@ from eascheduler.producers import (
     HolidayProducerFilter,
     InvertingProducerFilter,
     MonthOfYearProducerFilter,
+    NotWorkDayProducerFilter,
     TimeProducerFilter,
-    WorkingDayProducerFilter,
+    WorkDayProducerFilter,
 )
 from eascheduler.producers.base import ProducerFilterBase
 
@@ -63,17 +64,26 @@ class FilterBuilder:
 
     @staticmethod
     def weekdays(*weekdays: HINT_NAME_OR_NR) -> FilterObject:
-        """Let only certain weekdays pass through"""
+        """Let only certain weekdays pass through
+
+        :param weekdays: days of week as str, int, or str range ('Mon-Fri', 'Sun-Mon', 'Mo-Mi, Fr-So')
+        """
         return FilterObject(DayOfWeekProducerFilter(get_weekdays(weekdays)))
 
     @staticmethod
     def days(*days: HINT_NAME_OR_NR) -> FilterObject:
-        """Let only certain days pass through"""
+        """Let only certain days of the month pass through
+
+        :param days: days of the month as str, int, or str range ('1-7', '1-5,10-15', '1,5,7')
+        """
         return FilterObject(DayOfMonthProducerFilter(get_days(days)))
 
     @staticmethod
     def months(*months: HINT_NAME_OR_NR) -> FilterObject:
-        """Let only certain months pass through"""
+        """Let only certain months pass through
+
+        :param months: Month as str, int, or str range ('Jan-Jun', '1-3,10-12', 'Oct-Feb', 'Jan, March')
+        """
         return FilterObject(MonthOfYearProducerFilter(get_months(months)))
 
     @staticmethod
@@ -88,7 +98,7 @@ class FilterBuilder:
         return FilterObject(HolidayProducerFilter(holidays))
 
     @staticmethod
-    def working_days(holidays: _HolidayBase | None = None) -> FilterObject:
+    def work_days(holidays: _HolidayBase | None = None) -> FilterObject:
         """Let only working days pass through
 
         :param holidays:
@@ -96,4 +106,15 @@ class FilterBuilder:
             Userful if you want to use holidays from e.g. another country or another subdivision
         """
 
-        return FilterObject(WorkingDayProducerFilter(holidays))
+        return FilterObject(WorkDayProducerFilter(holidays))
+
+    @staticmethod
+    def not_work_days(holidays: _HolidayBase | None = None) -> FilterObject:
+        """Let only days pass through that are not working days
+
+        :param holidays:
+            Optional holiday object to use. If not provided the default holiday object will be used
+            Userful if you want to use holidays from e.g. another country or another subdivision
+        """
+
+        return FilterObject(NotWorkDayProducerFilter(holidays))

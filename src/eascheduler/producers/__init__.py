@@ -8,7 +8,7 @@ from .prod_filter import (
     MonthOfYearProducerFilter,
     TimeProducerFilter,
 )
-from .prod_filter_holiday import HolidayProducerFilter, WorkingDayProducerFilter
+from .prod_filter_holiday import HolidayProducerFilter, NotWorkDayProducerFilter, WorkDayProducerFilter
 from .prod_group import GroupProducer
 from .prod_interval import IntervalProducer
 from .prod_operation import (
