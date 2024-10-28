@@ -22,10 +22,10 @@ class TimeProducer(DateTimeProducerBase):
     @override
     def get_next(self, dt: Instant) -> Instant:     # type: ignore[return]
 
-        base_dt = dt
+        date = dt.to_system_tz().date()
         for _ in not_infinite_loop():  # noqa: RET503
             try:
-                local_dts = (self._time.replace(base_dt.to_system_tz()), )
+                local_dts = (self._time.replace(date), )
             except TimeSkippedError:
                 local_dts = ()
             except TimeTwiceError as e:
@@ -36,4 +36,4 @@ class TimeProducer(DateTimeProducerBase):
                 if next_dt > dt and ((f := self._filter) is None or f.allow(local_dt)):
                     return next_dt
 
-            base_dt = base_dt.add(hours=24)
+            date = date.add(days=1)

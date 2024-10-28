@@ -1,6 +1,6 @@
 import pytest
 from tzlocal import get_localzone_name
-from whenever import Time
+from whenever import SystemDateTime, Time
 
 from eascheduler.helpers import TimeReplacer
 from eascheduler.producers import TimeProducer
@@ -40,11 +40,23 @@ def test_time_start_end_of_day(time_replacer: TimeReplacer, hour: str) -> None:
 
     producer = TimeProducer(time_replacer)
 
-    instant = get_system_as_instant(year=2023, month=12, day=31, hour=1)
+    instant = get_system_as_instant(year=2024, month=1, day=1).subtract(nanoseconds=1)
+    assert producer.get_next(instant).to_system_tz().format_common_iso()[:10] == '2024-01-01'
+
+    days = set()
+    s = SystemDateTime(2024, 1, 1)
+    while s.year == 2024:
+        days.add(s.format_common_iso().split('T')[0])
+        s = s.add(hours=24)
+
     for _ in range(366):    # 2024 is a leap year
         instant = producer.get_next(instant)
         iso = instant.to_system_tz().format_common_iso()
-        assert iso.split('T')[-1].split('+')[0] == hour
+        day, clock = iso.split('T')
+        assert day in days, days
+        days.remove(day)
+        assert clock.split('+')[0] == hour
+    assert not days
     assert instant.to_system_tz().format_common_iso()[:10] == '2024-12-31'
 
 
