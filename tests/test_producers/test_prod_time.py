@@ -28,20 +28,20 @@ def test_filter() -> None:
 
 
 @pytest.mark.parametrize(
-    ('time_replacer', 'hour', 'calls'), [
-        pytest.param(TimeReplacer(Time(0, 0), 'after', 'twice'), '00:00:00', 366, id='midnight'),
+    ('time_replacer', 'hour'), [
+        pytest.param(TimeReplacer(Time(0, 0), 'after', 'twice'), '00:00:00', id='midnight'),
         pytest.param(
             TimeReplacer(Time(23, 59, 59, nanosecond=999_999_999), 'after', 'twice'),
-            '23:59:59.999999999', 366, id='end_of_day'
+            '23:59:59.999999999', id='end_of_day'
         ),
     ]
 )
-def test_time_start_end_of_day(time_replacer: TimeReplacer, hour: str, calls: int) -> None:
+def test_time_start_end_of_day(time_replacer: TimeReplacer, hour: str) -> None:
 
     producer = TimeProducer(time_replacer)
 
     instant = get_system_as_instant(year=2023, month=12, day=31, hour=1)
-    for _ in range(calls):
+    for _ in range(366):    # 2024 is a leap year
         instant = producer.get_next(instant)
         iso = instant.to_system_tz().format_common_iso()
         assert iso.split('T')[-1].split('+')[0] == hour
