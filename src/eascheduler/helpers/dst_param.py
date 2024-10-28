@@ -62,7 +62,7 @@ def find_time(*, reverse: bool) -> bool | tuple[Literal['forward', 'backward'], 
 
     # check that the next ones are valid
     for t in (upper.replace(hour=upper.hour - 1 if upper.hour >= 1 else 23),
-              lower.replace(hour=lower.hour + 1 if lower.hour < 23 else 0)):
+              lower.replace(hour=lower.hour + 1 if lower.hour < 23 else 0)):  # noqa: PLR2004
         try:
             dt.replace_time(t, disambiguate='raise')
         except (SkippedTime, RepeatedTime):  # noqa: PERF203

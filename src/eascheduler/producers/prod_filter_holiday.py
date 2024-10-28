@@ -34,14 +34,14 @@ class HolidayProducerFilter(HolidayProducerFilterBase):
 class NotWorkDayProducerFilter(HolidayProducerFilterBase):
     @override
     def allow(self, dt: SystemDateTime) -> bool:
-        return not self._holidays.is_workday(dt.date().py_date())
+        return not self._holidays.is_working_day(dt.date().py_date())
 
 
 class WorkDayProducerFilter(HolidayProducerFilterBase):
 
     @override
     def allow(self, dt: SystemDateTime) -> bool:
-        return self._holidays.is_workday(dt.date().py_date())
+        return self._holidays.is_working_day(dt.date().py_date())
 
 
 def _get_holiday_obj(holidays: _HolidayBase | None = None) -> _HolidayBase:
