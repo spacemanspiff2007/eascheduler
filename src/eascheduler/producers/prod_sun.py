@@ -15,7 +15,7 @@ from eascheduler.producers.base import DateTimeProducerBase, not_infinite_loop
 
 
 if TYPE_CHECKING:
-    from collections.abc import Callable
+    from collections.abc import Callable, Hashable
     from datetime import date as dt_date
     from datetime import datetime
 
@@ -66,6 +66,9 @@ class SunProducer(DateTimeProducerBase):
 
         self.func: Final = func
 
+    def _cache_key(self) -> tuple[Hashable, ...]:
+        return (self.__class__, )
+
     def _get_next_sun(self, dt: Instant) -> Instant:
         if (observer := OBSERVER) is None:
             raise LocationNotSetError()
@@ -73,7 +76,7 @@ class SunProducer(DateTimeProducerBase):
         sun_cache = SUN_CACHE
 
         # we cache the SUN calculations because they are somewhat expensive
-        key = (id(observer), self.__class__, dt)
+        key = (dt.to_tz('UTC').date(), id(observer)) + self._cache_key()
         if (obj := sun_cache.get(key)) is not None:
             sun_cache.move_to_end(key)
             return obj
@@ -160,6 +163,10 @@ class SunElevationProducer(SunProducer):
     def _sun_func(self, observer: Observer, date: dt_date) -> datetime:
         return sun.time_at_elevation(observer, self.elevation, date, self.direction)
 
+    @override
+    def _cache_key(self) -> tuple[Hashable, ...]:
+        return self.__class__, self.elevation, self.direction
+
 
 class SunAzimuthProducer(SunProducer):
     def __init__(self, azimuth: float) -> None:
@@ -169,6 +176,10 @@ class SunAzimuthProducer(SunProducer):
 
         self.azimuth: Final = azimuth
         super().__init__(self._sun_func)
+
+    @override
+    def _cache_key(self) -> tuple[Hashable, ...]:
+        return self.__class__, self.azimuth
 
     def _sun_func(self, observer: Observer, date: dt_date) -> datetime:
         # I'm not smart enough to implement the azimuth calculation myself,

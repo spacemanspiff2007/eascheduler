@@ -11,3 +11,5 @@ from eascheduler.builder import (
 from eascheduler.errors.handler import set_exception_handler
 from eascheduler.producers.prod_filter_holiday import setup_holidays
 from eascheduler.producers.prod_sun import set_location
+
+from .default import get_default_scheduler

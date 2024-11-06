@@ -28,17 +28,6 @@ if TYPE_CHECKING:
 tz = 'Europe/Berlin'
 
 
-@pytest.fixture(autouse=True)
-def _setup():
-    prod_sun_module.set_location(52.51870523376821, 13.376072914752532)
-
-    yield
-
-    # remove location
-    assert hasattr(prod_sun_module, 'OBSERVER')
-    prod_sun_module.OBSERVER = None
-
-
 def get_params() -> Generator[ParameterSet, None, None]:
     # Double check with http://suncalc.net/#/52.5245,13.3717,17/2024.03.29/07:29
     # and for azimuth / elevation https://gml.noaa.gov/grad/solcalc/
@@ -117,11 +106,11 @@ def test_sun_cache_eviction() -> None:
     producer = SunriseProducer()
     max_entries = 0
 
-    for month in (5, 6):
+    for month in (5, 6, 7):
         for day in range(1, 30):
 
             dt = ZonedDateTime(2024, month, day, tz=tz)
-            producer.get_next(dt.instant()).to_tz(tz)
+            producer.get_next(dt.instant())
             max_entries = max(max_entries, len(prod_sun_module.SUN_CACHE))
 
     assert max_entries > len(prod_sun_module.SUN_CACHE) + 3
@@ -136,3 +125,41 @@ def test_sun_pos_calc() -> None:
 
     # User facing function
     assert get_sun_position(i.py_datetime()) == result
+
+
+def test_sun_cache_hits() -> None:
+
+    hits = 0
+    misses = 0
+    get_func = prod_sun_module.SUN_CACHE.get
+
+    def get(key):
+        nonlocal hits, misses
+        if (obj := get_func(key)) is not None:
+            hits += 1
+        else:
+            misses += 1
+        return obj
+
+    prod_sun_module.SUN_CACHE.get = get
+
+    producer_sunrise = SunriseProducer()
+    producer_azimuth1 = SunAzimuthProducer(126)
+    producer_azimuth2 = SunAzimuthProducer(127)
+    producer_elevation1 = SunElevationProducer(13, 'rising')
+    producer_elevation2 = SunElevationProducer(13, 'setting')
+    producer_elevation3 = SunElevationProducer(14, 'rising')
+    producer_elevation4 = SunElevationProducer(14, 'setting')
+
+    for day in range(1, 31):
+
+        dt = ZonedDateTime(2024, 1, day, hour=3, tz=tz)
+        producer_sunrise.get_next(dt.instant())
+        producer_azimuth1.get_next(dt.instant())
+        producer_azimuth2.get_next(dt.instant())
+        producer_elevation1.get_next(dt.instant())
+        producer_elevation2.get_next(dt.instant())
+        producer_elevation3.get_next(dt.instant())
+        producer_elevation4.get_next(dt.instant())
+
+    assert (hits, misses) == (0, 30 * 7)
