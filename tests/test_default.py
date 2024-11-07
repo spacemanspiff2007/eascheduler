@@ -1,5 +1,11 @@
 import asyncio
+import os
+import re
 from datetime import timedelta
+from pathlib import Path
+from textwrap import dedent
+
+import pytest
 
 from eascheduler import get_default_scheduler
 from tests.helper import CountDownHelper
@@ -29,6 +35,7 @@ async def test_countdown() -> None:
 
 
 async def test_examples() -> None:
+    # readme example start
     import eascheduler
 
     async def my_coro() -> None:
@@ -103,3 +110,30 @@ async def test_examples() -> None:
         scheduler.triggers.sunset().offset(timedelta(hours=-1)),
         my_coro
     )
+
+    # readme example stop
+    scheduler._scheduler.remove_all()
+
+
+@pytest.mark.skipif(os.getenv('TOX_ENV_NAME', '') != '', reason='No run during CI')
+def test_sync_example():
+    text = Path(__file__).read_text()
+
+    match_example = re.search(r'# readme example start\n(.*)\s+# readme example stop', text, re.DOTALL)
+    assert match_example
+
+    pattern_readme = re.compile(r'(## Example\s+````python\n)(.+?)````', re.DOTALL)
+    readme_file = Path(__file__).parent.parent / 'README.md'
+    readme_text = readme_file.read_text()
+    match_readme = pattern_readme.search(readme_text, re.DOTALL)
+    assert match_readme
+
+    example_text = dedent(match_example.group(1)).rstrip() + '\n'
+
+    if example_text == match_readme.group(2):
+        return None
+
+    readme_new = pattern_readme.sub(match_readme.group(1) + example_text.rstrip(' ') + '````', readme_text)
+    assert readme_new != readme_text
+
+    readme_file.write_text(readme_new)

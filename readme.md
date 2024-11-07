@@ -20,80 +20,80 @@ Easy Async Scheduler (or EAScheduler) is a lightweight asyncio scheduler with a 
 ## Example
 
 ````python
-    import eascheduler
+import eascheduler
 
-    async def my_coro():
-        print('Hello')
+async def my_coro() -> None:
+    print('Hello')
 
-    # If you want something easy that you can use out of the box just use the default scheduler
-    scheduler = eascheduler.get_default_scheduler()
+# If you want something easy that you can use out of the box just use the default scheduler
+scheduler = eascheduler.get_default_scheduler()
 
-    # -------------------------------------------------------------------------------------------------------
-    # Different job types
-    # -------------------------------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------------------------------
+# Different job types
+# -------------------------------------------------------------------------------------------------------
 
-    # Run once in 30s
-    job_once = scheduler.once(30, my_coro)
+# Run once in 30s
+job_once = scheduler.once(30, my_coro)
 
-    # Countdown
-    countdown = scheduler.countdown(30, my_coro)
-    countdown.reset()               # make countdown start (again)
-    countdown.stop()                # stop countdown
-    countdown.set_countdown(15)     # set different countdown time which will be used for the next reset call
+# Countdown
+countdown = scheduler.countdown(30, my_coro)
+countdown.reset()               # make countdown start (again)
+countdown.stop()                # stop countdown
+countdown.set_countdown(15)     # set different countdown time which will be used for the next reset call
 
-    # Trigger job which runs continuously, e.g.
+# Trigger job which runs continuously, e.g.
 
-    # every day at 8
-    job_every = scheduler.at(scheduler.triggers.time('08:00:00'), my_coro)
-    # for the first time in 10 mins, then every hour
-    job_every = scheduler.at(scheduler.triggers.interval(600, 3600), my_coro)
+# every day at 8
+job_every = scheduler.at(scheduler.triggers.time('08:00:00'), my_coro)
+# for the first time in 10 mins, then every hour
+job_every = scheduler.at(scheduler.triggers.interval(600, 3600), my_coro)
 
-    # -------------------------------------------------------------------------------------------------------
-    # Restricting the trigger with a filter.
-    # Only when the filter condition passes the time will be taken as the next time
+# -------------------------------------------------------------------------------------------------------
+# Restricting the trigger with a filter.
+# Only when the filter condition passes the time will be taken as the next time
 
-    # every Fr-So at 8
-    scheduler.at(
+# every Fr-So at 8
+scheduler.at(
+    scheduler.triggers.time('08:00:00').only_at(scheduler.filters.weekdays('Fr-So')),
+    my_coro
+)
+
+# Triggers can be grouped
+# Mo-Fr at 7, Sa at 8
+scheduler.at(
+    scheduler.triggers.group(
+        scheduler.triggers.time('07:00:00').only_at(scheduler.filters.weekdays('Mo-Fr')),
         scheduler.triggers.time('08:00:00').only_at(scheduler.filters.weekdays('Fr-So')),
-        my_coro
-    )
+    ),
+    my_coro
+)
 
-    # Triggers can be grouped
-    # Mo-Fr at 7, Sa at 8
-    scheduler.at(
-        scheduler.triggers.group(
-            scheduler.triggers.time('07:00:00').only_at(scheduler.filters.weekdays('Mo-Fr')),
-            scheduler.triggers.time('08:00:00').only_at(scheduler.filters.weekdays('Fr-So')),
+# Filters can be grouped with any or all
+# On the first sunday of the month at 8
+scheduler.at(
+    scheduler.triggers.time('08:00:00').only_at(
+        scheduler.filters.all(
+            scheduler.filters.days('1-7'),
+            scheduler.filters.weekdays('So'),
         ),
-        my_coro
-    )
+    ),
+    my_coro
+)
 
-    # Filters can be grouped with any or all
-    # On the first sunday of the month at 8
-    scheduler.at(
-        scheduler.triggers.time('08:00:00').only_at(
-            scheduler.filters.all(
-                scheduler.filters.days('1-7'),
-                scheduler.filters.weekdays('So'),
-            ),
-        ),
-        my_coro
-    )
+# -------------------------------------------------------------------------------------------------------
+# The trigger time can also be modified
 
-    # -------------------------------------------------------------------------------------------------------
-    # The trigger time can also be modified
+# On sunrise, but not earlier than 8
+scheduler.at(
+    scheduler.triggers.sunset().earliest('08:00:00'),
+    my_coro
+)
 
-    # On sunrise, but not earlier than 8
-    scheduler.at(
-        scheduler.triggers.sunset().earliest('08:00:00'),
-        my_coro
-    )
-
-    # One hour before sunset
-    scheduler.at(
-        scheduler.triggers.sunset().offset(timedelta(hours=-1)),
-        my_coro
-    )
+# One hour before sunset
+scheduler.at(
+    scheduler.triggers.sunset().offset(timedelta(hours=-1)),
+    my_coro
+)
 ````
 
 ## Changelog
