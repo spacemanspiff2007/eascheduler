@@ -62,7 +62,7 @@ def get_holiday_name(date: HINT_DATE, default: None = None) -> str | None:
     ...
 
 
-def get_holiday_name(date, default=None):
+def get_holiday_name(date, default=None) -> str:
     """Get the holiday name of a given date if the date is a holiday else return the given default.
 
     :param date: Date

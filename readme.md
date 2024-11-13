@@ -14,8 +14,11 @@ _Easy async task scheduling_
 
 Easy Async Scheduler (or EAScheduler) is a lightweight asyncio scheduler with a nice and easy to use interface.
 
+The home automation software [HABApp](https://pypi.org/project/HABApp/) make use of EAScheduler.
+
+
 ## Documentation
-[The documentation can be found at here](https://eascheduler.readthedocs.io)
+[The documentation can be found here](https://eascheduler.readthedocs.io)
 
 ## Example
 

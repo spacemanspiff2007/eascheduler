@@ -33,14 +33,17 @@ class JobStatusEnum(str, Enum):
 
     @property
     def is_running(self) -> bool:
+        """True if the job is running"""
         return self is STATUS_RUNNING
 
     @property
     def is_paused(self) -> bool:
+        """True if the job is paused"""
         return self is STATUS_PAUSED
 
     @property
     def is_finished(self) -> bool:
+        """True if the job is finished"""
         return self is STATUS_FINISHED
 
 

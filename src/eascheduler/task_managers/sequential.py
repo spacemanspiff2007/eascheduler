@@ -69,6 +69,11 @@ class SequentialTaskManager(SequentialTaskManagerBase):
 
     @override
     def create_task(self, coro: Coroutine, *, name: str | None = None) -> Task | None:
+        """Create a new task. All tasks will sequentially
+
+        :param coro: Coro
+        :param name: Task name
+        """
         self.queue.append((coro, name))
         return self._task_start()
 
@@ -77,6 +82,11 @@ class LimitingSequentialTaskManager(SequentialTaskManager):
     __slots__ = ('max_queue', 'action')
 
     def __init__(self, max_queue: int, action: HINT_SEQUENTIAL_TASK_POLICY = POLICY_SKIP) -> None:
+        """
+
+        :param max_queue: maximum number of tasks in the queue
+        :param action: what to do when the limit will be exceeded
+        """
         super().__init__()
         if not isinstance(max_queue, int) or max_queue < 1:
             raise ValueError()
@@ -92,6 +102,13 @@ class LimitingSequentialTaskManager(SequentialTaskManager):
 
     @override
     def create_task(self, coro: Coroutine, *, name: str | None = None) -> Task | None:
+        """Create a new task. All tasks will sequentially.
+        When the limit is exceeded either the first task in the queue, the last task in the queue or
+        the to be created task will be skipped.
+
+        :param coro: Coro
+        :param name: Task name
+        """
 
         if len(queue := self.queue) >= self.max_queue:
             if (action := self.action) is POLICY_SKIP:
@@ -128,6 +145,13 @@ class SequentialDeduplicatingTaskManager(SequentialTaskManagerBase):
     # noinspection PyMethodOverriding
     @override
     def create_task(self, coro: Coroutine, key: Hashable, *, name: str | None = None) -> Task | None:   # type: ignore[override]
+        """Create a new task. All tasks will sequentially.
+        A key is used to deduplicate the tasks. If a task with the same key is already in the queue it will be skipped.
+
+        :param coro: Coro
+        :param key: Key used for deduplicating tasks
+        :param name: Task name
+        """
         queue = self.queue
         if (rem_coro := queue.pop(key, None)) is not None:
             rem_coro[0].close()

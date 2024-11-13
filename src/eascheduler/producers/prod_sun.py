@@ -23,7 +23,7 @@ if TYPE_CHECKING:
 OBSERVER: Observer | None = None
 
 
-def set_location(latitude: float, longitude: float, elevation: float | tuple[float, float] = 0.0) -> None:
+def set_location(latitude: float | str, longitude: float | str, elevation: float | tuple[float, float] = 0.0) -> None:
     """
     Latitude and longitude can be set either as a float or as a string.
     For strings they must be of the form

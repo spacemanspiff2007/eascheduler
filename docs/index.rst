@@ -5,7 +5,8 @@ Welcome to EAScheduler's documentation!
    :maxdepth: 2
    :caption: Contents:
 
-   scheduler_view
+   eascheduler
+   api_docs
 
 
 Indices and tables

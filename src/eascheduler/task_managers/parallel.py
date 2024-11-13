@@ -36,6 +36,11 @@ class ParallelTaskManager(TaskManagerBase):
 
     @override
     def create_task(self, coro: Coroutine, *, name: str | None = None) -> Task | None:
+        """Create a new task. All tasks will run parallel
+
+        :param coro: Coro
+        :param name: Task name
+        """
         task = create_task(coro, name=name)
         self.tasks.add(task)
         task.add_done_callback(self.tasks.discard)
@@ -46,6 +51,11 @@ class LimitingParallelTaskManager(TaskManagerBase):
     __slots__ = ('tasks', 'parallel', 'action')
 
     def __init__(self, parallel: int, action: HINT_PARALLEL_TASK_POLICY = POLICY_SKIP) -> None:
+        """
+
+        :param parallel: Maximum parallel tasks
+        :param action: What to do when the limit is exceeded
+        """
         super().__init__()
         if not isinstance(parallel, int) or parallel < 1:
             raise ValueError()
@@ -67,6 +77,13 @@ class LimitingParallelTaskManager(TaskManagerBase):
 
     @override
     def create_task(self, coro: Coroutine, *, name: str | None = None) -> Task | None:
+        """Create a new task. All tasks will run until the max parallel limit is reached.
+        Depending on the action, the oldest or the newest the task will be cancelled
+        or the to be created task will be skipped.
+
+        :param coro: Coro
+        :param name: Task name
+        """
         if len(self.tasks) >= self.parallel:
             if (action := self.action) is POLICY_SKIP:
                 coro.close()

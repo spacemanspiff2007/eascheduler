@@ -46,6 +46,7 @@ class TriggerObject:
 
     def offset(self, offset: HINT_TIMEDELTA) -> Self:
         """Offset the time returned by the trigger
+
         :param offset: The offset (positive or negative)
         """
         return self.__class__(
@@ -156,12 +157,27 @@ class TriggerBuilder:
 
     @staticmethod
     def group(*builders: TriggerObject) -> TriggerObject:
-        """Group multiple triggers together. The triggers will be checked and the trigger that runs next will be used"""
+        """Group multiple triggers together. The triggers will be checked and the trigger that runs next will be used
+
+        :param builders: Triggers that should be grouped together
+        """
+
         return TriggerObject(GroupProducer([_get_producer(b) for b in builders]))
 
     @staticmethod
     def interval(start: HINT_INSTANT, interval: HINT_TIMEDELTA) -> TriggerObject:
-        """Triggers at a fixed interval from a given start time."""
+        """Triggers at a fixed interval from a given start time.
+
+        :param start: When this trigger will run for the first time.
+                      Note: It's not possible to specify a start time
+                      greater than the interval time. Since the producer is stateless it will automatically select
+                      the next appropriate run time.
+                      Example: start 90 minutes, interval 60 minutes -> first run will be in 30 minutes.
+                      This makes it easy to ensure that the job will always run at a certain time by
+                      specifying the start time isntead of a delta and the interval.
+                      E.g. start ``00:15:00`` and interval 1 hour
+        :param interval: The interval how this trigger will be repeated
+        """
         return TriggerObject(
             IntervalProducer(get_instant(start) if start is not None else None, get_pos_timedelta_secs(interval))
         )
