@@ -1,2 +1,8 @@
-from .errors import BoundaryFunctionError, FirstRunInThePastError, JobAlreadyCanceledException, UnknownWeekdayError, \
-    InfiniteLoopDetectedError
+from .errors import (
+    BoundaryFunctionError,
+    InfiniteLoopDetectedError,
+    JobAlreadyCanceledError,
+    ScheduledRunInThePastError,
+    UnknownWeekdayError,
+)
+from .handler import set_exception_handler

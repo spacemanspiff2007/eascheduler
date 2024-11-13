@@ -1,19 +1,42 @@
-
-class JobAlreadyCanceledException(Exception):
+class EaSchedulerError(Exception):
     pass
 
 
-class UnknownWeekdayError(Exception):
+class JobNotLinkedToSchedulerError(EaSchedulerError):
     pass
 
 
-class FirstRunInThePastError(Exception):
+class JobAlreadyCanceledError(EaSchedulerError):
     pass
 
 
-class BoundaryFunctionError(Exception):
+class JobExecutionTimeIsNotSetError(EaSchedulerError):
     pass
 
 
-class InfiniteLoopDetectedError(Exception):
+class JobAlreadyFinishedError(EaSchedulerError):
+    pass
+
+
+class UnknownWeekdayError(EaSchedulerError):
+    pass
+
+
+class ScheduledRunInThePastError(EaSchedulerError):
+    pass
+
+
+class BoundaryFunctionError(EaSchedulerError):
+    pass
+
+
+class InfiniteLoopDetectedError(EaSchedulerError):
+    pass
+
+
+class LocationNotSetError(EaSchedulerError):
+    pass
+
+
+class HolidaysNotSetUpError(EaSchedulerError):
     pass

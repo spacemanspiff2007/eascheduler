@@ -1,54 +1,43 @@
 from __future__ import annotations
 
-from datetime import datetime
-from datetime import time as dt_time
-from datetime import timedelta
-from typing import Union
+from typing import TYPE_CHECKING
 
-from pendulum import now as get_now
-from pendulum import UTC
+from typing_extensions import Self, override
+from whenever import Instant
 
-from eascheduler.const import FAR_FUTURE
-from eascheduler.errors import JobAlreadyCanceledException
-from eascheduler.executors.executor import ExecutorBase
-from eascheduler.jobs.job_base import ScheduledJobBase
-from eascheduler.schedulers import AsyncScheduler
+from eascheduler.errors.errors import JobNotLinkedToSchedulerError
+from eascheduler.jobs.base import IdType, JobBase
 
 
-class CountdownJob(ScheduledJobBase):
-    def __init__(self, parent: AsyncScheduler, func: ExecutorBase):
-        super().__init__(parent, func)
-        self._expire: float = 0.0
+if TYPE_CHECKING:
+    from eascheduler.executor import ExecutorBase
 
-    def countdown(self, time: Union[timedelta, float, int]) -> CountdownJob:
-        """Set the time after which the job will be executed.
 
-        :param time: time
-        """
-        if self._parent is None:
-            raise JobAlreadyCanceledException()
+class CountdownJob(JobBase):
+    def __init__(self, executor: ExecutorBase, secs: float, *, job_id: IdType | None = None) -> None:
+        super().__init__(executor, job_id=job_id)
+        self._seconds: float = 0
+        self.set_countdown(secs)    # Validate and set the countdown
 
-        secs = time.total_seconds() if isinstance(time, timedelta) else time
-        assert secs > 0, secs
+    @override
+    def update_next(self) -> None:
+        self.set_next_run(None)
 
-        self._expire = float(secs)
-        return self
+    def set_countdown(self, secs: float) -> None:
+        if not isinstance(secs, (int, float)):
+            raise TypeError()
+        if secs <= 0:
+            raise ValueError()
+        self._seconds = secs
 
-    def reset(self):
-        if self._parent is None:
-            raise JobAlreadyCanceledException()
+    def reset(self) -> None:
+        if (scheduler := self._scheduler) is None:
+            raise JobNotLinkedToSchedulerError()
 
-        now = get_now(UTC).timestamp()
-        self._set_next_run(now + self._expire)
+        self.set_next_run(Instant.now().add(seconds=self._seconds))
+        scheduler.update_job(self)
 
-    def stop(self):
-        """Stops the countdown so it can be started again with a call to reset"""
-        if self._parent is None:
-            raise JobAlreadyCanceledException()
-        self._set_next_run(FAR_FUTURE)
-
-    def _schedule_next_run(self):
-        self._set_next_run(FAR_FUTURE)
-
-    def _schedule_first_run(self, first_run: Union[None, int, float, timedelta, dt_time, datetime]):
-        pass
+    @override
+    def job_resume(self) -> Self:
+        # Should call reset
+        raise NotImplementedError()

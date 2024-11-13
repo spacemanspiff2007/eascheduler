@@ -1,5 +1,19 @@
-from eascheduler import SchedulerView
-from eascheduler.executors import AsyncExecutor
-from eascheduler.schedulers import AsyncScheduler
+from eascheduler.builder import FilterBuilder, JobBuilder, TriggerBuilder
+from eascheduler.executor import AsyncExecutor
+from eascheduler.schedulers.async_scheduler import AsyncScheduler
 
-RUN = SchedulerView(AsyncScheduler(), AsyncExecutor)
+
+class DefaultJobBuilder(JobBuilder):
+    triggers = TriggerBuilder
+    filters = FilterBuilder
+
+
+DEFAULT: DefaultJobBuilder | None = None
+
+
+def get_default_scheduler() -> DefaultJobBuilder:
+    global DEFAULT
+
+    if DEFAULT is None:
+        DEFAULT = DefaultJobBuilder(scheduler=AsyncScheduler(), executor=AsyncExecutor)
+    return DEFAULT

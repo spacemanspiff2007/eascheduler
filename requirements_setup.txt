@@ -1,3 +1,6 @@
 # Requirements to install and use this library
-pendulum == 2.1.2
+whenever == 0.6.12
 astral   == 3.2
+holidays == 0.60
+
+typing_extensions == 4.12.2
