@@ -52,33 +52,34 @@ it also comes with a default scheduler that you can use out of the box.
    asyncio.run(my_asyncio_code())
 
 
-Setting up EAScheduler
-==================================
-Some functionalities of EAScheduler require a bit of setup.
-If sun functionalities should be used :func:`~eascheduler.set_location` needs to be called first.
-For holidays :func:`~eascheduler.setup_holidays` is required and a custom exception handler can be set with
-:func:`~eascheduler.set_exception_handler`
+Passing arguments to the coroutine function
+===========================================
+
+It's possible to pass both arguments and keyword arguments to the coroutine function.
 
 
 .. exec_code::
-   :hide_output:
 
+   # --- hide: start -----
+   import asyncio
    import eascheduler
-
-   # The sun triggers need the location
    eascheduler.set_location(52.51870, 13.37607)
 
-   # The holiday triggers need the country code and optionally the subdivision code
-   # Here the country is Germany and the subdivision is Berlin
-   eascheduler.setup_holidays('DE', 'BE')
+   async def my_asyncio_code():
 
-   # Is possible to register a custom exception handler that gets called when an error occurs
-   # The default exception handler will just log the errors with the logging module
-   def my_exception_handler(e: Exception):
-      print(f'Exception occurred: {e}')
+      scheduler = eascheduler.get_default_scheduler()
+   # --- hide: stop -----
 
-   eascheduler.set_exception_handler(my_exception_handler)
+      async def my_coro(a, b=None, c=None):
+          print(f'a: {a}, b: {b}, c: {c}')
 
+      # Scheduling a onetime job with None means it will run as soon as possible
+      job_every = scheduler.once(None, my_coro, 'a1', c='kw1')
+
+   # --- hide: start -----
+      await asyncio.sleep(0.1)
+
+   asyncio.run(my_asyncio_code())
 
 Reoccurring Jobs
 ==================================
@@ -236,6 +237,34 @@ Filters can also be inverted with :meth:`~eascheduler.builder.FilterBuilder.not_
 
    # --- hide: start -----
    asyncio.run(my_asyncio_code())
+
+
+Setting up EAScheduler
+==================================
+Some functionalities of EAScheduler require a bit of setup.
+If sun functionalities should be used :func:`~eascheduler.set_location` needs to be called first.
+For holidays :func:`~eascheduler.setup_holidays` is required and a custom exception handler can be set with
+:func:`~eascheduler.set_exception_handler`
+
+
+.. exec_code::
+   :hide_output:
+
+   import eascheduler
+
+   # The sun triggers need the location
+   eascheduler.set_location(52.51870, 13.37607)
+
+   # The holiday triggers need the country code and optionally the subdivision code
+   # Here the country is Germany and the subdivision is Berlin
+   eascheduler.setup_holidays('DE', 'BE')
+
+   # Is possible to register a custom exception handler that gets called when an error occurs
+   # The default exception handler will just log the errors with the logging module
+   def my_exception_handler(e: Exception):
+      print(f'Exception occurred: {e}')
+
+   eascheduler.set_exception_handler(my_exception_handler)
 
 
 Other functions

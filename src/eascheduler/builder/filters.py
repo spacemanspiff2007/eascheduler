@@ -66,7 +66,7 @@ class FilterBuilder:
     def weekdays(*weekdays: HINT_NAME_OR_NR) -> FilterObject:
         """Let only certain weekdays pass through
 
-        :param weekdays: days of week as str, int, or str range ('Mon-Fri', 'Sun-Mon', 'Mo-Mi, Fr-So')
+        :param weekdays: days of week as str, int, or str range (``'Mon-Fri'``, ``'Sun-Mon'``, ``'Mo-Mi``, ``'Fr-So'``)
         """
         return FilterObject(DayOfWeekProducerFilter(get_weekdays(weekdays)))
 
@@ -74,7 +74,7 @@ class FilterBuilder:
     def days(*days: HINT_NAME_OR_NR) -> FilterObject:
         """Let only certain days of the month pass through
 
-        :param days: days of the month as str, int, or str range ('1-7', '1-5,10-15', '1,5,7')
+        :param days: days of the month as str, int, or str range (``'1-7'``, ``'1-5,10-15'``, ``'1,5,7'``)
         """
         return FilterObject(DayOfMonthProducerFilter(get_days(days)))
 
@@ -82,7 +82,7 @@ class FilterBuilder:
     def months(*months: HINT_NAME_OR_NR) -> FilterObject:
         """Let only certain months pass through
 
-        :param months: Month as str, int, or str range ('Jan-Jun', '1-3,10-12', 'Oct-Feb', 'Jan, March')
+        :param months: Month as str, int, or str range (``'Jan-Jun'``, ``'1-3,10-12'``, ``'Oct-Feb'``, ``'Jan, March'``)
         """
         return FilterObject(MonthOfYearProducerFilter(get_months(months)))
 

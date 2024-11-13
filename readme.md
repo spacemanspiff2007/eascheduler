@@ -101,6 +101,9 @@ scheduler.at(
 
 ## Changelog
 
+#### 0.2.0 (2024-11-13)
+- Complete rewrite
+
 #### 0.1.11 (2023-09-11)
 - Fixed an issue with a possible infinite loop
 
