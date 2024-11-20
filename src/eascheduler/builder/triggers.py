@@ -8,6 +8,7 @@ from eascheduler.builder.helper import (
     HINT_CLOCK_BACKWARD,
     HINT_CLOCK_FORWARD,
     HINT_INSTANT,
+    HINT_POS_TIMEDELTA,
     HINT_TIME,
     HINT_TIMEDELTA,
     BuilderTypeValidator,
@@ -85,7 +86,7 @@ class TriggerObject:
             )
         )
 
-    def jitter(self, low: HINT_TIMEDELTA, high: HINT_TIMEDELTA | None = None) -> Self:
+    def jitter(self, low: HINT_POS_TIMEDELTA, high: HINT_POS_TIMEDELTA | None = None) -> Self:
         """Add jitter to the time returned by the trigger.
 
         :param low: The lower bound of the jitter
@@ -94,7 +95,7 @@ class TriggerObject:
         return self.__class__(
             JitterProducerOperation(
                 self._producer,
-                get_pos_timedelta_secs(low), get_pos_timedelta_secs(high) if high is not None else None
+                get_timedelta(low).in_seconds(), get_timedelta(high).in_seconds() if high is not None else None
             )
         )
 
@@ -165,7 +166,7 @@ class TriggerBuilder:
         return TriggerObject(GroupProducer([_get_producer(b) for b in builders]))
 
     @staticmethod
-    def interval(start: HINT_INSTANT, interval: HINT_TIMEDELTA) -> TriggerObject:
+    def interval(start: HINT_INSTANT, interval: HINT_POS_TIMEDELTA) -> TriggerObject:
         """Triggers at a fixed interval from a given start time.
 
         :param start: When this trigger will run for the first time.

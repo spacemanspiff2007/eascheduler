@@ -1,7 +1,12 @@
 from collections.abc import Awaitable, Callable
 from typing import Any, Final
 
-from eascheduler.builder.helper import HINT_INSTANT, HINT_TIMEDELTA, get_instant, get_pos_timedelta_secs
+from eascheduler.builder.helper import (
+    HINT_INSTANT,
+    HINT_POS_TIMEDELTA,
+    get_instant,
+    get_pos_timedelta_secs,
+)
 from eascheduler.builder.triggers import TriggerObject, _get_producer
 from eascheduler.executor import ExecutorBase
 from eascheduler.job_control import CountdownJobControl, DateTimeJobControl, OneTimeJobControl
@@ -20,7 +25,7 @@ class JobBuilder:
         self._executor: Final = executor
         self._job_store: Final = job_store
 
-    def countdown(self, secs: HINT_TIMEDELTA, coro_func: Callable[..., Awaitable[Any]],
+    def countdown(self, secs: HINT_POS_TIMEDELTA, coro_func: Callable[..., Awaitable[Any]],
                   *args: Any, job_id: IdType | None = None, **kwargs: Any) -> CountdownJobControl:
         """Create a job that count town a certain time and then execute.
 

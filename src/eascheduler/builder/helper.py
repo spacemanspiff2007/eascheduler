@@ -15,6 +15,7 @@ from eascheduler.helpers import HINT_CLOCK_BACKWARD, HINT_CLOCK_FORWARD, TimeRep
 
 HINT_TIME: TypeAlias = dt_time | Time | str
 HINT_TIMEDELTA: TypeAlias = dt_timedelta | TimeDelta | int | float | str
+HINT_POS_TIMEDELTA: TypeAlias = HINT_TIMEDELTA
 HINT_INSTANT: TypeAlias = dt_datetime | None | str | HINT_TIME | HINT_TIMEDELTA | SystemDateTime
 HINT_NAME_OR_NR: TypeAlias = int | str | Iterable[int | str]
 HINT_DATE: TypeAlias = dt_date | dt_datetime | str | None | Date | SystemDateTime | Instant
@@ -34,7 +35,7 @@ def get_timedelta(value: HINT_TIMEDELTA) -> TimeDelta:
             raise TypeError()
 
 
-def get_pos_timedelta_secs(value: HINT_TIMEDELTA) -> float:
+def get_pos_timedelta_secs(value: HINT_POS_TIMEDELTA) -> float:
     if (value := get_timedelta(value).in_seconds()) <= 0:
         msg = 'Value must be positive.'
         raise ValueError(msg)
