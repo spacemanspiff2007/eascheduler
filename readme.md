@@ -100,6 +100,8 @@ scheduler.at(
 ````
 
 ## Changelog
+#### 0.2.1 (2024-11-20)
+- Updated dependencies and some type hints
 
 #### 0.2.0 (2024-11-13)
 - Complete rewrite
