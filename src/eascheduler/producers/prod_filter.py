@@ -24,6 +24,9 @@ class ProducerFilterGroupBase(ProducerFilterBase):
         self._filters = (*self._filters, filter)
         return self
 
+    def copy(self) -> Self:
+        return self.__class__(f.copy() for f in self._filters)
+
 
 class AnyGroupProducerFilter(ProducerFilterGroupBase):
     @override
@@ -45,6 +48,10 @@ class InvertingProducerFilter(ProducerFilterBase):
         self._filter: ProducerFilterBase = filter
 
     @override
+    def copy(self) -> Self:
+        return self.__class__(self._filter.copy())
+
+    @override
     def allow(self, dt: SystemDateTime) -> bool:
         return not self._filter.allow(dt)
 
@@ -56,6 +63,10 @@ class TimeProducerFilter(ProducerFilterBase):
         super().__init__()
         self._lower: Final = lower
         self._upper: Final = upper
+
+    @override
+    def copy(self) -> Self:
+        return self.__class__(self._lower, self._upper)
 
     @override
     def allow(self, dt: SystemDateTime) -> bool:
@@ -78,6 +89,10 @@ class DayOfWeekProducerFilter(ProducerFilterBase):
         self._weekdays: Final = frozenset(weekdays)
 
     @override
+    def copy(self) -> Self:
+        return self.__class__(self._weekdays)
+
+    @override
     def allow(self, dt: SystemDateTime) -> bool:
         return dt.py_datetime().isoweekday() in self._weekdays
 
@@ -90,6 +105,10 @@ class DayOfMonthProducerFilter(ProducerFilterBase):
         self._days: Final = frozenset(days)
 
     @override
+    def copy(self) -> DayOfMonthProducerFilter:
+        return self.__class__(self._days)
+
+    @override
     def allow(self, dt: SystemDateTime) -> bool:
         return dt.day in self._days
 
@@ -100,6 +119,9 @@ class MonthOfYearProducerFilter(ProducerFilterBase):
     def __init__(self, months: Iterable[int]) -> None:
         super().__init__()
         self._months: Final = frozenset(months)
+
+    def copy(self) -> Self:
+        return self.__class__(self._months)
 
     @override
     def allow(self, dt: SystemDateTime) -> bool:

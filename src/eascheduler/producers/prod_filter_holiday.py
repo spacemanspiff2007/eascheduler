@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING, Any, Final
 
 from holidays import HolidayBase as _HolidayBase
 from holidays import country_holidays
-from typing_extensions import override
+from typing_extensions import Self, override
 
 from eascheduler.errors.errors import HolidaysNotSetUpError
 from eascheduler.producers.base import ProducerFilterBase
@@ -23,6 +23,10 @@ class HolidayProducerFilterBase(ProducerFilterBase):
     def __init__(self, holidays: _HolidayBase | None = None) -> None:
         super().__init__()
         self._holidays: Final = _get_holiday_obj(holidays)
+
+    @override
+    def copy(self) -> Self:
+        return self.__class__(self._holidays)
 
 
 class HolidayProducerFilter(HolidayProducerFilterBase):

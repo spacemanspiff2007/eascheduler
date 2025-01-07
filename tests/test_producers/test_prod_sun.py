@@ -9,14 +9,14 @@ from eascheduler import get_sun_position
 from eascheduler.producers import (
     DayOfWeekProducerFilter,
     DuskProducer,
-    SunAzimuthProducer,
-    SunElevationProducer,
+    SunAzimuthProducerCompare,
+    SunElevationProducerCompare,
     SunriseProducer,
     SunsetProducer,
 )
 from eascheduler.producers import prod_sun as prod_sun_module
 from eascheduler.producers.prod_sun import SunProducer, get_azimuth_and_elevation
-from tests.helper import get_ger_str, get_german_as_instant, get_system_as_instant
+from tests.helper import compare_with_copy, get_ger_str, get_german_as_instant, get_system_as_instant
 
 
 if TYPE_CHECKING:
@@ -55,15 +55,15 @@ def get_params() -> Generator[ParameterSet, None, None]:
         id='Dusk-15',
     )
     yield pytest.param(
-        SunElevationProducer(-6, 'setting'), get_german_as_instant(5, 15, 12, year=2024), '2024-05-15T21:40:46+02:00',
+        SunElevationProducerCompare(-6, 'setting'), get_german_as_instant(5, 15, 12, year=2024), '2024-05-15T21:40:46+02:00',
         id='Elevation-15',
     )
     yield pytest.param(
-        SunAzimuthProducer(269.73), get_german_as_instant(5, 15, 1, year=2024), '2024-05-15T18:00:00+02:00',
+        SunAzimuthProducerCompare(269.73), get_german_as_instant(5, 15, 1, year=2024), '2024-05-15T18:00:00+02:00',
         id='Azimuth-15-high',
     )
     yield pytest.param(
-        SunAzimuthProducer(28.49), get_german_as_instant(5, 15, 1, year=2024), '2024-05-15T02:59:59+02:00',
+        SunAzimuthProducerCompare(28.49), get_german_as_instant(5, 15, 1, year=2024), '2024-05-15T02:59:59+02:00',
         id='Azimuth-15-low',
     )
 
@@ -72,6 +72,9 @@ def get_params() -> Generator[ParameterSet, None, None]:
 def test_sun(producer: SunProducer, dt: Instant, result: str) -> None:
     for _ in range(50):
         assert get_ger_str(producer.get_next(dt)) == result
+
+    # Test copy
+    compare_with_copy(producer, producer.copy())
 
 
 def test_no_sun_pos() -> None:
@@ -99,6 +102,9 @@ def test_filter() -> None:
 
     for _ in range(10):
         assert producer.get_next(dt.instant()).to_tz(tz) == ZonedDateTime(2001, 1, 6, 8, 16, 20, tz=tz)
+
+    # Test copy
+    compare_with_copy(producer, producer.copy())
 
 
 def test_sun_cache_eviction() -> None:
@@ -144,12 +150,12 @@ def test_sun_cache_hits() -> None:
     prod_sun_module.SUN_CACHE.get = get
 
     producer_sunrise = SunriseProducer()
-    producer_azimuth1 = SunAzimuthProducer(126)
-    producer_azimuth2 = SunAzimuthProducer(127)
-    producer_elevation1 = SunElevationProducer(13, 'rising')
-    producer_elevation2 = SunElevationProducer(13, 'setting')
-    producer_elevation3 = SunElevationProducer(14, 'rising')
-    producer_elevation4 = SunElevationProducer(14, 'setting')
+    producer_azimuth1 = SunAzimuthProducerCompare(126)
+    producer_azimuth2 = SunAzimuthProducerCompare(127)
+    producer_elevation1 = SunElevationProducerCompare(13, 'rising')
+    producer_elevation2 = SunElevationProducerCompare(13, 'setting')
+    producer_elevation3 = SunElevationProducerCompare(14, 'rising')
+    producer_elevation4 = SunElevationProducerCompare(14, 'setting')
 
     for day in range(1, 31):
 

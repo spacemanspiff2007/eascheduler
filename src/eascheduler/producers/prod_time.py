@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Final
 
-from typing_extensions import override
+from typing_extensions import Self, override
 
 from eascheduler.helpers import TimeReplacer, TimeSkippedError, TimeTwiceError
 from eascheduler.producers.base import DateTimeProducerBase, not_infinite_loop
@@ -18,6 +18,11 @@ class TimeProducer(DateTimeProducerBase):
     def __init__(self, time: TimeReplacer) -> None:
         super().__init__()
         self._time: Final = time
+
+    @override
+    def copy(self) -> Self:
+        cls = self.__class__(time=self._time.copy())
+        return self._copy_filter(cls)
 
     @override
     def get_next(self, dt: Instant) -> Instant:     # type: ignore[return]

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import re
 from datetime import date as dt_date
+from datetime import datetime, time, timedelta
 from datetime import datetime as dt_datetime
 from datetime import time as dt_time
 from datetime import timedelta as dt_timedelta
@@ -46,10 +47,21 @@ def test_get_instant() -> None:
     with patch_current_time(i, keep_ticking=False):
         # Immediately
         assert get_instant(None) == i
+        # datetime
+        assert get_instant(datetime(2001, 1, 1, 8)) == SystemDateTime(2001, 1, 1, 8).instant()
+        assert get_instant(SystemDateTime(2001, 1, 1, 8)) == SystemDateTime(2001, 1, 1, 8).instant()
+
         # Timedelta test
         assert get_instant(3600) == i.add(hours=1)
+        assert get_instant(3600.0) == i.add(hours=1)
+        assert get_instant(timedelta(hours=1)) == i.add(hours=1)
+        assert get_instant(TimeDelta(hours=1)) == i.add(hours=1)
+        assert get_instant('PT1H') == i.add(hours=1)
+
         # Time test
         assert get_instant('08:00:00') == SystemDateTime(2001, 1, 1, 8).instant()
+        assert get_instant(time(8)) == SystemDateTime(2001, 1, 1, 8).instant()
+        assert get_instant(Time(8)) == SystemDateTime(2001, 1, 1, 8).instant()
 
     # datetime test
     d = SystemDateTime(2001, 1, 1, 12, 30).add(seconds=0.5).instant()
@@ -126,21 +138,35 @@ def test_get_months() -> None:
 
 
 def test_builder_type_validator() -> None:
+
+    class TestVal:
+        def __init__(self, val) -> None:
+            self.val = val
+
+        def copy(self):
+            return self.__class__(self.val)
+
+        def __eq__(self, other):
+            return self.val == other.val
+
     class TestObj:
         def __init__(self, val) -> None:
             self.val = val
 
-    v = BuilderTypeValidator(TestObj, int, 'val')
+    v = BuilderTypeValidator(TestObj, TestVal, 'val')
 
-    assert str(v) == 'BuilderTypeValidator(TestObj, int, val)'
+    assert str(v) == 'BuilderTypeValidator(TestObj, TestVal, val)'
 
     with pytest.raises(TypeError, match=re.escape('Expected type TestObj, got 1 (int)')):
         v(1)
 
-    with pytest.raises(TypeError, match=re.escape('Expected an instance of int, got asdf (str)')):
-        v(TestObj('asdf'))
+    with pytest.raises(TypeError, match=re.escape('Expected an instance of TestVal, got 1 (int)')):
+        v(TestObj(1))
 
-    assert v(TestObj(1)) == 1
+    o = TestObj(TestVal(1))
+    c = v(o)
+    assert c is not o.val
+    assert c == o.val
 
 
 def test_get_pydate() -> None:

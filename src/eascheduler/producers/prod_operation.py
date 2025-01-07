@@ -3,7 +3,7 @@ from __future__ import annotations
 from random import uniform
 from typing import TYPE_CHECKING, Final
 
-from typing_extensions import override
+from typing_extensions import Self, override
 from whenever import LocalDateTime, SkippedTime, SystemDateTime, Time, TimeDelta
 
 from eascheduler.helpers import TimeReplacer, TimeSkippedError, TimeTwiceError
@@ -35,6 +35,11 @@ class OffsetProducerOperation(DateTimeProducerOperationBase):
         self.offset: Final = offset
 
     @override
+    def copy(self) -> Self:
+        cls = self.__class__(self._producer.copy(), self.offset)
+        return self._copy_filter(cls)
+
+    @override
     def apply_operation(self, next_dt: Instant, dt: Instant) -> Instant:
         return next_dt.add(seconds=self.offset)
 
@@ -45,6 +50,11 @@ class EarliestProducerOperation(DateTimeProducerOperationBase):
     def __init__(self, producer: DateTimeProducerBase, earliest: TimeReplacer) -> None:
         super().__init__(producer)
         self.earliest: Final = earliest
+
+    @override
+    def copy(self) -> Self:
+        cls = self.__class__(self._producer.copy(), self.earliest.copy())
+        return self._copy_filter(cls)
 
     @override
     def apply_operation(self, next_dt: Instant, dt: Instant) -> Instant:
@@ -70,6 +80,11 @@ class LatestProducerOperation(DateTimeProducerOperationBase):
         self.latest: Final = earliest
 
     @override
+    def copy(self) -> Self:
+        cls = self.__class__(self._producer.copy(), self.latest.copy())
+        return self._copy_filter(cls)
+
+    @override
     def apply_operation(self, next_dt: Instant, dt: Instant) -> Instant:
         try:
             latest_dt = self.latest.replace(next_dt.to_system_tz()).instant()
@@ -86,7 +101,7 @@ class LatestProducerOperation(DateTimeProducerOperationBase):
 
 
 class JitterProducerOperation(DateTimeProducerOperationBase):
-    __slots__ = ('low', 'high')
+    __slots__ = ('high', 'low')
 
     def __init__(self, producer: DateTimeProducerBase, low: float, high: float | None = None) -> None:
         super().__init__(producer)
@@ -99,6 +114,11 @@ class JitterProducerOperation(DateTimeProducerOperationBase):
 
         self.low: Final = low
         self.high: Final = high
+
+    @override
+    def copy(self) -> Self:
+        cls = self.__class__(self._producer.copy(), self.low, self.high)
+        return self._copy_filter(cls)
 
     @override
     def apply_operation(self, next_dt: Instant, dt: Instant) -> Instant:

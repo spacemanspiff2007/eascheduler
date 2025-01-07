@@ -1,6 +1,6 @@
 from eascheduler.producers.prod_filter import DayOfWeekProducerFilter
 from eascheduler.producers.prod_interval import IntervalProducer
-from tests.helper import get_ger_str, get_german_as_instant, get_system_as_instant
+from tests.helper import compare_with_copy, get_ger_str, get_german_as_instant, get_system_as_instant
 
 
 def test_first() -> None:
@@ -68,3 +68,17 @@ def test_dst() -> None:
         assert get_ger_str(dst_1) == '2001-10-28T02:30:00+02:00'
         assert get_ger_str(dst_2) == '2001-10-28T02:30:00+01:00'
         assert get_ger_str(dst_3) == '2001-10-28T03:30:00+01:00'
+
+
+def test_cmp() -> None:
+    start = get_german_as_instant(3, 25, 0, 30)
+    producer = IntervalProducer(start, 3600)
+    assert producer == IntervalProducer(start, 3600)
+
+
+def test_copy() -> None:
+    p = IntervalProducer(None, 3600)
+    compare_with_copy(p, p.copy())
+
+    p._filter = DayOfWeekProducerFilter([6])
+    compare_with_copy(p, p.copy())

@@ -7,7 +7,7 @@ from datetime import timezone as dt_timezone
 from typing import TYPE_CHECKING, Final, Literal
 
 from astral import Observer, SunDirection, sun
-from typing_extensions import override
+from typing_extensions import Self, override
 from whenever import Instant
 
 from eascheduler.errors.errors import LocationNotSetError
@@ -65,6 +65,11 @@ class SunProducer(DateTimeProducerBase):
         super().__init__()
 
         self.func: Final = func
+
+    @override
+    def copy(self) -> Self:
+        cls = self.__class__()
+        return self._copy_filter(cls)
 
     def _cache_key(self) -> tuple[Hashable, ...]:
         return (self.__class__, )
@@ -150,15 +155,32 @@ class DuskProducer(SunProducer):
         super().__init__(sun.dusk)
 
 
-class SunElevationProducer(SunProducer):
+class SunFuncIgnoringCompare:
+    __slots__ = ()
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, self.__class__):
+            raise TypeError()
+        return all(getattr(self, s) == getattr(other, s) for s in self.__slots__ if s != 'func')
+
+
+class SunElevationProducerCompare(SunProducer, SunFuncIgnoringCompare):
+    __slots__ = ('direction', 'elevation')
+
     def __init__(self, elevation: float, direction: Literal['rising', 'setting']) -> None:
         if elevation < -90 or elevation > 90:
             msg = 'Elevation must be between -90 and 90'
             raise ValueError(msg)
 
         self.elevation: Final = elevation
-        self.direction: Final = {'rising': SunDirection.RISING, 'setting': SunDirection.SETTING}[direction]
+        self.direction: Final = {'rising': SunDirection.RISING, 'setting': SunDirection.SETTING}[direction] \
+            if direction is not SunDirection.RISING and direction is not SunDirection.SETTING else direction
         super().__init__(self._sun_func)
+
+    @override
+    def copy(self) -> Self:
+        cls = self.__class__(self.elevation, self.direction)
+        return self._copy_filter(cls)
 
     def _sun_func(self, observer: Observer, date: dt_date) -> datetime:
         return sun.time_at_elevation(observer, self.elevation, date, self.direction)
@@ -168,7 +190,9 @@ class SunElevationProducer(SunProducer):
         return self.__class__, self.elevation, self.direction
 
 
-class SunAzimuthProducer(SunProducer):
+class SunAzimuthProducerCompare(SunProducer, SunFuncIgnoringCompare):
+    __slots__ = ('azimuth', )
+
     def __init__(self, azimuth: float) -> None:
         if not 0 <= azimuth <= 360:
             msg = 'Azimuth must be between 0° and 360°'
@@ -176,6 +200,11 @@ class SunAzimuthProducer(SunProducer):
 
         self.azimuth: Final = azimuth
         super().__init__(self._sun_func)
+
+    @override
+    def copy(self) -> Self:
+        cls = self.__class__(self.azimuth)
+        return self._copy_filter(cls)
 
     @override
     def _cache_key(self) -> tuple[Hashable, ...]:

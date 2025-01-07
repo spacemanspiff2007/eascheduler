@@ -103,7 +103,7 @@ def get_instant(value: HINT_INSTANT) -> Instant:
     # timedelta
     try:
         timedelta = get_timedelta(value)
-    except ValueError:
+    except (ValueError, TypeError):
         pass
     else:
         return Instant.now() + timedelta
@@ -112,7 +112,7 @@ def get_instant(value: HINT_INSTANT) -> Instant:
     # time
     try:
         time = get_time(value)
-    except ValueError:
+    except (ValueError, TypeError):
         pass
     else:
         now = SystemDateTime.now()
@@ -228,7 +228,8 @@ class BuilderTypeValidator(Generic[TYPE_OUT]):
             msg = f'Expected an instance of {self.type_out.__name__}, got {obj} ({type(obj).__name__})'
             raise TypeError(msg)
 
-        return obj
+        # We return a copy so we are sure that there are no side effects
+        return obj.copy()
 
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}({self.type_in.__name__}, {self.type_out.__name__}, {self.var_name})'

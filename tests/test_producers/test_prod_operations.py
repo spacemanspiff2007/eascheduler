@@ -10,7 +10,7 @@ from eascheduler.producers.prod_operation import (
     LatestProducerOperation,
     OffsetProducerOperation,
 )
-from tests.helper import get_system_as_instant
+from tests.helper import compare_with_copy, get_system_as_instant
 
 
 class PatchedUniform:
@@ -59,6 +59,9 @@ def test_offset() -> None:
         assert o.get_next(get_system_as_instant(1, 1, 4)) == get_system_as_instant(1, 1, 4, 55)
         assert o.get_next(get_system_as_instant(1, 1, 5)) == get_system_as_instant(1, 1, 5, 55)
 
+    # Test copy
+    compare_with_copy(o, o.copy())
+
 
 def test_earliest() -> None:
 
@@ -73,6 +76,9 @@ def test_earliest() -> None:
         assert o.get_next(get_system_as_instant(1, 1, 22)) == get_system_as_instant(1, 1, 23)
         assert o.get_next(get_system_as_instant(1, 1, 23)) == get_system_as_instant(1, 2, 8)
 
+    # Test copy
+    compare_with_copy(o, o.copy())
+
 
 def test_latest() -> None:
 
@@ -86,6 +92,9 @@ def test_latest() -> None:
         assert o.get_next(get_system_as_instant(1, 1, 7, 59)) == get_system_as_instant(1, 1, 8)
         assert o.get_next(get_system_as_instant(1, 1, 8)) == get_system_as_instant(1, 2, 0, 30)
 
+    # Test copy
+    compare_with_copy(o, o.copy())
+
 
 def test_jitter() -> None:
 
@@ -97,6 +106,9 @@ def test_jitter() -> None:
         assert o.get_next(start) == get_system_as_instant(1, 1, 1)
         assert o.get_next(start) == get_system_as_instant(1, 1, 1, 0, 30)
         assert o.get_next(start) == get_system_as_instant(1, 1, 1, 1)
+
+    # Test copy
+    compare_with_copy(o, o.copy())
 
 
 def test_jitter_low_ok() -> None:
@@ -110,6 +122,9 @@ def test_jitter_low_ok() -> None:
         assert o.get_next(start) == get_system_as_instant(1, 1, 1, 0)
         assert o.get_next(start) == get_system_as_instant(1, 1, 1, 1)
 
+    # Test copy
+    compare_with_copy(o, o.copy())
+
 
 def test_jitter_shift_forward() -> None:
 
@@ -121,3 +136,6 @@ def test_jitter_shift_forward() -> None:
         assert o.get_next(start) == get_system_as_instant(1, 1, 0, 59, 30, microsecond=100)
         assert o.get_next(start) == get_system_as_instant(1, 1, 1, 0, 30, microsecond=100)
         assert o.get_next(start) == get_system_as_instant(1, 1, 1, 1, 30, microsecond=100)
+
+    # Test copy
+    compare_with_copy(o, o.copy())

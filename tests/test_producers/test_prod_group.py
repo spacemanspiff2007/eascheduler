@@ -1,7 +1,7 @@
 from eascheduler.producers.prod_filter import DayOfWeekProducerFilter
 from eascheduler.producers.prod_group import GroupProducer
 from eascheduler.producers.prod_interval import IntervalProducer
-from tests.helper import get_system_as_instant
+from tests.helper import compare_with_copy, get_system_as_instant
 
 
 def test_simple() -> None:
@@ -20,6 +20,9 @@ def test_simple() -> None:
         assert p.get_next(get_system_as_instant(1, 1, 14)) == get_system_as_instant(1, 1, 17)
         assert p.get_next(get_system_as_instant(1, 1, 17)) == get_system_as_instant(1, 1, 18)
 
+    # Test copy
+    compare_with_copy(p, p.copy())
+
 
 def test_filter() -> None:
     p1 = IntervalProducer(get_system_as_instant(1, 1, 8), 3600 * 5)   # 8, 13, 18, 23, 4, 9
@@ -34,3 +37,6 @@ def test_filter() -> None:
         assert p.get_next(get_system_as_instant(1, 2, 2)) == get_system_as_instant(1, 2, 4)
         assert p.get_next(get_system_as_instant(1, 2, 4)) == get_system_as_instant(1, 2, 5)
         assert p.get_next(get_system_as_instant(1, 2, 23)) == get_system_as_instant(1, 9, 1)
+
+    # Test copy
+    compare_with_copy(p, p.copy())

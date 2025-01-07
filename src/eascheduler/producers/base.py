@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, NoReturn
+from typing import TYPE_CHECKING, NoReturn, TypeVar
 
-from typing_extensions import override
+from typing_extensions import Self, override
 
 from eascheduler.errors import InfiniteLoopDetectedError
 
@@ -13,14 +13,30 @@ if TYPE_CHECKING:
     from whenever import Instant, SystemDateTime
 
 
-class ProducerFilterBase:
+class CompareEqualityBySlotValues:
+    __slots__ = ()
+
+    # Since all classes use slots we can compare them by comparing their slot values
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, self.__class__):
+            raise TypeError()
+        return all(getattr(self, s) == getattr(other, s) for s in self.__slots__)
+
+
+class ProducerFilterBase(CompareEqualityBySlotValues):
     __slots__ = ()
 
     def allow(self, dt: SystemDateTime) -> bool:
         raise NotImplementedError()
 
+    def copy(self) -> Self:
+        raise NotImplementedError()
 
-class DateTimeProducerBase:
+
+DTPB_TYPE = TypeVar('DTPB_TYPE', bound='DateTimeProducerBase')
+
+
+class DateTimeProducerBase(CompareEqualityBySlotValues):
     __slots__ = ('_filter', )
 
     def __init__(self) -> None:
@@ -29,6 +45,13 @@ class DateTimeProducerBase:
     def get_next(self, dt: Instant) -> Instant:
         """Get the next date time after the given date time.
         Has to guarantee that the returned date time is after the given date time."""
+        raise NotImplementedError()
+
+    def _copy_filter(self, obj: DTPB_TYPE) -> DTPB_TYPE:
+        obj._filter = self._filter.copy() if self._filter is not None else None
+        return obj
+
+    def copy(self) -> Self:
         raise NotImplementedError()
 
 

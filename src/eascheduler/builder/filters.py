@@ -35,7 +35,7 @@ class FilterObject:
         self._filter: Final = filter
 
 
-_get_producer_filter = BuilderTypeValidator(FilterObject, ProducerFilterBase, '_filter')
+_get_producer_filter: Final = BuilderTypeValidator(FilterObject, ProducerFilterBase, '_filter')
 
 
 # noinspection PyProtectedMember,PyShadowingBuiltins

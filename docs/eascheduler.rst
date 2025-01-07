@@ -84,6 +84,8 @@ It's possible to pass both arguments and keyword arguments to the coroutine func
 Reoccurring Jobs
 ==================================
 
+All triggers, filters and processing of triggers are immutable and can be composed without side effects.
+
 
 Grouping triggers
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

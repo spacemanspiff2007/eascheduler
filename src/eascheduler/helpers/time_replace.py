@@ -3,6 +3,7 @@ from __future__ import annotations
 from enum import Enum
 from typing import TYPE_CHECKING, Final, Literal, TypeAlias
 
+from typing_extensions import Self
 from whenever import Date, LocalDateTime, RepeatedTime, SkippedTime, SystemDateTime, Time
 
 from eascheduler.helpers.helpers import to_enum
@@ -60,7 +61,7 @@ class TimeTwiceError(Exception):
 
 
 class TimeReplacer:
-    __slots__ = ('_time', '_skipped', '_repeated')
+    __slots__ = ('_repeated', '_skipped', '_time')
 
     def __init__(self, time: Time, if_skipped: HINT_SKIPPED, if_repeated: HINT_REPEATED) -> None:
         super().__init__()
@@ -68,9 +69,17 @@ class TimeReplacer:
         self._skipped: Final[SkippedTimeBehavior] = to_enum(SkippedTimeBehavior, if_skipped)
         self._repeated: Final[RepeatedTimeBehavior] = to_enum(RepeatedTimeBehavior, if_repeated)
 
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, TimeReplacer):
+            return NotImplemented
+        return self._time == other._time and self._skipped == other._skipped and self._repeated == other._repeated
+
     def __repr__(self) -> str:
         return (f'<{self.__class__.__name__} {self._time!s}'
                 f' if_skipped={self._skipped.value:s} if_repeated={self._repeated.value:s}>')
+
+    def copy(self) -> Self:
+        return self.__class__(self._time, self._skipped, self._repeated)
 
     def replace(self, dt: SystemDateTime | Date) -> SystemDateTime:  # noqa: C901
 

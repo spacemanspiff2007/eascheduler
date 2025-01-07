@@ -21,8 +21,8 @@ from .prod_sun import (
     DawnProducer,
     DuskProducer,
     NoonProducer,
-    SunAzimuthProducer,
-    SunElevationProducer,
+    SunAzimuthProducerCompare,
+    SunElevationProducerCompare,
     SunriseProducer,
     SunsetProducer,
 )
