@@ -12,7 +12,7 @@ from eascheduler.producers.prod_operation import (
     EarliestProducerOperation,
     LatestProducerOperation,
 )
-from tests.helper import get_ger_str, get_german_as_instant, get_system_as_instant
+from tests.helper import compare_with_copy, get_ger_str, get_german_as_instant, get_system_as_instant
 
 
 pytestmark = pytest.mark.skipif(
@@ -45,6 +45,9 @@ def test_earliest_forward(param: HINT_SKIPPED, target: list[str]) -> None:
 
         assert [get_ger_str(dst_1), get_ger_str(dst_2), get_ger_str(dst_3)] == target
 
+    # Test copy
+    compare_with_copy(o, o.copy())
+
 
 @pytest.mark.parametrize(
     ('param', 'target'), [
@@ -71,6 +74,9 @@ def test_earliest_backwards(param: HINT_REPEATED, target: list[str]) -> None:
 
         assert [get_ger_str(dst_1), get_ger_str(dst_2), get_ger_str(dst_3), get_ger_str(dst_4)] == target
 
+    # Test copy
+    compare_with_copy(o, o.copy())
+
 
 @pytest.mark.parametrize(
     ('param', 'target'), [
@@ -96,6 +102,9 @@ def test_latest_forward(param: HINT_SKIPPED, target: list[str]) -> None:
         dst_4 = o.get_next(dst_3)
 
         assert [get_ger_str(dst_1), get_ger_str(dst_2), get_ger_str(dst_3), get_ger_str(dst_4)] == target
+
+    # Test copy
+    compare_with_copy(o, o.copy())
 
 
 @pytest.mark.parametrize(
@@ -124,3 +133,6 @@ def test_latest_backwards(param: HINT_REPEATED, target: list[str]) -> None:
 
         assert [get_ger_str(dst_1), get_ger_str(dst_2), get_ger_str(dst_3),
                 get_ger_str(dst_4), get_ger_str(dst_5)] == target
+
+    # Test copy
+    compare_with_copy(o, o.copy())

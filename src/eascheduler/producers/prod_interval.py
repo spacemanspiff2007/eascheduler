@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Final
 
-from typing_extensions import override
+from typing_extensions import Self, override
 
 from .base import DateTimeProducerBase
 
@@ -19,6 +19,11 @@ class IntervalProducer(DateTimeProducerBase):
 
         self._next: Instant | None = start
         self._interval: Final = interval
+
+    @override
+    def copy(self) -> Self:
+        cls = self.__class__(start=self._next, interval=self._interval)
+        return self._copy_filter(cls)
 
     @override
     def get_next(self, dt: Instant) -> Instant:

@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Final
 
+from typing_extensions import Self, override
+
 from .base import DateTimeProducerBase, not_infinite_loop
 
 
@@ -17,6 +19,11 @@ class GroupProducer(DateTimeProducerBase):
     def __init__(self, producers: Iterable[DateTimeProducerBase]) -> None:
         super().__init__()
         self._producers: Final = tuple(producers)
+
+    @override
+    def copy(self) -> Self:
+        cls = self.__class__(p.copy() for p in self._producers)
+        return self._copy_filter(cls)
 
     def get_next(self, dt: Instant) -> Instant:   # type: ignore[return]
 

@@ -141,3 +141,30 @@ async def test_assert_always_error_raises() -> None:
         AlwaysError()()
     with pytest.raises(ValueError, match='Must not be called!'):
         await AlwaysError()
+
+
+def compare_with_copy(o: object, c: object) -> None:
+    assert type(o) is type(c)
+    assert o is not c
+    assert o == c, f'\n{o}\n{c}'
+
+    for name in ('_filter', '_produces'):
+        if not hasattr(o, name):
+            continue
+        o_v = getattr(o, name)
+        c_v = getattr(c, name)
+
+        if o_v is None:
+            assert c_v is None
+            continue
+
+        compare_with_copy(o_v, c_v)
+
+    for name in ('_filters', '_producers'):
+        if not hasattr(o, name):
+            continue
+        o_v = getattr(o, name)
+        c_v = getattr(c, name)
+
+        for o_v_i, c_v_i in zip(o_v, c_v, strict=True):
+            compare_with_copy(o_v_i, c_v_i)

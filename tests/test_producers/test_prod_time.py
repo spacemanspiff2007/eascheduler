@@ -5,7 +5,7 @@ from whenever import SystemDateTime, Time
 from eascheduler.helpers import TimeReplacer
 from eascheduler.producers import TimeProducer
 from eascheduler.producers.prod_filter import DayOfWeekProducerFilter
-from tests.helper import get_ger_str, get_german_as_instant, get_system_as_instant
+from tests.helper import compare_with_copy, get_ger_str, get_german_as_instant, get_system_as_instant
 
 
 def test_simple() -> None:
@@ -15,6 +15,16 @@ def test_simple() -> None:
         assert producer.get_next(get_system_as_instant(1, 1, 7)) == get_system_as_instant(1, 1, 8)
         assert producer.get_next(get_system_as_instant(1, 1, 8)) == get_system_as_instant(1, 2, 8)
         assert producer.get_next(get_system_as_instant(1, 2, 8)) == get_system_as_instant(1, 3, 8)
+
+
+def test_copy() -> None:
+    p = TimeProducer(TimeReplacer(Time(8), 'after', 'earlier'))
+    p1 = p.copy()
+    compare_with_copy(p, p1)
+
+    p1._filter = DayOfWeekProducerFilter([6])
+    compare_with_copy(p, TimeProducer(TimeReplacer(Time(8), 'after', 'earlier')))
+    compare_with_copy(p1, p1.copy())
 
 
 def test_filter() -> None:

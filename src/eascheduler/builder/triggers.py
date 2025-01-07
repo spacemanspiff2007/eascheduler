@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING, Final, Literal
 
 from typing_extensions import Self
 
+from eascheduler.builder.filters import _get_producer_filter
 from eascheduler.builder.helper import (
     HINT_CLOCK_BACKWARD,
     HINT_CLOCK_FORWARD,
@@ -27,8 +28,8 @@ from eascheduler.producers import (
     LatestProducerOperation,
     NoonProducer,
     OffsetProducerOperation,
-    SunAzimuthProducer,
-    SunElevationProducer,
+    SunAzimuthProducerCompare,
+    SunElevationProducerCompare,
     SunriseProducer,
     SunsetProducer,
     TimeProducer,
@@ -51,7 +52,7 @@ class TriggerObject:
         :param offset: The offset (positive or negative)
         """
         return self.__class__(
-            OffsetProducerOperation(self._producer, get_timedelta(offset).in_seconds())
+            OffsetProducerOperation(_get_producer(self), get_timedelta(offset).in_seconds())
         )
 
     def earliest(self, earliest: HINT_TIME, *,
@@ -65,7 +66,7 @@ class TriggerObject:
         """
         return self.__class__(
             EarliestProducerOperation(
-                self._producer,
+                _get_producer(self),
                 get_time_replacer(earliest, clock_forward=clock_forward, clock_backward=clock_backward)
             )
         )
@@ -81,7 +82,7 @@ class TriggerObject:
         """
         return self.__class__(
             LatestProducerOperation(
-                self._producer,
+                _get_producer(self),
                 get_time_replacer(latest, clock_forward=clock_forward, clock_backward=clock_backward)
             )
         )
@@ -94,7 +95,7 @@ class TriggerObject:
         """
         return self.__class__(
             JitterProducerOperation(
-                self._producer,
+                _get_producer(self),
                 get_timedelta(low).in_seconds(), get_timedelta(high).in_seconds() if high is not None else None
             )
         )
@@ -106,7 +107,7 @@ class TriggerObject:
         """
         if self._producer._filter is not None:
             raise ValueError()
-        self._producer._filter = filter._filter
+        self._producer._filter = _get_producer_filter(filter)
         return self
 
     only_at = only_on
@@ -146,7 +147,7 @@ class TriggerBuilder:
         :param elevation: Sun elevation in degrees
         :param direction: rising or falling
         """
-        return TriggerObject(SunElevationProducer(elevation, direction))
+        return TriggerObject(SunElevationProducerCompare(elevation, direction))
 
     @staticmethod
     def sun_azimuth(azimuth: float) -> TriggerObject:
@@ -154,7 +155,7 @@ class TriggerBuilder:
 
         :param azimuth: Sun azimuth in degrees
         """
-        return TriggerObject(SunAzimuthProducer(azimuth))
+        return TriggerObject(SunAzimuthProducerCompare(azimuth))
 
     @staticmethod
     def group(*builders: TriggerObject) -> TriggerObject:
@@ -200,4 +201,4 @@ class TriggerBuilder:
         )
 
 
-_get_producer = BuilderTypeValidator(TriggerObject, DateTimeProducerBase, '_producer')
+_get_producer: Final = BuilderTypeValidator(TriggerObject, DateTimeProducerBase, '_producer')

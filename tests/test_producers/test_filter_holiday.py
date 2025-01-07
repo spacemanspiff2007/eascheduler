@@ -12,6 +12,7 @@ from eascheduler.producers.prod_filter_holiday import (
     pop_holiday,
     setup_holidays,
 )
+from tests.helper import compare_with_copy
 
 
 @pytest.fixture(autouse=True)
@@ -29,6 +30,11 @@ def test_holiday_setup() -> None:
 
     prod_filter_holiday_module.HOLIDAYS = None
     setup_holidays('DE', observed=False, language='BE', categories=('catholic', 'public'))
+
+
+def test_copy() -> None:
+    f = HolidayProducerFilter()
+    compare_with_copy(f, f.copy())
 
 
 def test_holiday_filter() -> None:
