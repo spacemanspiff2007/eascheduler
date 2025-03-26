@@ -79,7 +79,7 @@ class SequentialTaskManager(SequentialTaskManagerBase):
 
 
 class LimitingSequentialTaskManager(SequentialTaskManager):
-    __slots__ = ('max_queue', 'action')
+    __slots__ = ('action', 'max_queue')
 
     def __init__(self, max_queue: int, action: HINT_SEQUENTIAL_TASK_POLICY = POLICY_SKIP) -> None:
         """

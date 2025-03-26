@@ -19,7 +19,7 @@ if TYPE_CHECKING:
 
 
 class AsyncScheduler(SchedulerBase):
-    __slots__ = ('_loop', 'timer', 'jobs', '_enabled')
+    __slots__ = ('_enabled', '_loop', 'jobs', 'timer')
 
     def __init__(self, event_loop: asyncio.AbstractEventLoop | None = None, *, enabled: bool = True) -> None:
         self._loop: Final = event_loop if event_loop is not None else asyncio.get_running_loop()

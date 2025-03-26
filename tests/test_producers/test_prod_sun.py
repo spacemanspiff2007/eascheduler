@@ -55,7 +55,7 @@ def get_params() -> Generator[ParameterSet, None, None]:
         id='Dusk-15',
     )
     yield pytest.param(
-        SunElevationProducerCompare(-6, 'setting'), get_german_as_instant(5, 15, 12, year=2024), '2024-05-15T21:40:46+02:00',
+        SunElevationProducerCompare(-6, 'setting'), get_german_as_instant(5, 15, 12, year=2024), '2024-05-15T21:40:46+02:00',  # noqa: E501
         id='Elevation-15',
     )
     yield pytest.param(

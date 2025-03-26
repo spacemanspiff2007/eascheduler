@@ -121,7 +121,7 @@ async def test_deduplicating_repr() -> None:
 
 
 async def test_deduplicating_skip() -> None:
-    d = {k: 1 for k in range(10)}
+    d = dict.fromkeys(range(10), 1)
     d[2] = 2
     d[3] = 3
 
