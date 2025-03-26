@@ -34,8 +34,6 @@ ignore = [
     "UP038",    # Use X | Y in {} call instead of (X, Y)
 
     # https://docs.astral.sh/ruff/rules/#flake8-annotations-ann
-    "ANN101",   # Missing type annotation for {name} in method
-    "ANN102",   # Missing type annotation for {name} in classmethod
     "ANN401",   # Dynamically typed expressions (typing.Any) are disallowed in {name}
 
     # https://docs.astral.sh/ruff/rules/#flake8-blind-except-ble
@@ -111,4 +109,8 @@ lines-after-imports = 2     # https://docs.astral.sh/ruff/settings/#lint_isort_l
 
 "tests/test_task_managers/test_sequential.py" = [
     "ASYNC110"  # Use `anyio.Event` instead of awaiting `anyio.sleep` in a `while` loop
+]
+
+"tests/test_default.py" = [
+    "F841"  # F841 Local variable `job_once` is assigned to but never used
 ]

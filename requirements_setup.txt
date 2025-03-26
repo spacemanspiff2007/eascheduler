@@ -1,6 +1,6 @@
 # Requirements to install and use this library
-whenever == 0.6.16
+whenever == 0.7.3
 astral   == 3.2
-holidays == 0.64
+holidays == 0.69
 
-typing_extensions == 4.12.2
+typing_extensions

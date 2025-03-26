@@ -100,6 +100,9 @@ scheduler.at(
 ````
 
 ## Changelog
+#### 0.2.3 (2025-03-26)
+- Updated dependencies
+
 #### 0.2.2 (2025-01-07)
 - Ensured that all trigger builders are imputable and can be composed without side effects
 - Updated dependencies
