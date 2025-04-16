@@ -55,7 +55,7 @@ def set_location(latitude: float | str, longitude: float | str, elevation: float
     OBSERVER = Observer(latitude, longitude, elevation)
 
 
-SUN_CACHE: Final = OrderedDict()
+SUN_CACHE: Final[OrderedDict[tuple[Hashable, ...], Instant]] = OrderedDict()
 
 
 class SunProducer(DateTimeProducerBase):

@@ -9,7 +9,7 @@ from eascheduler.producers.base import DateTimeProducerBase, not_infinite_loop
 
 
 if TYPE_CHECKING:
-    from whenever import Instant
+    from whenever import Instant, SystemDateTime
 
 
 class TimeProducer(DateTimeProducerBase):
@@ -26,6 +26,8 @@ class TimeProducer(DateTimeProducerBase):
 
     @override
     def get_next(self, dt: Instant) -> Instant:     # type: ignore[return]
+
+        local_dts: tuple[SystemDateTime, ...]
 
         date = dt.to_system_tz().date()
         for _ in not_infinite_loop():  # noqa: RET503
