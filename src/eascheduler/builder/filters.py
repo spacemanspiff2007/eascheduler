@@ -58,8 +58,15 @@ class FilterBuilder:
     @staticmethod
     def time(lower: HINT_TIME | None = None, upper: HINT_TIME | None = None) -> FilterObject:
         """Restrict the trigger instant to a time range"""
+
+        if lower is None and upper is None:
+            msg = 'At least one of lower or upper must be provided'
+            raise ValueError(msg)
+
+        time_lower = get_time(lower) if lower is not None else None
+        time_upper = get_time(upper) if upper is not None else None
         return FilterObject(
-            TimeProducerFilter(get_time(lower), get_time(upper))
+            TimeProducerFilter(time_lower, time_upper)
         )
 
     @staticmethod

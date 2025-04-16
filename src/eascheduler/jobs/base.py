@@ -116,7 +116,10 @@ class JobBase(Generic[IdType]):
         self.update_next()
         return self.status
 
-    def __lt__(self, other_job: object) -> bool:
+    def __lt__(self, other_job: JobBase) -> bool:
+        if not isinstance(other_job, JobBase):
+            return NotImplemented
+
         if (other := other_job.next_run) is None:
             return True
         if (this := self.next_run) is None:

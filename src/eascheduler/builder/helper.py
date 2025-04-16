@@ -16,7 +16,7 @@ from eascheduler.helpers import HINT_CLOCK_BACKWARD, HINT_CLOCK_FORWARD, TimeRep
 HINT_TIME: TypeAlias = dt_time | Time | str
 HINT_TIMEDELTA: TypeAlias = dt_timedelta | TimeDelta | int | float | str
 HINT_POS_TIMEDELTA: TypeAlias = HINT_TIMEDELTA
-HINT_INSTANT: TypeAlias = dt_datetime | None | str | HINT_TIME | HINT_TIMEDELTA | SystemDateTime
+HINT_INSTANT: TypeAlias = dt_datetime | None | str | HINT_TIME | HINT_TIMEDELTA | SystemDateTime | Instant
 HINT_NAME_OR_NR: TypeAlias = int | str | Iterable[int | str]
 HINT_DATE: TypeAlias = dt_date | dt_datetime | str | None | Date | SystemDateTime | Instant
 
@@ -98,11 +98,13 @@ def get_instant(value: HINT_INSTANT) -> Instant:
                                   value.second, nanosecond=value.microsecond * 1_000).instant()
         case SystemDateTime():
             return value.instant()
+        case Instant():
+            return value
 
     # ------------------------------------------------------------------------------------------------------------------
     # timedelta
     try:
-        timedelta = get_timedelta(value)
+        timedelta = get_timedelta(value)    # type: ignore[arg-type]
     except (ValueError, TypeError):
         pass
     else:
@@ -111,7 +113,7 @@ def get_instant(value: HINT_INSTANT) -> Instant:
     # ------------------------------------------------------------------------------------------------------------------
     # time
     try:
-        time = get_time(value)
+        time = get_time(value)              # type: ignore[arg-type]
     except (ValueError, TypeError):
         pass
     else:

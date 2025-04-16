@@ -100,6 +100,10 @@ scheduler.at(
 ````
 
 ## Changelog
+#### 0.2.4 (2025-04-16)
+- Instand for execution can be specified directly as `Instant`
+- Updated dependencies
+
 #### 0.2.3 (2025-03-26)
 - Updated dependencies
 
