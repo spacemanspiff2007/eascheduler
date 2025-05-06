@@ -39,7 +39,7 @@ class TimeProducer(DateTimeProducerBase):
                 local_dts = (e.earlier, e.later)
 
             for local_dt in local_dts:
-                next_dt = local_dt.instant()
+                next_dt = local_dt.to_instant()
                 if next_dt > dt and ((f := self._filter) is None or f.allow(local_dt)):
                     return next_dt
 

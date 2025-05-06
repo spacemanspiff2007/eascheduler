@@ -9,13 +9,13 @@ from whenever import Instant, SystemDateTime, TimeDelta, ZonedDateTime
 def get_german_as_instant(month=1, day=1, hour=0, minute=0, second=0, *, year=2001, microsecond=0) -> Instant:
     return ZonedDateTime(
         year, month, day, hour, minute=minute, second=second, nanosecond=microsecond * 1000, tz='Europe/Berlin'
-    ).instant()
+    ).to_instant()
 
 
 def get_system_as_instant(month=1, day=1, hour=0, minute=0, second=0, *, year=2001, microsecond=0) -> Instant:
     return SystemDateTime(
         year, month, day, hour, minute=minute, second=second, nanosecond=int(microsecond * 1000)
-    ).instant()
+    ).to_instant()
 
 
 def get_ger_str(obj: Instant) -> str:
