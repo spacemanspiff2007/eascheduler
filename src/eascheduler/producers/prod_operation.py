@@ -4,7 +4,7 @@ from random import uniform
 from typing import TYPE_CHECKING, Final
 
 from typing_extensions import Self, override
-from whenever import LocalDateTime, SkippedTime, SystemDateTime, Time, TimeDelta
+from whenever import PlainDateTime, SkippedTime, SystemDateTime, Time, TimeDelta
 
 from eascheduler.helpers import TimeReplacer, TimeSkippedError, TimeTwiceError
 from eascheduler.producers.base import DateTimeProducerBase, DateTimeProducerOperationBase
@@ -16,13 +16,13 @@ if TYPE_CHECKING:
 
 def find_time_after_dst_switch(dt: SystemDateTime, time: Time) -> Instant:
     # DST changes typically occur on the full minute
-    local = LocalDateTime(dt.year, dt.month, dt.day, time.hour, time.minute)
+    local = PlainDateTime(dt.year, dt.month, dt.day, time.hour, time.minute)
 
     while True:
         local = local.add(minutes=1, ignore_dst=True)
 
         try:
-            return dt.replace_time(local.time(), disambiguate='raise').instant()
+            return dt.replace_time(local.time(), disambiguate='raise').to_instant()
         except SkippedTime:
             continue
 
@@ -59,13 +59,13 @@ class EarliestProducerOperation(DateTimeProducerOperationBase):
     @override
     def apply_operation(self, next_dt: Instant, dt: Instant) -> Instant:
         try:
-            earliest_dt = self.earliest.replace(next_dt.to_system_tz()).instant()
+            earliest_dt = self.earliest.replace(next_dt.to_system_tz()).to_instant()
         except TimeSkippedError:
             return next_dt
         except TimeTwiceError as e:
-            earliest_dt = e.earlier.instant()
+            earliest_dt = e.earlier.to_instant()
             if earliest_dt <= dt:
-                earliest_dt = e.later.instant()
+                earliest_dt = e.later.to_instant()
 
         if next_dt < earliest_dt:
             return earliest_dt
@@ -87,13 +87,13 @@ class LatestProducerOperation(DateTimeProducerOperationBase):
     @override
     def apply_operation(self, next_dt: Instant, dt: Instant) -> Instant:
         try:
-            latest_dt = self.latest.replace(next_dt.to_system_tz()).instant()
+            latest_dt = self.latest.replace(next_dt.to_system_tz()).to_instant()
         except TimeSkippedError:
             return next_dt
         except TimeTwiceError as e:
-            latest_dt = e.earlier.instant()
+            latest_dt = e.earlier.to_instant()
             if latest_dt <= dt:
-                latest_dt = e.later.instant()
+                latest_dt = e.later.to_instant()
 
         if next_dt > latest_dt:
             return latest_dt

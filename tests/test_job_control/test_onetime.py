@@ -33,7 +33,7 @@ async def test_base_properties() -> None:
     now = SystemDateTime.now().add(seconds=1)
 
     s = AsyncScheduler()
-    job = OneTimeJob(SyncExecutor(AlwaysError()), now.instant())
+    job = OneTimeJob(SyncExecutor(AlwaysError()), now.to_instant())
     job.link_scheduler(s)
 
     ctrl = OneTimeJobControl(job)

@@ -86,9 +86,9 @@ def test_no_sun_pos() -> None:
     dt = ZonedDateTime(2024, 5, 17, tz=tz)
     result = ZonedDateTime(2024, 5, 17, 0, 57, 52, tz=tz)
 
-    assert producer.get_next(dt.instant()).to_tz(tz) == result
+    assert producer.get_next(dt.to_instant()).to_tz(tz) == result
     # We don't have a sunrise, so we check that we jump forward
-    assert producer.get_next(result.instant()).to_tz(tz) == ZonedDateTime(2024, 7, 27, 1, 30, 56, tz=tz)
+    assert producer.get_next(result.to_instant()).to_tz(tz) == ZonedDateTime(2024, 7, 27, 1, 30, 56, tz=tz)
 
 
 def test_filter() -> None:
@@ -96,12 +96,12 @@ def test_filter() -> None:
     producer = SunriseProducer()
 
     for _ in range(10):
-        assert producer.get_next(dt.instant()).to_tz(tz) == ZonedDateTime(2001, 1, 1, 8, 17, 43, tz=tz)
+        assert producer.get_next(dt.to_instant()).to_tz(tz) == ZonedDateTime(2001, 1, 1, 8, 17, 43, tz=tz)
 
     producer._filter = DayOfWeekProducerFilter([6])
 
     for _ in range(10):
-        assert producer.get_next(dt.instant()).to_tz(tz) == ZonedDateTime(2001, 1, 6, 8, 16, 20, tz=tz)
+        assert producer.get_next(dt.to_instant()).to_tz(tz) == ZonedDateTime(2001, 1, 6, 8, 16, 20, tz=tz)
 
     # Test copy
     compare_with_copy(producer, producer.copy())
@@ -116,7 +116,7 @@ def test_sun_cache_eviction() -> None:
         for day in range(1, 30):
 
             dt = ZonedDateTime(2024, month, day, tz=tz)
-            producer.get_next(dt.instant())
+            producer.get_next(dt.to_instant())
             max_entries = max(max_entries, len(prod_sun_module.SUN_CACHE))
 
     assert max_entries > len(prod_sun_module.SUN_CACHE) + 3
@@ -160,12 +160,12 @@ def test_sun_cache_hits() -> None:
     for day in range(1, 31):
 
         dt = ZonedDateTime(2024, 1, day, hour=3, tz=tz)
-        producer_sunrise.get_next(dt.instant())
-        producer_azimuth1.get_next(dt.instant())
-        producer_azimuth2.get_next(dt.instant())
-        producer_elevation1.get_next(dt.instant())
-        producer_elevation2.get_next(dt.instant())
-        producer_elevation3.get_next(dt.instant())
-        producer_elevation4.get_next(dt.instant())
+        producer_sunrise.get_next(dt.to_instant())
+        producer_azimuth1.get_next(dt.to_instant())
+        producer_azimuth2.get_next(dt.to_instant())
+        producer_elevation1.get_next(dt.to_instant())
+        producer_elevation2.get_next(dt.to_instant())
+        producer_elevation3.get_next(dt.to_instant())
+        producer_elevation4.get_next(dt.to_instant())
 
     assert (hits, misses) == (0, 30 * 7)

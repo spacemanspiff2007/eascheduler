@@ -10,7 +10,7 @@ from tests.helper import AlwaysError
 
 
 async def test_eq() -> None:
-    now = SystemDateTime.now().replace(nanosecond=0, disambiguate='raise').instant()
+    now = SystemDateTime.now().replace(nanosecond=0, disambiguate='raise').to_instant()
     job1 = DateTimeJob(SyncExecutor(AlwaysError()), IntervalProducer(now, 1))
     job2 = DateTimeJob(SyncExecutor(AlwaysError()), IntervalProducer(now, 1))
 

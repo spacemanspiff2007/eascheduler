@@ -48,8 +48,8 @@ def test_get_instant() -> None:
         # Immediately
         assert get_instant(None) == i
         # datetime
-        assert get_instant(datetime(2001, 1, 1, 8)) == SystemDateTime(2001, 1, 1, 8).instant()
-        assert get_instant(SystemDateTime(2001, 1, 1, 8)) == SystemDateTime(2001, 1, 1, 8).instant()
+        assert get_instant(datetime(2001, 1, 1, 8)) == SystemDateTime(2001, 1, 1, 8).to_instant()
+        assert get_instant(SystemDateTime(2001, 1, 1, 8)) == SystemDateTime(2001, 1, 1, 8).to_instant()
 
         # Timedelta test
         assert get_instant(3600) == i.add(hours=1)
@@ -59,12 +59,12 @@ def test_get_instant() -> None:
         assert get_instant('PT1H') == i.add(hours=1)
 
         # Time test
-        assert get_instant('08:00:00') == SystemDateTime(2001, 1, 1, 8).instant()
-        assert get_instant(time(8)) == SystemDateTime(2001, 1, 1, 8).instant()
-        assert get_instant(Time(8)) == SystemDateTime(2001, 1, 1, 8).instant()
+        assert get_instant('08:00:00') == SystemDateTime(2001, 1, 1, 8).to_instant()
+        assert get_instant(time(8)) == SystemDateTime(2001, 1, 1, 8).to_instant()
+        assert get_instant(Time(8)) == SystemDateTime(2001, 1, 1, 8).to_instant()
 
     # datetime test
-    d = SystemDateTime(2001, 1, 1, 12, 30).add(seconds=0.5).instant()
+    d = SystemDateTime(2001, 1, 1, 12, 30).add(seconds=0.5).to_instant()
     dt_with_tz_utc = d.py_datetime()
     assert get_instant(dt_with_tz_utc) == d
     assert get_instant(dt_datetime(2001, 1, 1, 12, 30, 0, 500_000)) == d
@@ -184,7 +184,7 @@ def test_get_pydate() -> None:
 
     assert get_pydate(sys_dt.date())
     assert get_pydate(sys_dt)
-    assert get_pydate(sys_dt.instant())
+    assert get_pydate(sys_dt.to_instant())
 
     with pytest.raises(TypeError):
         assert get_pydate(1)

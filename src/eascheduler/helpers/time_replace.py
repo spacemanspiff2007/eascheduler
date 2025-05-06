@@ -4,7 +4,7 @@ from enum import Enum
 from typing import TYPE_CHECKING, Final, Literal, TypeAlias
 
 from typing_extensions import Self
-from whenever import Date, LocalDateTime, RepeatedTime, SkippedTime, SystemDateTime, Time
+from whenever import Date, PlainDateTime, RepeatedTime, SkippedTime, SystemDateTime, Time
 
 from eascheduler.helpers.helpers import to_enum
 
@@ -35,7 +35,7 @@ HINT_REPEATED: TypeAlias = RepeatedTimeBehavior | Literal['skip', 'earlier', 'la
 
 def find_time_after_dst_switch(dt: SystemDateTime | Date, time: Time) -> SystemDateTime:
     # DST changes typically occur on the full minute
-    t = LocalDateTime(dt.year, dt.month, dt.day, time.hour, time.minute)
+    t = PlainDateTime(dt.year, dt.month, dt.day, time.hour, time.minute)
 
     # dst is typically 1 hour, but who knows
     for _ in range(121):
