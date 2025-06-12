@@ -100,6 +100,10 @@ scheduler.at(
 ````
 
 ## Changelog
+#### 0.2.6 (2025-06-12)
+- Small fixes
+- Updated dependencies
+
 #### 0.2.5 (2025-05-06)
 - Updated to whenever 0.8 which introduces breaking changes
 - Updated dependencies
