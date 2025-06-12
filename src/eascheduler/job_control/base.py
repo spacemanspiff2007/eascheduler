@@ -44,7 +44,7 @@ class BaseControl:
 
         if (nr := self._job.next_run) is None:
             return None
-        return nr.to_system_tz().local().py_datetime()
+        return nr.to_system_tz().to_plain().py_datetime()
 
     @property
     def last_run_datetime(self) -> dt_datetime | None:
@@ -52,4 +52,4 @@ class BaseControl:
 
         if (nr := self._job.last_run) is None:
             return None
-        return nr.to_system_tz().local().py_datetime()
+        return nr.to_system_tz().to_plain().py_datetime()

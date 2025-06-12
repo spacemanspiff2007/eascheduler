@@ -7,7 +7,7 @@ from datetime import time as dt_time
 from datetime import timedelta as dt_timedelta
 from typing import Any, Final, Generic, TypeAlias, TypeVar
 
-from whenever import Date, Instant, SystemDateTime, Time, TimeDelta
+from whenever import Date, Instant, PlainDateTime, SystemDateTime, Time, TimeDelta
 
 from eascheduler.const import get_day_nr, get_month_nr
 from eascheduler.helpers import HINT_CLOCK_BACKWARD, HINT_CLOCK_FORWARD, TimeReplacer, check_dst_handling
@@ -92,12 +92,11 @@ def get_instant(value: HINT_INSTANT) -> Instant:
             return Instant.now()
         case dt_datetime():
             if value.tzinfo is not None:
-                return SystemDateTime.from_py_datetime(value).instant()
+                return SystemDateTime.from_py_datetime(value).to_instant()
             # We assume it's the system datetime because that's what datetime is normally used for
-            return SystemDateTime(value.year, value.month, value.day, value.hour, value.minute,
-                                  value.second, nanosecond=value.microsecond * 1_000).instant()
+            return PlainDateTime.from_py_datetime(value).assume_system_tz().to_instant()
         case SystemDateTime():
-            return value.instant()
+            return value.to_instant()
         case Instant():
             return value
 
@@ -121,7 +120,7 @@ def get_instant(value: HINT_INSTANT) -> Instant:
         new = now.replace_time(time, disambiguate='raise')
         if new < now:
             new = new.add(hours=24)
-        return new.instant()
+        return new.to_instant()
 
     raise ValueError()
 
