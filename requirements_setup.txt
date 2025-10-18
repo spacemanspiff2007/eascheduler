@@ -1,5 +1,5 @@
 # Requirements to install and use this library
-whenever == 0.8.8
+whenever==0.9.3
 astral   == 3.2
 holidays == 0.79
 
