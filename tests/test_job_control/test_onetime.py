@@ -1,6 +1,6 @@
 from datetime import datetime as dt_datetime
 
-from whenever import Instant, SystemDateTime, TimeDelta
+from whenever import Instant, TimeDelta, ZonedDateTime
 
 from eascheduler.executor.base import SyncExecutor
 from eascheduler.job_control import OneTimeJobControl
@@ -30,7 +30,7 @@ async def test_onetime() -> None:
 
 async def test_base_properties() -> None:
 
-    now = SystemDateTime.now().add(seconds=1)
+    now = ZonedDateTime.now_in_system_tz().add(seconds=1)
 
     s = AsyncScheduler()
     job = OneTimeJob(SyncExecutor(AlwaysError()), now.to_instant())

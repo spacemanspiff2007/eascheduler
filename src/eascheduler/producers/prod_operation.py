@@ -4,7 +4,7 @@ from random import uniform
 from typing import TYPE_CHECKING, Final
 
 from typing_extensions import Self, override
-from whenever import PlainDateTime, SkippedTime, SystemDateTime, Time, TimeDelta
+from whenever import PlainDateTime, SkippedTime, Time, TimeDelta, ZonedDateTime
 
 from eascheduler.helpers import TimeReplacer, TimeSkippedError, TimeTwiceError
 from eascheduler.producers.base import DateTimeProducerBase, DateTimeProducerOperationBase
@@ -14,7 +14,7 @@ if TYPE_CHECKING:
     from whenever import Instant
 
 
-def find_time_after_dst_switch(dt: SystemDateTime, time: Time) -> Instant:
+def find_time_after_dst_switch(dt: ZonedDateTime, time: Time) -> Instant:
     # DST changes typically occur on the full minute
     local = PlainDateTime(dt.year, dt.month, dt.day, time.hour, time.minute)
 

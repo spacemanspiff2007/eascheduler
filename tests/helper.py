@@ -3,7 +3,7 @@ from time import monotonic
 from typing import Final, Literal, TypeVar, Union, get_args, get_origin
 
 import pytest
-from whenever import Instant, SystemDateTime, TimeDelta, ZonedDateTime
+from whenever import Instant, TimeDelta, ZonedDateTime
 
 
 def get_german_as_instant(month=1, day=1, hour=0, minute=0, second=0, *, year=2001, microsecond=0) -> Instant:
@@ -13,13 +13,13 @@ def get_german_as_instant(month=1, day=1, hour=0, minute=0, second=0, *, year=20
 
 
 def get_system_as_instant(month=1, day=1, hour=0, minute=0, second=0, *, year=2001, microsecond=0) -> Instant:
-    return SystemDateTime(
+    return ZonedDateTime.from_system_tz(
         year, month, day, hour, minute=minute, second=second, nanosecond=int(microsecond * 1000)
     ).to_instant()
 
 
 def get_ger_str(obj: Instant) -> str:
-    return obj.to_tz('Europe/Berlin').to_fixed_offset().format_common_iso()
+    return obj.to_tz('Europe/Berlin').to_fixed_offset().format_iso()
 
 
 T = TypeVar('T')
@@ -87,7 +87,7 @@ def assert_called_at(value, target) -> bool:
         assert value < target_upper, f'\n{value}  {_fmt_diff(value-target_upper):s}\n{target_upper}'
         return True
 
-    if isinstance(value, (Instant, SystemDateTime)) and isinstance(target, (Instant, SystemDateTime)):
+    if isinstance(value, (Instant, ZonedDateTime)) and isinstance(target, (Instant, ZonedDateTime)):
         target_lower = target - TimeDelta(seconds=offset_lower)
         target_upper = target + TimeDelta(seconds=offset_upper)
         assert target_lower < value, f'\n{target_lower}\n{value}  {_fmt_diff(value-target_lower):s}'

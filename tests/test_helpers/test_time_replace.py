@@ -1,6 +1,6 @@
 import pytest
 from tzlocal import get_localzone_name
-from whenever import SystemDateTime, Time
+from whenever import Time, ZonedDateTime
 
 from eascheduler.helpers.time_replace import (
     HINT_REPEATED,
@@ -21,15 +21,15 @@ pytestmark = pytest.mark.skipif(
 
 
 def get_str(obj) -> str | tuple[str, str]:
-    if isinstance(obj, SystemDateTime):
-        return obj.format_common_iso()
+    if isinstance(obj, ZonedDateTime):
+        return obj.format_iso().split('[')[0]   # cut away timezone
     if isinstance(obj, tuple):
         if len(obj) == 1:
-            return obj[0].format_common_iso()
+            return obj[0].format_iso()
         if len(obj) == 2:
             return (
-                obj[0].format_common_iso(),
-                obj[1].format_common_iso()
+                obj[0].format_iso(),
+                obj[1].format_iso()
             )
 
     raise ValueError()

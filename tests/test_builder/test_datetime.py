@@ -2,7 +2,7 @@ import asyncio
 from datetime import datetime
 
 import pytest
-from whenever import SystemDateTime, patch_current_time
+from whenever import ZonedDateTime, patch_current_time
 
 from eascheduler.builder import FilterBuilder, JobBuilder, TriggerBuilder
 from eascheduler.executor.base import SyncExecutor
@@ -14,9 +14,9 @@ async def test_call() -> None:
     calls = []
 
     def append() -> None:
-        calls.append(SystemDateTime.now())
+        calls.append(ZonedDateTime.now_in_system_tz())
 
-    now = SystemDateTime.now()
+    now = ZonedDateTime.now_in_system_tz()
     dst = now.add(seconds=1).replace(nanosecond=0, disambiguate='raise')
 
     builder = JobBuilder(AsyncScheduler(), SyncExecutor)
@@ -32,7 +32,7 @@ async def test_call() -> None:
 
 @pytest.fixture
 async def builder():
-    with patch_current_time(SystemDateTime(2001, 1, 1, 12), keep_ticking=False):
+    with patch_current_time(ZonedDateTime.from_system_tz(2001, 1, 1, 12), keep_ticking=False):
         s = AsyncScheduler()
         yield JobBuilder(s, SyncExecutor)
         s.remove_all()
