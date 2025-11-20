@@ -62,6 +62,7 @@ def test_time_start_end_of_day(time_replacer: TimeReplacer, hour: str) -> None:
     for _ in range(366):    # 2024 is a leap year
         instant = producer.get_next(instant)
         iso = instant.to_system_tz().format_iso()
+        assert 'T' in iso, iso
         day, clock = iso.split('T')
         assert day in days, days
         days.remove(day)
