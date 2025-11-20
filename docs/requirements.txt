@@ -3,4 +3,4 @@ sphinx-autodoc-typehints    == 3.0.1
 sphinx_rtd_theme            == 3.0.2
 sphinx-exec-code            == 0.16
 sphinx-copybutton           == 0.5.2
-typing_extensions           == 4.14.1
+typing_extensions           == 4.15.0
