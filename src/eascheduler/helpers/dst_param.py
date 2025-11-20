@@ -2,7 +2,7 @@ import logging
 from collections.abc import Generator, Iterable
 from typing import Final, Literal, TypeAlias
 
-from whenever import RepeatedTime, SkippedTime, SystemDateTime, Time
+from whenever import RepeatedTime, SkippedTime, Time, ZonedDateTime
 
 from eascheduler.helpers.time_replace import HINT_REPEATED, HINT_SKIPPED, RepeatedTimeBehavior, SkippedTimeBehavior
 
@@ -18,15 +18,15 @@ def _iter_nr(nrs: Iterable[int], lower: int, upper: int) -> Generator[int, None,
             yield nr
 
 
-def _iter_date(*, reverse: bool = False) -> Generator[tuple[SystemDateTime, Time], None, None]:
+def _iter_date(*, reverse: bool = False) -> Generator[tuple[ZonedDateTime, Time], None, None]:
     month_order = (3, 4, 11, 9, 10)
     hour_order = (2, 3, 0, 1)
 
-    now = SystemDateTime.now()
+    now = ZonedDateTime.now_in_system_tz()
 
     for month in _iter_nr(month_order if not reverse else reversed(month_order), 1, 13):
         for hour in _iter_nr(hour_order if not reverse else reversed(hour_order), 0, 24):
-            start = SystemDateTime(now.year, month, 1)
+            start = ZonedDateTime.from_system_tz(now.year, month, 1)
             while start.month == month:
                 yield start, Time(hour, 30)
                 start = start.add(hours=24)

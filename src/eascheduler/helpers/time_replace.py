@@ -4,7 +4,7 @@ from enum import Enum
 from typing import TYPE_CHECKING, Final, Literal, TypeAlias
 
 from typing_extensions import Self
-from whenever import Date, PlainDateTime, RepeatedTime, SkippedTime, SystemDateTime, Time
+from whenever import Date, PlainDateTime, RepeatedTime, SkippedTime, Time, ZonedDateTime
 
 from eascheduler.helpers.helpers import to_enum
 
@@ -33,7 +33,7 @@ class RepeatedTimeBehavior(str, Enum):
 HINT_REPEATED: TypeAlias = RepeatedTimeBehavior | Literal['skip', 'earlier', 'later', 'twice']
 
 
-def find_time_after_dst_switch(dt: SystemDateTime | Date, time: Time) -> SystemDateTime:
+def find_time_after_dst_switch(dt: ZonedDateTime | Date, time: Time) -> ZonedDateTime:
     # DST changes typically occur on the full minute
     t = PlainDateTime(dt.year, dt.month, dt.day, time.hour, time.minute)
 
@@ -42,7 +42,7 @@ def find_time_after_dst_switch(dt: SystemDateTime | Date, time: Time) -> SystemD
         t = t.add(minutes=1, ignore_dst=True)
 
         try:
-            return SystemDateTime(dt.year, dt.month, dt.day, t.hour, t.minute, disambiguate='raise')
+            return ZonedDateTime.from_system_tz(dt.year, dt.month, dt.day, t.hour, t.minute, disambiguate='raise')
         except SkippedTime:
             continue
 
@@ -55,7 +55,7 @@ class TimeSkippedError(Exception):
 
 
 class TimeTwiceError(Exception):
-    def __init__(self, t1: SystemDateTime, t2: SystemDateTime) -> None:
+    def __init__(self, t1: ZonedDateTime, t2: ZonedDateTime) -> None:
         self.earlier: Final = t1
         self.later: Final = t2
 
@@ -81,7 +81,7 @@ class TimeReplacer:
     def copy(self) -> Self:
         return self.__class__(self._time, self._skipped, self._repeated)
 
-    def replace(self, dt: SystemDateTime | Date) -> SystemDateTime:  # noqa: C901
+    def replace(self, dt: ZonedDateTime | Date) -> ZonedDateTime:  # noqa: C901
 
         kwargs = {
             'year': dt.year, 'month': dt.month, 'day': dt.day,
@@ -90,15 +90,15 @@ class TimeReplacer:
         }
 
         try:
-            return SystemDateTime(**kwargs, disambiguate='raise')
+            return ZonedDateTime.from_system_tz(**kwargs, disambiguate='raise')
         except SkippedTime:
             match self._skipped:
                 case SkippedTimeBehavior.SKIP:
                     raise TimeSkippedError() from None
                 case SkippedTimeBehavior.EARLIER:
-                    return SystemDateTime(**kwargs, disambiguate='earlier')
+                    return ZonedDateTime.from_system_tz(**kwargs, disambiguate='earlier')
                 case SkippedTimeBehavior.LATER:
-                    return SystemDateTime(**kwargs, disambiguate='later')
+                    return ZonedDateTime.from_system_tz(**kwargs, disambiguate='later')
                 case SkippedTimeBehavior.AFTER:
                     return find_time_after_dst_switch(dt, self._time)
                 case _:
@@ -109,13 +109,13 @@ class TimeReplacer:
                 case RepeatedTimeBehavior.SKIP:
                     raise TimeSkippedError() from None
                 case RepeatedTimeBehavior.EARLIER:
-                    return SystemDateTime(**kwargs, disambiguate='earlier')
+                    return ZonedDateTime.from_system_tz(**kwargs, disambiguate='earlier')
                 case RepeatedTimeBehavior.LATER:
-                    return SystemDateTime(**kwargs, disambiguate='later')
+                    return ZonedDateTime.from_system_tz(**kwargs, disambiguate='later')
                 case RepeatedTimeBehavior.TWICE:
                     raise TimeTwiceError(
-                        SystemDateTime(**kwargs, disambiguate='earlier'),
-                        SystemDateTime(**kwargs, disambiguate='later'),
+                        ZonedDateTime.from_system_tz(**kwargs, disambiguate='earlier'),
+                        ZonedDateTime.from_system_tz(**kwargs, disambiguate='later'),
                     ) from None
                 case _:
                     msg = f'Invalid value: {self._repeated!r}'

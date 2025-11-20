@@ -7,7 +7,7 @@ from datetime import time as dt_time
 from datetime import timedelta as dt_timedelta
 from typing import Any, Final, Generic, TypeAlias, TypeVar
 
-from whenever import Date, Instant, PlainDateTime, SystemDateTime, Time, TimeDelta
+from whenever import Date, Instant, PlainDateTime, Time, TimeDelta, ZonedDateTime
 
 from eascheduler.const import get_day_nr, get_month_nr
 from eascheduler.helpers import HINT_CLOCK_BACKWARD, HINT_CLOCK_FORWARD, TimeReplacer, check_dst_handling
@@ -16,9 +16,9 @@ from eascheduler.helpers import HINT_CLOCK_BACKWARD, HINT_CLOCK_FORWARD, TimeRep
 HINT_TIME: TypeAlias = dt_time | Time | str
 HINT_TIMEDELTA: TypeAlias = dt_timedelta | TimeDelta | int | float | str
 HINT_POS_TIMEDELTA: TypeAlias = HINT_TIMEDELTA
-HINT_INSTANT: TypeAlias = dt_datetime | None | str | HINT_TIME | HINT_TIMEDELTA | SystemDateTime | Instant
+HINT_INSTANT: TypeAlias = dt_datetime | None | str | HINT_TIME | HINT_TIMEDELTA | ZonedDateTime | Instant
 HINT_NAME_OR_NR: TypeAlias = int | str | Iterable[int | str]
-HINT_DATE: TypeAlias = dt_date | dt_datetime | str | None | Date | SystemDateTime | Instant
+HINT_DATE: TypeAlias = dt_date | dt_datetime | str | None | Date | ZonedDateTime | Instant
 
 
 def get_timedelta(value: HINT_TIMEDELTA) -> TimeDelta:
@@ -30,7 +30,7 @@ def get_timedelta(value: HINT_TIMEDELTA) -> TimeDelta:
         case int() | float():
             return TimeDelta(seconds=value)
         case str():
-            return TimeDelta.parse_common_iso(value)
+            return TimeDelta.parse_iso(value)
         case _:
             raise TypeError()
 
@@ -49,7 +49,7 @@ def get_time(value: HINT_TIME) -> Time:
         case dt_time():
             return Time.from_py_time(value)
         case str():
-            return Time.parse_common_iso(value)
+            return Time.parse_iso(value)
         case _:
             raise TypeError()
 
@@ -63,15 +63,13 @@ def get_pydate(value: HINT_DATE) -> dt_date:  # noqa: PLR0911
             return value
 
         case None:
-            return SystemDateTime.now().date().py_date()
+            return ZonedDateTime.now_in_system_tz().date().py_date()
         case str():
-            return Date.parse_common_iso(value).py_date()
+            return Date.parse_iso(value).py_date()
 
         case Date():
             return value.py_date()
-        case SystemDateTime():
-            return value.date().py_date()
-        case Instant():
+        case ZonedDateTime() | Instant():
             return value.to_system_tz().date().py_date()
 
         case _:
@@ -91,11 +89,13 @@ def get_instant(value: HINT_INSTANT) -> Instant:
         case None:
             return Instant.now()
         case dt_datetime():
-            if value.tzinfo is not None:
-                return SystemDateTime.from_py_datetime(value).to_instant()
-            # We assume it's the system datetime because that's what datetime is normally used for
-            return PlainDateTime.from_py_datetime(value).assume_system_tz().to_instant()
-        case SystemDateTime():
+            if value.tzinfo is None:
+                # We assume it's the system datetime because that's what datetime is normally used for
+                return PlainDateTime.from_py_datetime(value).assume_system_tz().to_instant()
+
+            return Instant.from_py_datetime(value)
+
+        case ZonedDateTime():
             return value.to_instant()
         case Instant():
             return value
@@ -116,7 +116,7 @@ def get_instant(value: HINT_INSTANT) -> Instant:
     except (ValueError, TypeError):
         pass
     else:
-        now = SystemDateTime.now()
+        now = ZonedDateTime.now_in_system_tz()
         new = now.replace_time(time, disambiguate='raise')
         if new < now:
             new = new.add(hours=24)

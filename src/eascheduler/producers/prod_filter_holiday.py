@@ -14,7 +14,7 @@ if TYPE_CHECKING:
     from collections.abc import Iterable
     from datetime import date as dt_date
 
-    from whenever import SystemDateTime
+    from whenever import ZonedDateTime
 
 
 class HolidayProducerFilterBase(ProducerFilterBase):
@@ -31,20 +31,20 @@ class HolidayProducerFilterBase(ProducerFilterBase):
 
 class HolidayProducerFilter(HolidayProducerFilterBase):
     @override
-    def allow(self, dt: SystemDateTime) -> bool:
+    def allow(self, dt: ZonedDateTime) -> bool:
         return dt.date().py_date() in self._holidays
 
 
 class NotWorkDayProducerFilter(HolidayProducerFilterBase):
     @override
-    def allow(self, dt: SystemDateTime) -> bool:
+    def allow(self, dt: ZonedDateTime) -> bool:
         return not self._holidays.is_working_day(dt.date().py_date())
 
 
 class WorkDayProducerFilter(HolidayProducerFilterBase):
 
     @override
-    def allow(self, dt: SystemDateTime) -> bool:
+    def allow(self, dt: ZonedDateTime) -> bool:
         return self._holidays.is_working_day(dt.date().py_date())
 
 

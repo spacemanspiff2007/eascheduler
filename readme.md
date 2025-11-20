@@ -100,6 +100,11 @@ scheduler.at(
 ````
 
 ## Changelog
+#### 0.2.8 (2025-08-19)
+- Updated whenever to 0.9 which introduces breaking changes:
+  - Removed SystemDateTime and replaced it with ZonedDateTime
+- Updated dependencies and CI
+
 #### 0.2.7 (2025-08-19)
 - Updated dependencies
 

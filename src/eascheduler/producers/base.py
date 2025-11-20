@@ -10,7 +10,7 @@ from eascheduler.errors import InfiniteLoopDetectedError
 if TYPE_CHECKING:
     from collections.abc import Generator
 
-    from whenever import Instant, SystemDateTime
+    from whenever import Instant, ZonedDateTime
 
 
 class CompareEqualityBySlotValues:
@@ -26,7 +26,7 @@ class CompareEqualityBySlotValues:
 class ProducerFilterBase(CompareEqualityBySlotValues):
     __slots__ = ()
 
-    def allow(self, dt: SystemDateTime) -> bool:
+    def allow(self, dt: ZonedDateTime) -> bool:
         raise NotImplementedError()
 
     def copy(self) -> Self:

@@ -10,7 +10,7 @@ from eascheduler.producers.base import ProducerFilterBase
 if TYPE_CHECKING:
     from collections.abc import Iterable
 
-    from whenever import SystemDateTime, Time
+    from whenever import Time, ZonedDateTime
 
 
 class ProducerFilterGroupBase(ProducerFilterBase):
@@ -30,13 +30,13 @@ class ProducerFilterGroupBase(ProducerFilterBase):
 
 class AnyGroupProducerFilter(ProducerFilterGroupBase):
     @override
-    def allow(self, dt: SystemDateTime) -> bool:
+    def allow(self, dt: ZonedDateTime) -> bool:
         return any(f.allow(dt) for f in self._filters)
 
 
 class AllGroupProducerFilter(ProducerFilterGroupBase):
     @override
-    def allow(self, dt: SystemDateTime) -> bool:
+    def allow(self, dt: ZonedDateTime) -> bool:
         return all(f.allow(dt) for f in self._filters)
 
 
@@ -52,7 +52,7 @@ class InvertingProducerFilter(ProducerFilterBase):
         return self.__class__(self._filter.copy())
 
     @override
-    def allow(self, dt: SystemDateTime) -> bool:
+    def allow(self, dt: ZonedDateTime) -> bool:
         return not self._filter.allow(dt)
 
 
@@ -69,7 +69,7 @@ class TimeProducerFilter(ProducerFilterBase):
         return self.__class__(self._lower, self._upper)
 
     @override
-    def allow(self, dt: SystemDateTime) -> bool:
+    def allow(self, dt: ZonedDateTime) -> bool:
 
         time = dt.time()
         if (lower := self._lower) is not None and time < lower:
@@ -93,7 +93,7 @@ class DayOfWeekProducerFilter(ProducerFilterBase):
         return self.__class__(self._weekdays)
 
     @override
-    def allow(self, dt: SystemDateTime) -> bool:
+    def allow(self, dt: ZonedDateTime) -> bool:
         return dt.py_datetime().isoweekday() in self._weekdays
 
 
@@ -109,7 +109,7 @@ class DayOfMonthProducerFilter(ProducerFilterBase):
         return self.__class__(self._days)
 
     @override
-    def allow(self, dt: SystemDateTime) -> bool:
+    def allow(self, dt: ZonedDateTime) -> bool:
         return dt.day in self._days
 
 
@@ -124,5 +124,5 @@ class MonthOfYearProducerFilter(ProducerFilterBase):
         return self.__class__(self._months)
 
     @override
-    def allow(self, dt: SystemDateTime) -> bool:
+    def allow(self, dt: ZonedDateTime) -> bool:
         return dt.month in self._months
