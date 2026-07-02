@@ -3,4 +3,4 @@ whenever == 0.9.3
 astral   == 3.2
 holidays == 0.85
 
-typing_extensions
+typing_extensions==4.16.0
