@@ -1,5 +1,7 @@
 import asyncio
 
+from whenever import TimeDelta
+
 from eascheduler.executor.base import SyncExecutor
 from eascheduler.jobs.base import STATUS_PAUSED, STATUS_RUNNING
 from eascheduler.jobs.job_countdown import CountdownJob
@@ -11,7 +13,7 @@ async def test_countdown() -> None:
     calls = CountDownHelper()
 
     s = AsyncScheduler()
-    job = calls.link_job(CountdownJob(SyncExecutor(calls), 0.3))
+    job = calls.link_job(CountdownJob(SyncExecutor(calls), TimeDelta(seconds=0.3)))
     job.link_scheduler(s)
 
     calls.reset()
@@ -32,7 +34,7 @@ async def test_stop() -> None:
     calls = CountDownHelper()
 
     s = AsyncScheduler()
-    job = calls.link_job(CountdownJob(SyncExecutor(calls), 0.1))
+    job = calls.link_job(CountdownJob(SyncExecutor(calls), TimeDelta(seconds=0.1)))
     job.link_scheduler(s)
 
     job.reset()

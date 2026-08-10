@@ -1,3 +1,5 @@
+from whenever import TimeDelta
+
 from eascheduler.producers.prod_filter import DayOfWeekProducerFilter
 from eascheduler.producers.prod_group import GroupProducer
 from eascheduler.producers.prod_interval import IntervalProducer
@@ -6,8 +8,8 @@ from tests.helper import compare_with_copy, get_system_as_instant
 
 def test_simple() -> None:
 
-    p1 = IntervalProducer(get_system_as_instant(1, 1, 8), 3600 * 5)   # 8, 13, 18, 23
-    p2 = IntervalProducer(get_system_as_instant(1, 1, 8), 3600 * 3)   # 8, 11, 14, 17
+    p1 = IntervalProducer(get_system_as_instant(1, 1, 8), TimeDelta(seconds=3600 * 5))   # 8, 13, 18, 23
+    p2 = IntervalProducer(get_system_as_instant(1, 1, 8), TimeDelta(seconds=3600 * 3))   # 8, 11, 14, 17
 
     p = GroupProducer([p1, p2])
 
@@ -25,8 +27,8 @@ def test_simple() -> None:
 
 
 def test_filter() -> None:
-    p1 = IntervalProducer(get_system_as_instant(1, 1, 8), 3600 * 5)   # 8, 13, 18, 23, 4, 9
-    p2 = IntervalProducer(get_system_as_instant(1, 1, 8), 3600 * 3)   # 8, 11, 14, 17, 20, 23, 2, 5
+    p1 = IntervalProducer(get_system_as_instant(1, 1, 8), TimeDelta(seconds=3600 * 5))   # 8, 13, 18, 23, 4, 9
+    p2 = IntervalProducer(get_system_as_instant(1, 1, 8), TimeDelta(seconds=3600 * 3))   # 8, 11, 14, 17, 20, 23, 2, 5
 
     p = GroupProducer([p1, p2])
     p._filter = DayOfWeekProducerFilter([2])

@@ -14,7 +14,7 @@ from eascheduler.builder.helper import (
     HINT_TIMEDELTA,
     BuilderTypeValidator,
     get_instant,
-    get_pos_timedelta_secs,
+    get_pos_timedelta,
     get_time_replacer,
     get_timedelta,
 )
@@ -52,7 +52,7 @@ class TriggerObject:
         :param offset: The offset (positive or negative)
         """
         return self.__class__(
-            OffsetProducerOperation(_get_producer(self), get_timedelta(offset).in_seconds())
+            OffsetProducerOperation(_get_producer(self), get_timedelta(offset).total('seconds'))
         )
 
     def earliest(self, earliest: HINT_TIME, *,
@@ -96,7 +96,7 @@ class TriggerObject:
         return self.__class__(
             JitterProducerOperation(
                 _get_producer(self),
-                get_timedelta(low).in_seconds(), get_timedelta(high).in_seconds() if high is not None else None
+                get_timedelta(low).total('seconds'), get_timedelta(high).total('seconds') if high is not None else None
             )
         )
 
@@ -181,7 +181,7 @@ class TriggerBuilder:
         :param interval: The interval how this trigger will be repeated
         """
         return TriggerObject(
-            IntervalProducer(get_instant(start) if start is not None else None, get_pos_timedelta_secs(interval))
+            IntervalProducer(get_instant(start) if start is not None else None, get_pos_timedelta(interval))
         )
 
     @staticmethod

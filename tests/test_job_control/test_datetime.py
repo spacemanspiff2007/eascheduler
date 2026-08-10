@@ -1,4 +1,4 @@
-from whenever import Instant, ZonedDateTime
+from whenever import Instant, TimeDelta, ZonedDateTime
 
 from eascheduler.executor.base import SyncExecutor
 from eascheduler.job_control import DateTimeJobControl
@@ -11,8 +11,8 @@ from tests.helper import AlwaysError
 
 async def test_eq() -> None:
     now = ZonedDateTime.now_in_system_tz().replace(nanosecond=0, disambiguate='raise').to_instant()
-    job1 = DateTimeJob(SyncExecutor(AlwaysError()), IntervalProducer(now, 1))
-    job2 = DateTimeJob(SyncExecutor(AlwaysError()), IntervalProducer(now, 1))
+    job1 = DateTimeJob(SyncExecutor(AlwaysError()), IntervalProducer(now, TimeDelta(seconds=1)))
+    job2 = DateTimeJob(SyncExecutor(AlwaysError()), IntervalProducer(now, TimeDelta(seconds=1)))
 
     assert DateTimeJobControl(job1) == DateTimeJobControl(job1)
     assert DateTimeJobControl(job1) != DateTimeJobControl(job2)
@@ -21,7 +21,7 @@ async def test_eq() -> None:
 async def test_datetime() -> None:
 
     s = AsyncScheduler()
-    job = DateTimeJob(SyncExecutor(AlwaysError()), IntervalProducer(Instant.now(), 1))
+    job = DateTimeJob(SyncExecutor(AlwaysError()), IntervalProducer(Instant.now(), TimeDelta(seconds=1)))
     job.link_scheduler(s)
 
     ctrl = DateTimeJobControl(job)

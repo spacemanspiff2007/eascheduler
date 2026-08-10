@@ -1,6 +1,6 @@
 from eascheduler.builder import FilterBuilder, JobBuilder, TriggerBuilder
 from eascheduler.executor import AsyncExecutor
-from eascheduler.schedulers.async_scheduler import AsyncScheduler
+from eascheduler.schedulers import AsyncScheduler
 
 
 class DefaultJobBuilder(JobBuilder):

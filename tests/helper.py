@@ -58,13 +58,13 @@ class CountDownHelper:
             job = job._job
 
         for value in self._calls:
-            assert_called_at(value, job._seconds)
+            assert_called_at(value, job._delta)
         return self
 
 
 def _fmt_diff(value: TimeDelta | float) -> str:
     if isinstance(value, TimeDelta):
-        value = value.in_seconds()
+        value = value.total('seconds')
     if abs(value) > 0.02:
         return f'{value:.3f}s'
     value *= 1000
@@ -79,6 +79,11 @@ def assert_called_at(value, target) -> bool:
     if isinstance(value, (list, tuple)):
         assert len(value) == 1
         value = value[0]
+
+    if isinstance(value, TimeDelta):
+        value = value.total('seconds')
+    if isinstance(target, TimeDelta):
+        target = target.total('seconds')
 
     if isinstance(value, float) and isinstance(target, float):
         target_lower = target - offset_lower

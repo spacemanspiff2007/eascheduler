@@ -59,7 +59,7 @@ def get_params() -> Generator[ParameterSet, None, None]:
         id='Elevation-15',
     )
     yield pytest.param(
-        SunAzimuthProducerCompare(269.73), get_german_as_instant(5, 15, 1, year=2024), '2024-05-15T18:00:00+02:00',
+        SunAzimuthProducerCompare(269.73), get_german_as_instant(5, 15, 1, year=2024), '2024-05-15T17:59:59+02:00',
         id='Azimuth-15-high',
     )
     yield pytest.param(
@@ -75,6 +75,30 @@ def test_sun(producer: SunProducer, dt: Instant, result: str) -> None:
 
     # Test copy
     compare_with_copy(producer, producer.copy())
+
+
+def test_azimut_boundaries() -> None:
+    producer = SunAzimuthProducerCompare(0)
+    assert get_ger_str(producer.get_next(get_german_as_instant(5, 14, 23, year=2024))) == '2024-05-15T01:02:53+02:00'
+
+    producer = SunAzimuthProducerCompare(360 - 0.001)
+    assert get_ger_str(producer.get_next(get_german_as_instant(5, 14, 23, year=2024))) == '2024-05-15T01:02:53+02:00'
+
+
+def test_azimut_sweep() -> None:
+    producer = SunAzimuthProducerCompare(154)
+
+    targets: list[str] = ['2024-05-15T12:00:09+02:00', '2024-05-16T12:00:28+02:00', '2024-05-17T12:00:48+02:00']
+
+    dt_start = get_german_as_instant(5, 15, 11, year=2024)
+    dt_end = get_german_as_instant(5, 17, 12, 0, 27, year=2024)
+    dt = dt_start
+    while dt < dt_end:
+        dt = dt.add(seconds=1)
+        result = get_ger_str(producer.get_next(dt))
+        if result != targets[0] and len(targets) > 1:
+            targets.pop(0)
+        assert result == targets[0]
 
 
 def test_no_sun_pos() -> None:
@@ -130,7 +154,7 @@ def test_sun_pos_calc() -> None:
     assert get_azimuth_and_elevation(i) == result
 
     # User facing function
-    assert get_sun_position(i.py_datetime()) == result
+    assert get_sun_position(i.to_stdlib()) == result
 
 
 def test_sun_cache_hits() -> None:

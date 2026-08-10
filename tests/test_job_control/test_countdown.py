@@ -1,5 +1,7 @@
 import asyncio
 
+from whenever import TimeDelta
+
 from eascheduler.executor.base import SyncExecutor
 from eascheduler.job_control import CountdownJobControl
 from eascheduler.jobs.base import STATUS_PAUSED, STATUS_RUNNING
@@ -9,8 +11,8 @@ from tests.helper import AlwaysError, CountDownHelper
 
 
 async def test_eq() -> None:
-    job1 = CountdownJob(SyncExecutor(AlwaysError()), 1)
-    job2 = CountdownJob(SyncExecutor(AlwaysError()), 1)
+    job1 = CountdownJob(SyncExecutor(AlwaysError()), TimeDelta(seconds=1))
+    job2 = CountdownJob(SyncExecutor(AlwaysError()), TimeDelta(seconds=1))
 
     assert CountdownJobControl(job1) == CountdownJobControl(job1)
     assert CountdownJobControl(job1) != CountdownJobControl(job2)
@@ -20,11 +22,11 @@ async def test_countdown() -> None:
     calls = CountDownHelper()
 
     s = AsyncScheduler()
-    job = CountdownJob(SyncExecutor(calls), 1)
+    job = CountdownJob(SyncExecutor(calls), TimeDelta(seconds=1))
     job.link_scheduler(s)
 
     ctrl = calls.link_job(CountdownJobControl(job))
-    ctrl.set_countdown(0.3)
+    ctrl.set_countdown(TimeDelta(seconds=0.3))
 
     calls.reset()
     assert job.status is STATUS_RUNNING
@@ -44,11 +46,11 @@ async def test_stop() -> None:
     calls = CountDownHelper()
 
     s = AsyncScheduler()
-    job = CountdownJob(SyncExecutor(calls), 1)
+    job = CountdownJob(SyncExecutor(calls), TimeDelta(seconds=1))
     job.link_scheduler(s)
 
     ctrl = calls.link_job(CountdownJobControl(job))
-    ctrl.set_countdown(0.1)
+    ctrl.set_countdown(TimeDelta(seconds=0.1))
 
     ctrl.reset()
     for _ in range(10):

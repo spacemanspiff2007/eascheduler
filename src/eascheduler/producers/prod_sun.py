@@ -91,7 +91,7 @@ class SunProducer(DateTimeProducerBase):
         tries = 366
         for i in range(tries + 1):
             try:
-                next_sun = self.func(observer, dt.to_tz('UTC').date().py_date())
+                next_sun = self.func(observer, dt.to_tz('UTC').date().to_stdlib())
             except ValueError:  # noqa: PERF203
                 dt = dt.add(hours=24)
                 if i >= tries:
@@ -103,9 +103,9 @@ class SunProducer(DateTimeProducerBase):
 
         # round to next full second if necessary
         if next_sun.microsecond:
-            instant = Instant.from_py_datetime(next_sun.replace(microsecond=0)).add(seconds=1)
+            instant = Instant(next_sun.replace(microsecond=0)).add(seconds=1)
         else:
-            instant = Instant.from_py_datetime(next_sun)
+            instant = Instant(next_sun)
 
         # limit cache size
         if len(sun_cache) >= 64:
@@ -211,34 +211,57 @@ class SunAzimuthProducerCompare(SunProducer, SunFuncIgnoringCompare):
         return self.__class__, self.azimuth
 
     def _sun_func(self, observer: Observer, date: dt_date) -> datetime:
-        # I'm not smart enough to implement the azimuth calculation myself,
-        # so I'm using this hack to get the time of day when the azimuth is the closest to the target
-
-        sec_per_az = 86400 / 360
         az_target = self.azimuth
 
-        dt = dt_datetime(date.year, date.month, date.day, 12, 0, 0, tzinfo=dt_timezone.utc)
+        start = dt_datetime(date.year, date.month, date.day, 0, 0, 0, tzinfo=dt_timezone.utc)
 
-        while not_infinite_loop():
-            az = sun.azimuth(observer, dt)
-            az_diff = abs(az_target - az)
-            sign = 1 if az_target > az else -1
+        # Step 1: Find a bracket by sampling every 10 minutes
+        step = dt_timedelta(minutes=10)
+        t0 = start
+        az0 = sun.azimuth(observer, t0)
+        bracket = None
 
-            if az_diff < 0.01 and sign == -1:
+        for _ in range(144):  # 24h / 10min = 144 steps
+            t1 = t0 + step
+            az1 = sun.azimuth(observer, t1)
+
+            # Handle azimuth crossing the target (accounting for 360° wrap)
+            diff0 = (az_target - az0 + 360) % 360
+            diff1 = (az_target - az1 + 360) % 360
+
+            # Target is between t0 and t1 if azimuth crossed it
+            if diff0 <= 180 and diff1 > 180:
+                bracket = (t0, t1)
                 break
 
-            secs_diff = round(az_diff * sec_per_az)
-            if not secs_diff:
-                secs_diff = 1
-            dt = dt + dt_timedelta(seconds=sign * secs_diff)
+            t0, az0 = t1, az1
 
-        return dt
+        if bracket is None:
+            msg = f'Could not find azimuth {az_target}° on {date}'
+            raise ValueError(msg)
+
+        # Step 2: Bisect to converge
+        lo, hi = bracket
+        for _ in range(50):  # 50 iterations → sub-microsecond precision
+            mid = lo + (hi - lo) / 2
+            az_mid = sun.azimuth(observer, mid)
+            diff = (az_target - az_mid + 360) % 360
+
+            if diff <= 180:
+                lo = mid
+            else:
+                hi = mid
+
+            if (hi - lo).total_seconds() < 0.5:
+                break
+
+        return lo + (hi - lo) / 2
 
 
 def get_azimuth_and_elevation(instant: Instant) -> tuple[float, float]:
     if (observer := OBSERVER) is None:
         raise LocationNotSetError()
 
-    zenith, azimuth = sun.zenith_and_azimuth(observer, instant.to_tz('UTC').py_datetime())
+    zenith, azimuth = sun.zenith_and_azimuth(observer, instant.to_tz('UTC').to_stdlib())
 
     return round(azimuth, 2), round(90 - zenith, 2)

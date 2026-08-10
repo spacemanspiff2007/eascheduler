@@ -1,6 +1,6 @@
 import pytest
 from tzlocal import get_localzone_name
-from whenever import Time
+from whenever import Time, TimeDelta
 
 from eascheduler.helpers import TimeReplacer
 from eascheduler.helpers.time_replace import (
@@ -31,7 +31,7 @@ pytestmark = pytest.mark.skipif(
 )
 def test_earliest_forward(param: HINT_SKIPPED, target: list[str]) -> None:
     o = EarliestProducerOperation(
-        IntervalProducer(get_system_as_instant(3, 24, hour=0), 3600),
+        IntervalProducer(get_system_as_instant(3, 24, hour=0), TimeDelta(seconds=3600)),
         TimeReplacer(Time(2, 30, 0), param, 'skip')
     )
 
@@ -59,7 +59,7 @@ def test_earliest_forward(param: HINT_SKIPPED, target: list[str]) -> None:
 )
 def test_earliest_backwards(param: HINT_REPEATED, target: list[str]) -> None:
     o = EarliestProducerOperation(
-        IntervalProducer(get_system_as_instant(10, 27, 0), 3600),
+        IntervalProducer(get_system_as_instant(10, 27, 0), TimeDelta(seconds=3600)),
         TimeReplacer(Time(2, 30, 0), 'skip', param)
     )
     # one hour jump backwards
@@ -88,7 +88,7 @@ def test_earliest_backwards(param: HINT_REPEATED, target: list[str]) -> None:
 )
 def test_latest_forward(param: HINT_SKIPPED, target: list[str]) -> None:
     o = LatestProducerOperation(
-        IntervalProducer(get_system_as_instant(3, 24, hour=0), 3600),
+        IntervalProducer(get_system_as_instant(3, 24, hour=0), TimeDelta(seconds=3600)),
         TimeReplacer(Time(2, 30, 0), param, 'skip')
     )
 
@@ -117,7 +117,7 @@ def test_latest_forward(param: HINT_SKIPPED, target: list[str]) -> None:
 )
 def test_latest_backwards(param: HINT_REPEATED, target: list[str]) -> None:
     o = LatestProducerOperation(
-        IntervalProducer(get_system_as_instant(3, 24, 0), 3600),
+        IntervalProducer(get_system_as_instant(3, 24, 0), TimeDelta(seconds=3600)),
         TimeReplacer(Time(2, 30, 0), 'skip', param)
     )
 

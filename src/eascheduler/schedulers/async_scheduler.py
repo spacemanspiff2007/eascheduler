@@ -80,7 +80,7 @@ class AsyncScheduler(SchedulerBase):
         if (next_run := jobs[0].next_run) is None:
             raise JobExecutionTimeIsNotSetError()
 
-        diff = (next_run - Instant.now()).in_seconds()
+        diff = (next_run - Instant.now()).total('seconds')
         if diff <= 0:
             self.run_jobs()
         else:

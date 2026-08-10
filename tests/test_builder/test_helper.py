@@ -15,7 +15,7 @@ from eascheduler.builder.helper import (
     get_days,
     get_instant,
     get_months,
-    get_pos_timedelta_secs,
+    get_pos_timedelta,
     get_pydate,
     get_time,
     get_timedelta,
@@ -30,9 +30,9 @@ def test_get_timedelta() -> None:
     assert get_timedelta(3) == TimeDelta(seconds=3)
     assert get_timedelta('PT1H30M') == TimeDelta(hours=1, minutes=30)
 
-    assert get_pos_timedelta_secs(dt_timedelta(seconds=3.5)) == 3.5
+    assert get_pos_timedelta(dt_timedelta(seconds=3.5)) == TimeDelta(seconds=3.5)
     with pytest.raises(ValueError):  # noqa: PT011
-        get_pos_timedelta_secs(dt_timedelta(seconds=-3.5))
+        get_pos_timedelta(dt_timedelta(seconds=-3.5))
 
 
 def test_get_time() -> None:
@@ -65,7 +65,7 @@ def test_get_instant() -> None:
 
     # datetime test
     d = ZonedDateTime.from_system_tz(2001, 1, 1, 12, 30).add(seconds=0.5).to_instant()
-    dt_with_tz_utc = d.py_datetime()
+    dt_with_tz_utc = d.to_stdlib()
     assert get_instant(dt_with_tz_utc) == d
     assert get_instant(dt_datetime(2001, 1, 1, 12, 30, 0, 500_000)) == d
 

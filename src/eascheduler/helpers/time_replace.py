@@ -39,7 +39,7 @@ def find_time_after_dst_switch(dt: ZonedDateTime | Date, time: Time) -> ZonedDat
 
     # dst is typically 1 hour, but who knows
     for _ in range(121):
-        t = t.add(minutes=1, ignore_dst=True)
+        t = t.add(minutes=1, naive_arithmetic_ok=True)
 
         try:
             return ZonedDateTime.from_system_tz(dt.year, dt.month, dt.day, t.hour, t.minute, disambiguate='raise')

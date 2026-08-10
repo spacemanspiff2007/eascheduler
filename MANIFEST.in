@@ -1,3 +1,2 @@
 include LICENSE
-include requirements_setup.txt
 include src/eascheduler/py.typed

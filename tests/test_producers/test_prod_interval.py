@@ -1,22 +1,24 @@
+from whenever import TimeDelta
+
 from eascheduler.producers.prod_filter import DayOfWeekProducerFilter
 from eascheduler.producers.prod_interval import IntervalProducer
 from tests.helper import compare_with_copy, get_ger_str, get_german_as_instant, get_system_as_instant
 
 
 def test_first() -> None:
-    p = IntervalProducer(get_system_as_instant(1, 1, 8), 5)
+    p = IntervalProducer(get_system_as_instant(1, 1, 8), TimeDelta(seconds=5))
     assert p.get_next(get_system_as_instant(1, 1, 8, second=3)) == get_system_as_instant(1, 1, 8, second=5)
 
-    p = IntervalProducer(get_system_as_instant(1, 1, 8), 5)
+    p = IntervalProducer(get_system_as_instant(1, 1, 8), TimeDelta(seconds=5))
     assert p.get_next(get_system_as_instant(1, 1, 8, second=5)) == get_system_as_instant(1, 1, 8, second=10)
 
-    p = IntervalProducer(None, 5)
+    p = IntervalProducer(None, TimeDelta(seconds=5))
     assert p.get_next(get_system_as_instant(1, 1, 8)) == get_system_as_instant(1, 1, 8, microsecond=1)
 
 
 def test_simple() -> None:
     dt_now = get_system_as_instant(1, 1, 0)
-    p = IntervalProducer(get_system_as_instant(1, 1, 8), 3600 * 5)
+    p = IntervalProducer(get_system_as_instant(1, 1, 8), TimeDelta(seconds=3600 * 5))
 
     for v in range(3, 100, 5):
         days = v // 24
@@ -27,7 +29,7 @@ def test_simple() -> None:
 
 
 def test_filter() -> None:
-    producer = IntervalProducer(get_system_as_instant(1, 1, 8), 3600 * 12)
+    producer = IntervalProducer(get_system_as_instant(1, 1, 8), TimeDelta(seconds=3600 * 12))
 
     for _ in range(10):
         assert producer.get_next(get_system_as_instant(1, 1, 7)) == get_system_as_instant(1, 1, 8)
@@ -44,7 +46,7 @@ def test_filter() -> None:
 def test_dst() -> None:
     # one hour jump forward
     start = get_german_as_instant(3, 25, 0, 30)
-    producer = IntervalProducer(start, 3600)
+    producer = IntervalProducer(start, TimeDelta(seconds=3600))
 
     for _ in range(10):
         dst_1 = producer.get_next(start)
@@ -58,7 +60,7 @@ def test_dst() -> None:
 
     # one hour jump backwards
     start = get_german_as_instant(10, 28, 1, 30)
-    producer = IntervalProducer(start, 3600)
+    producer = IntervalProducer(start, TimeDelta(seconds=3600))
 
     for _ in range(10):
         dst_1 = producer.get_next(start)
@@ -72,12 +74,12 @@ def test_dst() -> None:
 
 def test_cmp() -> None:
     start = get_german_as_instant(3, 25, 0, 30)
-    producer = IntervalProducer(start, 3600)
-    assert producer == IntervalProducer(start, 3600)
+    producer = IntervalProducer(start, TimeDelta(seconds=3600))
+    assert producer == IntervalProducer(start, TimeDelta(seconds=3600))
 
 
 def test_copy() -> None:
-    p = IntervalProducer(None, 3600)
+    p = IntervalProducer(None, TimeDelta(seconds=3600))
     compare_with_copy(p, p.copy())
 
     p._filter = DayOfWeekProducerFilter([6])

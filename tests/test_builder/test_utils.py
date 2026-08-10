@@ -19,13 +19,13 @@ def test_is_holiday() -> None:
 
 
 def test_pop_holiday() -> None:
-    assert pop_holiday('2024-03-08') == 'Internationaler Frauentag'
+    assert pop_holiday('2024-03-08') == 'Frauentag'
     assert pop_holiday('2024-03-08') is None
 
 
 def test_get_holiday_name() -> None:
-    assert get_holiday_name('2024-03-08') == 'Internationaler Frauentag'
-    assert get_holiday_name('2024-03-08') == 'Internationaler Frauentag'
+    assert get_holiday_name('2024-03-08') == 'Frauentag'
+    assert get_holiday_name('2024-03-08') == 'Frauentag'
 
 
 def test_add_and_get_by_name() -> None:
