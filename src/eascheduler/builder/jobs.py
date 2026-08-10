@@ -37,7 +37,7 @@ class JobBuilder:
         :return: Created job
         """
         job = CountdownJob(
-            self._executor(coro_func, args, kwargs), get_pos_timedelta(secs).total('seconds'), job_id=job_id)
+            self._executor(coro_func, args, kwargs), get_pos_timedelta(secs), job_id=job_id)
         job.link_scheduler(self._scheduler)
         if self._job_store is not None:
             self._job_store.add_job(job)

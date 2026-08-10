@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Final
 
 from typing_extensions import Self, override
-from whenever import Instant
+from whenever import Instant, TimeDelta
 
 from eascheduler.errors.errors import JobNotLinkedToSchedulerError
 from eascheduler.jobs.base import IdType, JobBase
@@ -14,27 +14,32 @@ if TYPE_CHECKING:
 
 
 class CountdownJob(JobBase):
-    def __init__(self, executor: ExecutorBase, secs: float, *, job_id: IdType | None = None) -> None:
+    def __init__(self, executor: ExecutorBase, delta: TimeDelta, *, job_id: IdType | None = None) -> None:
         super().__init__(executor, job_id=job_id)
-        self._seconds: float = 0
-        self.set_countdown(secs)    # Validate and set the countdown
+        self._delta: TimeDelta = TimeDelta.ZERO
+        self.set_countdown(delta)    # Validate and set the countdown
 
     @override
     def update_next(self) -> None:
         self.set_next_run(None)
 
-    def set_countdown(self, secs: float) -> None:
-        if not isinstance(secs, (int, float)):
+    def set_countdown(self, secs: TimeDelta | float) -> None:
+        if not isinstance(secs, TimeDelta):
+            delta: Final = TimeDelta(seconds=secs)
+        else:
+            delta: Final = secs
+
+        if not isinstance(delta, TimeDelta):
             raise TypeError()
-        if secs <= 0:
+        if delta <= TimeDelta.ZERO:
             raise ValueError()
-        self._seconds = secs
+        self._delta = delta
 
     def reset(self) -> None:
         if (scheduler := self._scheduler) is None:
             raise JobNotLinkedToSchedulerError()
 
-        self.set_next_run(Instant.now().add(seconds=self._seconds))
+        self.set_next_run(Instant.now() + self._delta)
         scheduler.update_job(self)
 
     @override

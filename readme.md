@@ -100,6 +100,13 @@ scheduler.at(
 ````
 
 ## Changelog
+#### 0.2.9 (2026-08-10)
+- License Change to EUPL-1.2
+- Migrated to pyproject.toml
+- Fixed a bug with sun azimuth
+- Small code improvements
+- Updated dependencies
+
 #### 0.2.8 (2025-08-19)
 - Updated whenever to 0.9 which introduces breaking changes:
   - Removed SystemDateTime and replaced it with ZonedDateTime
