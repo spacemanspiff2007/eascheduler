@@ -32,20 +32,20 @@ class HolidayProducerFilterBase(ProducerFilterBase):
 class HolidayProducerFilter(HolidayProducerFilterBase):
     @override
     def allow(self, dt: ZonedDateTime) -> bool:
-        return dt.date().py_date() in self._holidays
+        return dt.date().to_stdlib() in self._holidays
 
 
 class NotWorkDayProducerFilter(HolidayProducerFilterBase):
     @override
     def allow(self, dt: ZonedDateTime) -> bool:
-        return not self._holidays.is_working_day(dt.date().py_date())
+        return not self._holidays.is_working_day(dt.date().to_stdlib())
 
 
 class WorkDayProducerFilter(HolidayProducerFilterBase):
 
     @override
     def allow(self, dt: ZonedDateTime) -> bool:
-        return self._holidays.is_working_day(dt.date().py_date())
+        return self._holidays.is_working_day(dt.date().to_stdlib())
 
 
 def _get_holiday_obj(holidays: _HolidayBase | None = None) -> _HolidayBase:

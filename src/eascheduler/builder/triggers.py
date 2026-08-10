@@ -52,7 +52,7 @@ class TriggerObject:
         :param offset: The offset (positive or negative)
         """
         return self.__class__(
-            OffsetProducerOperation(_get_producer(self), get_timedelta(offset).in_seconds())
+            OffsetProducerOperation(_get_producer(self), get_timedelta(offset).total('seconds'))
         )
 
     def earliest(self, earliest: HINT_TIME, *,
@@ -96,7 +96,7 @@ class TriggerObject:
         return self.__class__(
             JitterProducerOperation(
                 _get_producer(self),
-                get_timedelta(low).in_seconds(), get_timedelta(high).in_seconds() if high is not None else None
+                get_timedelta(low).total('seconds'), get_timedelta(high).total('seconds') if high is not None else None
             )
         )
 

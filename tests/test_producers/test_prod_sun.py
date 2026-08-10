@@ -154,7 +154,7 @@ def test_sun_pos_calc() -> None:
     assert get_azimuth_and_elevation(i) == result
 
     # User facing function
-    assert get_sun_position(i.py_datetime()) == result
+    assert get_sun_position(i.to_stdlib()) == result
 
 
 def test_sun_cache_hits() -> None:

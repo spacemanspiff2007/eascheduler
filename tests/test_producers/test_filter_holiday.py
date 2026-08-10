@@ -49,7 +49,7 @@ def test_is_holiday() -> None:
 
 
 def test_holiday_remove() -> None:
-    assert pop_holiday(dt_date(2024, 3, 8)) == 'Internationaler Frauentag'
+    assert pop_holiday(dt_date(2024, 3, 8)) == 'Frauentag'
     assert pop_holiday(dt_date(2024, 3, 9)) is None
 
 

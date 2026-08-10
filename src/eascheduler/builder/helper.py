@@ -24,7 +24,7 @@ HINT_DATE: TypeAlias = dt_date | dt_datetime | str | None | Date | ZonedDateTime
 def get_timedelta(value: HINT_TIMEDELTA) -> TimeDelta:
     match value:
         case dt_timedelta():
-            return TimeDelta.from_py_timedelta(value)
+            return TimeDelta(value)
         case TimeDelta():
             return value
         case int() | float():
@@ -36,7 +36,7 @@ def get_timedelta(value: HINT_TIMEDELTA) -> TimeDelta:
 
 
 def get_pos_timedelta_secs(value: HINT_POS_TIMEDELTA) -> float:
-    if (value := get_timedelta(value).in_seconds()) <= 0:
+    if (value := get_timedelta(value).total('seconds')) <= 0:
         msg = 'Value must be positive.'
         raise ValueError(msg)
     return value
@@ -47,7 +47,7 @@ def get_time(value: HINT_TIME) -> Time:
         case Time():
             return value
         case dt_time():
-            return Time.from_py_time(value)
+            return Time(value)
         case str():
             return Time.parse_iso(value)
         case _:
@@ -63,14 +63,14 @@ def get_pydate(value: HINT_DATE) -> dt_date:  # noqa: PLR0911
             return value
 
         case None:
-            return ZonedDateTime.now_in_system_tz().date().py_date()
+            return ZonedDateTime.now_in_system_tz().date().to_stdlib()
         case str():
-            return Date.parse_iso(value).py_date()
+            return Date.parse_iso(value).to_stdlib()
 
         case Date():
-            return value.py_date()
+            return value.to_stdlib()
         case ZonedDateTime() | Instant():
-            return value.to_system_tz().date().py_date()
+            return value.to_system_tz().date().to_stdlib()
 
         case _:
             raise TypeError()
@@ -91,9 +91,9 @@ def get_instant(value: HINT_INSTANT) -> Instant:
         case dt_datetime():
             if value.tzinfo is None:
                 # We assume it's the system datetime because that's what datetime is normally used for
-                return PlainDateTime.from_py_datetime(value).assume_system_tz().to_instant()
+                return PlainDateTime(value).assume_system_tz().to_instant()
 
-            return Instant.from_py_datetime(value)
+            return Instant(value)
 
         case ZonedDateTime():
             return value.to_instant()

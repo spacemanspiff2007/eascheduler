@@ -126,7 +126,7 @@ class JitterProducerOperation(DateTimeProducerOperationBase):
             return next_dt.add(seconds=uniform(low, self.high))
 
         # Check if we can use the whole interval
-        lowest = (dt - next_dt).in_seconds()
+        lowest = (dt - next_dt).total('seconds')
         if lowest < low:
             return next_dt.add(seconds=uniform(low, self.high))
 

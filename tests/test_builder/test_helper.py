@@ -65,7 +65,7 @@ def test_get_instant() -> None:
 
     # datetime test
     d = ZonedDateTime.from_system_tz(2001, 1, 1, 12, 30).add(seconds=0.5).to_instant()
-    dt_with_tz_utc = d.py_datetime()
+    dt_with_tz_utc = d.to_stdlib()
     assert get_instant(dt_with_tz_utc) == d
     assert get_instant(dt_datetime(2001, 1, 1, 12, 30, 0, 500_000)) == d
 

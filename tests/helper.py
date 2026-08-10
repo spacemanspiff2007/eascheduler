@@ -64,7 +64,7 @@ class CountDownHelper:
 
 def _fmt_diff(value: TimeDelta | float) -> str:
     if isinstance(value, TimeDelta):
-        value = value.in_seconds()
+        value = value.total('seconds')
     if abs(value) > 0.02:
         return f'{value:.3f}s'
     value *= 1000

@@ -91,7 +91,7 @@ class SunProducer(DateTimeProducerBase):
         tries = 366
         for i in range(tries + 1):
             try:
-                next_sun = self.func(observer, dt.to_tz('UTC').date().py_date())
+                next_sun = self.func(observer, dt.to_tz('UTC').date().to_stdlib())
             except ValueError:  # noqa: PERF203
                 dt = dt.add(hours=24)
                 if i >= tries:
@@ -103,9 +103,9 @@ class SunProducer(DateTimeProducerBase):
 
         # round to next full second if necessary
         if next_sun.microsecond:
-            instant = Instant.from_py_datetime(next_sun.replace(microsecond=0)).add(seconds=1)
+            instant = Instant(next_sun.replace(microsecond=0)).add(seconds=1)
         else:
-            instant = Instant.from_py_datetime(next_sun)
+            instant = Instant(next_sun)
 
         # limit cache size
         if len(sun_cache) >= 64:
@@ -262,6 +262,6 @@ def get_azimuth_and_elevation(instant: Instant) -> tuple[float, float]:
     if (observer := OBSERVER) is None:
         raise LocationNotSetError()
 
-    zenith, azimuth = sun.zenith_and_azimuth(observer, instant.to_tz('UTC').py_datetime())
+    zenith, azimuth = sun.zenith_and_azimuth(observer, instant.to_tz('UTC').to_stdlib())
 
     return round(azimuth, 2), round(90 - zenith, 2)

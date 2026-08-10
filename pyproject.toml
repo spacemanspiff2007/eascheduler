@@ -16,9 +16,9 @@ keywords = [
 ]
 requires-python = ">=3.10"
 dependencies = [
-    "whenever==0.9.3",
+    "whenever>=0.10.5",
     "astral==3.2",
-    "holidays==0.85",
+    "holidays==0.102",
     "typing_extensions",
 ]
 license = "EUPL-1.2"

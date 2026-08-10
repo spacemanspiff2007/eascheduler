@@ -94,7 +94,7 @@ class DayOfWeekProducerFilter(ProducerFilterBase):
 
     @override
     def allow(self, dt: ZonedDateTime) -> bool:
-        return dt.py_datetime().isoweekday() in self._weekdays
+        return dt.to_stdlib().isoweekday() in self._weekdays
 
 
 class DayOfMonthProducerFilter(ProducerFilterBase):
