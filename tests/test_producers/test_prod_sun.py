@@ -77,6 +77,25 @@ def test_sun(producer: SunProducer, dt: Instant, result: str) -> None:
     compare_with_copy(producer, producer.copy())
 
 
+def test_azimut_boundaries() -> None:
+    producer = SunAzimuthProducerCompare(0)
+    assert get_ger_str(producer.get_next(get_german_as_instant(5, 14, 23, year=2024))) == '2024-05-15T01:02:53+02:00'
+
+    producer = SunAzimuthProducerCompare(360 - 0.001)
+    assert get_ger_str(producer.get_next(get_german_as_instant(5, 14, 23, year=2024))) == '2024-05-15T01:02:53+02:00'
+
+
+def test_azimut_sweep() -> None:
+    producer = SunAzimuthProducerCompare(154)
+
+    dt_start = get_german_as_instant(5, 15, 11, year=2024)
+    dt_end = get_german_as_instant(5, 16, 13, year=2024)
+    dt = dt_start
+    while dt_start < dt_end:
+        dt = dt.add(seconds=1)
+        assert get_ger_str(producer.get_next(dt)) == '2024-05-15T12:00:10+02:00'
+
+
 def test_no_sun_pos() -> None:
     # http://suncalc.net/#/69.6529,18.9565,10/2024.05.16/13:11
     prod_sun_module.set_location(69.6529, 18.9565, 10)
