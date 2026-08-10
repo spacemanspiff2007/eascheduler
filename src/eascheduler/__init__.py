@@ -1,4 +1,4 @@
-from eascheduler import errors, job_stores, task_managers
+from eascheduler import errors, job_stores, schedulers, task_managers
 from eascheduler.__version__ import __version__
 from eascheduler.builder import (
     add_holiday,
@@ -11,5 +11,6 @@ from eascheduler.builder import (
 from eascheduler.errors.handler import set_exception_handler
 from eascheduler.producers.prod_filter_holiday import setup_holidays
 from eascheduler.producers.prod_sun import set_location
+from eascheduler.schedulers import AsyncScheduler
 
 from .default import get_default_scheduler

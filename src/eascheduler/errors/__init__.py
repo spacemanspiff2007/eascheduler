@@ -1,7 +1,13 @@
 from .errors import (
     BoundaryFunctionError,
+    EaSchedulerError,
+    HolidaysNotSetUpError,
     InfiniteLoopDetectedError,
     JobAlreadyCanceledError,
+    JobAlreadyFinishedError,
+    JobExecutionTimeIsNotSetError,
+    JobNotLinkedToSchedulerError,
+    LocationNotSetError,
     ScheduledRunInThePastError,
     UnknownWeekdayError,
 )
