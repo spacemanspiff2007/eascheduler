@@ -20,6 +20,7 @@ build:
 # Optionally set the version of Python and requirements required to build your docs
 python:
   install:
-    - requirements: docs/requirements.txt
     - method: setuptools
       path: .
+      extra_requirements:
+        - docs
