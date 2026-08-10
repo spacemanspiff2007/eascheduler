@@ -1,5 +1,5 @@
 import pytest
-from whenever import Time
+from whenever import Time, TimeDelta
 
 import eascheduler.producers.prod_operation as prod_operation_module
 from eascheduler.helpers import TimeReplacer
@@ -38,21 +38,21 @@ def _patch_uniform(monkeypatch) -> None:
 
 def test_offset() -> None:
 
-    o = OffsetProducerOperation(IntervalProducer(get_system_as_instant(1, 1, 0), 3600), -3600 * 10)
+    o = OffsetProducerOperation(IntervalProducer(get_system_as_instant(1, 1, 0), TimeDelta(seconds=3600)), -3600 * 10)
 
     for _ in range(10):
         assert o.get_next(get_system_as_instant(1, 1, 3)) == get_system_as_instant(1, 1, 4)
         assert o.get_next(get_system_as_instant(1, 1, 4)) == get_system_as_instant(1, 1, 5)
         assert o.get_next(get_system_as_instant(1, 1, 5)) == get_system_as_instant(1, 1, 6)
 
-    o = OffsetProducerOperation(IntervalProducer(get_system_as_instant(1, 1, 0), 3600), 300)
+    o = OffsetProducerOperation(IntervalProducer(get_system_as_instant(1, 1, 0), TimeDelta(seconds=3600)), 300)
 
     for _ in range(10):
         assert o.get_next(get_system_as_instant(1, 1, 3)) == get_system_as_instant(1, 1, 4, 5)
         assert o.get_next(get_system_as_instant(1, 1, 4)) == get_system_as_instant(1, 1, 5, 5)
         assert o.get_next(get_system_as_instant(1, 1, 5)) == get_system_as_instant(1, 1, 6, 5)
 
-    o = OffsetProducerOperation(IntervalProducer(get_system_as_instant(1, 1, 0), 3600), -300)
+    o = OffsetProducerOperation(IntervalProducer(get_system_as_instant(1, 1, 0), TimeDelta(seconds=3600)), -300)
 
     for _ in range(10):
         assert o.get_next(get_system_as_instant(1, 1, 3)) == get_system_as_instant(1, 1, 3, 55)
@@ -66,7 +66,7 @@ def test_offset() -> None:
 def test_earliest() -> None:
 
     o = EarliestProducerOperation(IntervalProducer(
-        get_system_as_instant(1, 1, 0), 3600),
+        get_system_as_instant(1, 1, 0), TimeDelta(seconds=3600)),
         TimeReplacer(Time(8, 0, 0), 'after', 'twice')
     )
 
@@ -83,7 +83,7 @@ def test_earliest() -> None:
 def test_latest() -> None:
 
     o = LatestProducerOperation(
-        IntervalProducer(get_system_as_instant(1, 1, 0, 30), 3600),
+        IntervalProducer(get_system_as_instant(1, 1, 0, 30), TimeDelta(seconds=3600)),
         TimeReplacer(Time(8, 0, 0), 'after', 'twice')
     )
 
@@ -98,7 +98,7 @@ def test_latest() -> None:
 
 def test_jitter() -> None:
 
-    o = JitterProducerOperation(IntervalProducer(get_system_as_instant(1, 1, 1), 3600), 60)
+    o = JitterProducerOperation(IntervalProducer(get_system_as_instant(1, 1, 1), TimeDelta(seconds=3600)), 60)
 
     start = get_system_as_instant(1, 1, 0, 59)
 
@@ -113,7 +113,7 @@ def test_jitter() -> None:
 
 def test_jitter_low_ok() -> None:
 
-    o = JitterProducerOperation(IntervalProducer(get_system_as_instant(1, 1, 1), 3600), -60, 60)
+    o = JitterProducerOperation(IntervalProducer(get_system_as_instant(1, 1, 1), TimeDelta(seconds=3600)), -60, 60)
 
     start = get_system_as_instant(1, 1, 0, 30)
 
@@ -128,7 +128,7 @@ def test_jitter_low_ok() -> None:
 
 def test_jitter_shift_forward() -> None:
 
-    o = JitterProducerOperation(IntervalProducer(get_system_as_instant(1, 1, 1), 3600), -60, 60)
+    o = JitterProducerOperation(IntervalProducer(get_system_as_instant(1, 1, 1),TimeDelta(seconds=3600)), -60, 60)
 
     start = get_system_as_instant(1, 1, 0, 59, 30)
 

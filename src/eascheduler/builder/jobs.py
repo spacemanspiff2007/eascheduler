@@ -5,7 +5,7 @@ from eascheduler.builder.helper import (
     HINT_INSTANT,
     HINT_POS_TIMEDELTA,
     get_instant,
-    get_pos_timedelta_secs,
+    get_pos_timedelta,
 )
 from eascheduler.builder.triggers import TriggerObject, _get_producer
 from eascheduler.executor import ExecutorBase
@@ -36,7 +36,8 @@ class JobBuilder:
         :param kwargs: |param_scheduled_cb_kwargs|
         :return: Created job
         """
-        job = CountdownJob(self._executor(coro_func, args, kwargs), get_pos_timedelta_secs(secs), job_id=job_id)
+        job = CountdownJob(
+            self._executor(coro_func, args, kwargs), get_pos_timedelta(secs).total('seconds'), job_id=job_id)
         job.link_scheduler(self._scheduler)
         if self._job_store is not None:
             self._job_store.add_job(job)

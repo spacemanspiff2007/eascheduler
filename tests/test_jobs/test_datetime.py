@@ -21,7 +21,7 @@ async def test_datetime() -> None:
         calls.append(Instant.now())
 
     now = Instant.now().to_system_tz().replace(nanosecond=0, disambiguate='raise').to_instant()
-    producer = IntervalProducer(now, 1)
+    producer = IntervalProducer(now, TimeDelta(seconds=1))
     s = AsyncScheduler()
     job = DateTimeJob(SyncExecutor(append), producer)
     job.link_scheduler(s)

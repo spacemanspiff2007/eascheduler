@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from math import floor
 from typing import TYPE_CHECKING, Final
 
 from typing_extensions import Self, override
@@ -9,13 +8,13 @@ from .base import DateTimeProducerBase, not_infinite_loop
 
 
 if TYPE_CHECKING:
-    from whenever import Instant
+    from whenever import Instant, TimeDelta
 
 
 class IntervalProducer(DateTimeProducerBase):
     __slots__ = ('_interval', '_next', )
 
-    def __init__(self, start: Instant | None, interval: float) -> None:
+    def __init__(self, start: Instant | None, interval: TimeDelta) -> None:
         super().__init__()
 
         self._next: Instant | None = start
@@ -36,15 +35,14 @@ class IntervalProducer(DateTimeProducerBase):
 
         # The producer should be stateless. We still need the DateTime in case we have odd intervals.
         # That's why we move backwards/forward in time here
-        diff = (dt - new_dt).in_nanoseconds()
-        if diff != 0:
-            new_dt = new_dt.add(nanoseconds=floor(diff // interval) * interval)
+        new_dt = new_dt + ((dt - new_dt) // interval) * interval
 
+        # just in case we overshoot through floating point error
         while new_dt > dt:
-            new_dt = new_dt.subtract(seconds=interval)
+            new_dt = new_dt - interval
 
         for _ in not_infinite_loop():
-            new_dt = new_dt.add(seconds=interval)
+            new_dt += interval
             if new_dt > dt and ((f := self._filter) is None or f.allow(new_dt.to_system_tz())):
                 break
 

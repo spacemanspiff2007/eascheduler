@@ -14,7 +14,7 @@ from eascheduler.builder.helper import (
     HINT_TIMEDELTA,
     BuilderTypeValidator,
     get_instant,
-    get_pos_timedelta_secs,
+    get_pos_timedelta,
     get_time_replacer,
     get_timedelta,
 )
@@ -181,7 +181,7 @@ class TriggerBuilder:
         :param interval: The interval how this trigger will be repeated
         """
         return TriggerObject(
-            IntervalProducer(get_instant(start) if start is not None else None, get_pos_timedelta_secs(interval))
+            IntervalProducer(get_instant(start) if start is not None else None, get_pos_timedelta(interval))
         )
 
     @staticmethod

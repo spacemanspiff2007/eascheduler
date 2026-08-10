@@ -35,8 +35,8 @@ def get_timedelta(value: HINT_TIMEDELTA) -> TimeDelta:
             raise TypeError()
 
 
-def get_pos_timedelta_secs(value: HINT_POS_TIMEDELTA) -> float:
-    if (value := get_timedelta(value).total('seconds')) <= 0:
+def get_pos_timedelta(value: HINT_POS_TIMEDELTA) -> TimeDelta:
+    if (value := get_timedelta(value)) <= TimeDelta.ZERO:
         msg = 'Value must be positive.'
         raise ValueError(msg)
     return value

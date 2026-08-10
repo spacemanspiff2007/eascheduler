@@ -87,7 +87,7 @@ async def test_scheduler_calls() -> None:
     s = AsyncScheduler()
     job = DateTimeJob(
         SyncExecutor(append),
-        IntervalProducer(None, 0.2)
+        IntervalProducer(None, TimeDelta(seconds=0.2))
     )
     job.link_scheduler(s)
 
