@@ -1,0 +1,51 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+
+[project]
+name = "EAScheduler"
+dynamic = ["version", "dependencies", "readme"]
+description = "Easy async scheduling with a nice interface"
+authors = [
+    { name = "spaceman_spiff" },
+]
+keywords = [
+    "scheduler",
+    "asyncio",
+]
+requires-python = ">=3.10"
+license = "Apache-2.0"
+license-files = ["LICENSE"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Framework :: AsyncIO",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Programming Language :: Python :: 3 :: Only",
+]
+
+[project.urls]
+Homepage = "https://github.com/spacemanspiff2007/eascheduler"
+Documentation = "https://eascheduler.readthedocs.io/"
+GitHub = "https://github.com/spacemanspiff2007/eascheduler"
+
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
+exclude = ["tests*"]
+
+[tool.setuptools.package-data]
+eascheduler = ["py.typed"]
+
+[tool.setuptools.dynamic]
+version = { attr = "eascheduler.__version__.__version__" }
+dependencies = { file = ["requirements_setup.txt"] }
+readme = { file = ["readme.md"], content-type = "text/markdown" }
