@@ -1,7 +1,6 @@
 # EAScheduler
 [![Tests Status](https://github.com/spacemanspiff2007/eascheduler/workflows/Tests/badge.svg)](https://github.com/spacemanspiff2007/eascheduler/actions)
 [![Documentation Status](https://readthedocs.org/projects/eascheduler/badge/?version=latest)](https://eascheduler.readthedocs.io/en/latest/?badge=latest)
-[![Updates](https://pyup.io/repos/github/spacemanspiff2007/eascheduler/shield.svg)](https://pyup.io/repos/github/spacemanspiff2007/eascheduler/)
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/eascheduler)
 
 [![PyPI](https://img.shields.io/pypi/v/eascheduler)]((https://pypi.org/project/EAScheduler/))
