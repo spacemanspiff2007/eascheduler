@@ -7,7 +7,6 @@
 [![Downloads](https://pepy.tech/badge/eascheduler/month)](https://pepy.tech/project/eascheduler)
 
 
-
 _Easy async task scheduling_
 
 
