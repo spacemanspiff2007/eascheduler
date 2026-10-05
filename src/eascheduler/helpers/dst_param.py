@@ -97,7 +97,7 @@ class DstHandlingRequiredDate(DstHandlingRequiredBase):
         return f'<{self.__class__.__name__} lower={self.lower!s} upper={self.upper!s}>'
 
     def required(self, t: Time) -> bool:
-        return self.lower <= t <= self.upper
+        return bool(self.lower <= t <= self.upper)
 
 
 TIME_FORWARD: DstHandlingRequiredBase | None = None

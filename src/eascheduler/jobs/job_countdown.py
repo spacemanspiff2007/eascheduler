@@ -24,10 +24,7 @@ class CountdownJob(JobBase):
         self.set_next_run(None)
 
     def set_countdown(self, secs: TimeDelta | float) -> None:
-        if not isinstance(secs, TimeDelta):
-            delta: Final = TimeDelta(seconds=secs)
-        else:
-            delta: Final = secs
+        delta: Final = TimeDelta(seconds=secs) if not isinstance(secs, TimeDelta) else secs
 
         if not isinstance(delta, TimeDelta):
             raise TypeError()
