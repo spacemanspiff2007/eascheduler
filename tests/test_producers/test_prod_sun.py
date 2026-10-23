@@ -68,7 +68,7 @@ def get_params() -> Generator[ParameterSet, None, None]:
     )
 
 
-@pytest.mark.parametrize(('producer', 'dt', 'result'), get_params())
+@pytest.mark.parametrize(('producer', 'dt', 'result'), tuple(get_params()))
 def test_sun(producer: SunProducer, dt: Instant, result: str) -> None:
     for _ in range(50):
         assert get_ger_str(producer.get_next(dt)) == result

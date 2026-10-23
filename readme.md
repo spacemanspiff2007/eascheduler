@@ -98,6 +98,12 @@ scheduler.at(
 ````
 
 ## Changelog
+#### 0.2.11 (2026-10-23)
+- Updated dependencies
+
+#### 0.2.10 (2026-10-23)
+- Updated dependencies
+
 #### 0.2.9 (2026-08-10)
 - License Change to EUPL-1.2
 - Migrated to pyproject.toml
