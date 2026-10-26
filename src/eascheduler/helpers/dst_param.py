@@ -2,7 +2,7 @@ import logging
 from collections.abc import Generator, Iterable
 from typing import Final, Literal, TypeAlias
 
-from whenever import RepeatedTime, SkippedTime, Time, ZonedDateTime
+from whenever import SYSTEM_TZ, RepeatedTime, SkippedTime, Time, ZonedDateTime
 
 from eascheduler.helpers.time_replace import HINT_REPEATED, HINT_SKIPPED, RepeatedTimeBehavior, SkippedTimeBehavior
 
@@ -22,11 +22,11 @@ def _iter_date(*, reverse: bool = False) -> Generator[tuple[ZonedDateTime, Time]
     month_order = (3, 4, 11, 9, 10)
     hour_order = (2, 3, 0, 1)
 
-    now = ZonedDateTime.now_in_system_tz()
+    now = ZonedDateTime.now(SYSTEM_TZ)
 
     for month in _iter_nr(month_order if not reverse else reversed(month_order), 1, 13):
         for hour in _iter_nr(hour_order if not reverse else reversed(hour_order), 0, 24):
-            start = ZonedDateTime.from_system_tz(now.year, month, 1)
+            start = ZonedDateTime(now.year, month, 1, tz=SYSTEM_TZ)
             while start.month == month:
                 yield start, Time(hour, 30)
                 start = start.add(hours=24)
@@ -39,7 +39,7 @@ def find_time(*, reverse: bool) -> bool | tuple[Literal['forward', 'backward'], 
 
     for dt, time in _iter_date(reverse=reverse):
         try:
-            dt.replace_time(time, disambiguate='raise')
+            dt.replace_time(time, disambiguation='raise')
         except (SkippedTime, RepeatedTime) as e:  # noqa: PERF203
             dst_type = 'forward' if isinstance(e, SkippedTime) else 'backward'
             break
@@ -53,7 +53,7 @@ def find_time(*, reverse: bool) -> bool | tuple[Literal['forward', 'backward'], 
     # check that both are invalid
     for t in (lower, upper):
         try:
-            dt.replace_time(t, disambiguate='raise')
+            dt.replace_time(t, disambiguation='raise')
         except (SkippedTime, RepeatedTime):  # noqa: PERF203
             pass
         else:
@@ -64,7 +64,7 @@ def find_time(*, reverse: bool) -> bool | tuple[Literal['forward', 'backward'], 
     for t in (upper.replace(hour=upper.hour - 1 if upper.hour >= 1 else 23),
               lower.replace(hour=lower.hour + 1 if lower.hour < 23 else 0)):  # noqa: PLR2004
         try:
-            dt.replace_time(t, disambiguate='raise')
+            dt.replace_time(t, disambiguation='raise')
         except (SkippedTime, RepeatedTime):  # noqa: PERF203
             log.error(f'DST transition is invalid when it should be valid ({dt.date()} {t})!')
             return True

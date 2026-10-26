@@ -8,7 +8,7 @@ from datetime import time as dt_time
 from datetime import timedelta as dt_timedelta
 
 import pytest
-from whenever import Instant, Time, TimeDelta, ZonedDateTime, patch_current_time
+from whenever import SYSTEM_TZ, Instant, Time, TimeDelta, ZonedDateTime, patch_current_time
 
 from eascheduler.builder.helper import (
     BuilderTypeValidator,
@@ -48,8 +48,8 @@ def test_get_instant() -> None:
         # Immediately
         assert get_instant(None) == i
         # datetime
-        assert get_instant(datetime(2001, 1, 1, 8)) == ZonedDateTime.from_system_tz(2001, 1, 1, 8).to_instant()
-        assert get_instant(ZonedDateTime.from_system_tz(2001, 1, 1, 8)) == ZonedDateTime.from_system_tz(2001, 1, 1, 8).to_instant()
+        assert get_instant(datetime(2001, 1, 1, 8)) == ZonedDateTime(2001, 1, 1, 8, tz=SYSTEM_TZ).to_instant()
+        assert get_instant(ZonedDateTime(2001, 1, 1, 8, tz=SYSTEM_TZ)) == ZonedDateTime(2001, 1, 1, 8, tz=SYSTEM_TZ).to_instant()
 
         # Timedelta test
         assert get_instant(3600) == i.add(hours=1)
@@ -59,12 +59,12 @@ def test_get_instant() -> None:
         assert get_instant('PT1H') == i.add(hours=1)
 
         # Time test
-        assert get_instant('08:00:00') == ZonedDateTime.from_system_tz(2001, 1, 1, 8).to_instant()
-        assert get_instant(time(8)) == ZonedDateTime.from_system_tz(2001, 1, 1, 8).to_instant()
-        assert get_instant(Time(8)) == ZonedDateTime.from_system_tz(2001, 1, 1, 8).to_instant()
+        assert get_instant('08:00:00') == ZonedDateTime(2001, 1, 1, 8, tz=SYSTEM_TZ).to_instant()
+        assert get_instant(time(8)) == ZonedDateTime(2001, 1, 1, 8, tz=SYSTEM_TZ).to_instant()
+        assert get_instant(Time(8)) == ZonedDateTime(2001, 1, 1, 8, tz=SYSTEM_TZ).to_instant()
 
     # datetime test
-    d = ZonedDateTime.from_system_tz(2001, 1, 1, 12, 30).add(seconds=0.5).to_instant()
+    d = ZonedDateTime(2001, 1, 1, 12, 30, tz=SYSTEM_TZ).add(seconds=0.5).to_instant()
     dt_with_tz_utc = d.to_stdlib()
     assert get_instant(dt_with_tz_utc) == d
     assert get_instant(dt_datetime(2001, 1, 1, 12, 30, 0, 500_000)) == d
@@ -176,7 +176,7 @@ def test_get_pydate() -> None:
     assert get_pydate(target) == target
     assert get_pydate(py_dt) == target
 
-    sys_dt = ZonedDateTime.from_system_tz(2024, 4, 1, 12, 30)
+    sys_dt = ZonedDateTime(2024, 4, 1, 12, 30, tz=SYSTEM_TZ)
     with patch_current_time(sys_dt, keep_ticking=False):
         assert get_pydate(None) == target
 

@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Final
 
 from typing_extensions import Self, override
+from whenever import SYSTEM_TZ
 
 from .base import DateTimeProducerBase, not_infinite_loop
 
@@ -35,5 +36,5 @@ class GroupProducer(DateTimeProducerBase):
             next_dt = values[0]
 
             for value in values:
-                if value > dt and ((f := self._filter) is None or f.allow(value.to_system_tz())):
+                if value > dt and ((f := self._filter) is None or f.allow(value.to_tz(SYSTEM_TZ))):
                     return value

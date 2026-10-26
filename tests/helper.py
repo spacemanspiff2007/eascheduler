@@ -3,7 +3,7 @@ from time import monotonic
 from typing import Final, Literal, TypeVar, Union, get_args, get_origin
 
 import pytest
-from whenever import Instant, TimeDelta, ZonedDateTime
+from whenever import SYSTEM_TZ, Instant, TimeDelta, ZonedDateTime
 
 
 def get_german_as_instant(month=1, day=1, hour=0, minute=0, second=0, *, year=2001, microsecond=0) -> Instant:
@@ -13,8 +13,8 @@ def get_german_as_instant(month=1, day=1, hour=0, minute=0, second=0, *, year=20
 
 
 def get_system_as_instant(month=1, day=1, hour=0, minute=0, second=0, *, year=2001, microsecond=0) -> Instant:
-    return ZonedDateTime.from_system_tz(
-        year, month, day, hour, minute=minute, second=second, nanosecond=int(microsecond * 1000)
+    return ZonedDateTime(
+        year, month, day, hour, minute=minute, second=second, nanosecond=int(microsecond * 1000), tz=SYSTEM_TZ
     ).to_instant()
 
 

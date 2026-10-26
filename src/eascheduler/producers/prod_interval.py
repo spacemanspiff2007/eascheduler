@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Final
 
 from typing_extensions import Self, override
+from whenever import SYSTEM_TZ
 
 from .base import DateTimeProducerBase, not_infinite_loop
 
@@ -43,7 +44,7 @@ class IntervalProducer(DateTimeProducerBase):
 
         for _ in not_infinite_loop():
             new_dt += interval
-            if new_dt > dt and ((f := self._filter) is None or f.allow(new_dt.to_system_tz())):
+            if new_dt > dt and ((f := self._filter) is None or f.allow(new_dt.to_tz(SYSTEM_TZ))):
                 break
 
         self._next = new_dt

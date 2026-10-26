@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, NoReturn, TypeVar
 
 from typing_extensions import Self, override
+from whenever import SYSTEM_TZ
 
 from eascheduler.errors import InfiniteLoopDetectedError
 
@@ -73,7 +74,7 @@ class DateTimeProducerOperationBase(DateTimeProducerBase):
             next_dt = self._producer.get_next(next_dt)
             value = self.apply_operation(next_dt, dt)
 
-            if value > dt and ((f := self._filter) is None or f.allow(value.to_system_tz())):
+            if value > dt and ((f := self._filter) is None or f.allow(value.to_tz(SYSTEM_TZ))):
                 return value
 
 

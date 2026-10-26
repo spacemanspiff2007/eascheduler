@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from typing_extensions import Self
+from whenever import SYSTEM_TZ
 
 
 if TYPE_CHECKING:
@@ -44,7 +45,7 @@ class BaseControl:
 
         if (nr := self._job.next_run) is None:
             return None
-        return nr.to_system_tz().to_plain().to_stdlib()
+        return nr.to_tz(SYSTEM_TZ).to_plain().to_stdlib()
 
     @property
     def last_run_datetime(self) -> dt_datetime | None:
@@ -52,4 +53,4 @@ class BaseControl:
 
         if (nr := self._job.last_run) is None:
             return None
-        return nr.to_system_tz().to_plain().to_stdlib()
+        return nr.to_tz(SYSTEM_TZ).to_plain().to_stdlib()

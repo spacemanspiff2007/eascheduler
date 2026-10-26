@@ -4,7 +4,7 @@ from random import uniform
 from typing import TYPE_CHECKING, Final
 
 from typing_extensions import Self, override
-from whenever import PlainDateTime, SkippedTime, Time, TimeDelta, ZonedDateTime
+from whenever import SYSTEM_TZ, PlainDateTime, SkippedTime, Time, TimeDelta, ZonedDateTime
 
 from eascheduler.helpers import TimeReplacer, TimeSkippedError, TimeTwiceError
 from eascheduler.producers.base import DateTimeProducerBase, DateTimeProducerOperationBase
@@ -19,10 +19,10 @@ def find_time_after_dst_switch(dt: ZonedDateTime, time: Time) -> Instant:
     local = PlainDateTime(dt.year, dt.month, dt.day, time.hour, time.minute)
 
     while True:
-        local = local.add(minutes=1, ignore_dst=True)
+        local = local.add(minutes=1, naive_arithmetic_ok=True)
 
         try:
-            return dt.replace_time(local.time(), disambiguate='raise').to_instant()
+            return dt.replace_time(local.time(), disambiguation='raise').to_instant()
         except SkippedTime:
             continue
 
@@ -59,7 +59,7 @@ class EarliestProducerOperation(DateTimeProducerOperationBase):
     @override
     def apply_operation(self, next_dt: Instant, dt: Instant) -> Instant:
         try:
-            earliest_dt = self.earliest.replace(next_dt.to_system_tz()).to_instant()
+            earliest_dt = self.earliest.replace(next_dt.to_tz(SYSTEM_TZ)).to_instant()
         except TimeSkippedError:
             return next_dt
         except TimeTwiceError as e:
@@ -87,7 +87,7 @@ class LatestProducerOperation(DateTimeProducerOperationBase):
     @override
     def apply_operation(self, next_dt: Instant, dt: Instant) -> Instant:
         try:
-            latest_dt = self.latest.replace(next_dt.to_system_tz()).to_instant()
+            latest_dt = self.latest.replace(next_dt.to_tz(SYSTEM_TZ)).to_instant()
         except TimeSkippedError:
             return next_dt
         except TimeTwiceError as e:

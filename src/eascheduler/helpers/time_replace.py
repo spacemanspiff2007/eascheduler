@@ -4,7 +4,7 @@ from enum import Enum
 from typing import TYPE_CHECKING, Final, Literal, TypeAlias
 
 from typing_extensions import Self
-from whenever import Date, PlainDateTime, RepeatedTime, SkippedTime, Time, ZonedDateTime
+from whenever import SYSTEM_TZ, Date, PlainDateTime, RepeatedTime, SkippedTime, Time, ZonedDateTime
 
 from eascheduler.helpers.helpers import to_enum
 
@@ -42,7 +42,7 @@ def find_time_after_dst_switch(dt: ZonedDateTime | Date, time: Time) -> ZonedDat
         t = t.add(minutes=1, naive_arithmetic_ok=True)
 
         try:
-            return ZonedDateTime.from_system_tz(dt.year, dt.month, dt.day, t.hour, t.minute, disambiguate='raise')
+            return ZonedDateTime(dt.year, dt.month, dt.day, t.hour, t.minute, tz=SYSTEM_TZ, disambiguation='raise')
         except SkippedTime:
             continue
 
@@ -90,15 +90,15 @@ class TimeReplacer:
         }
 
         try:
-            return ZonedDateTime.from_system_tz(**kwargs, disambiguate='raise')
+            return ZonedDateTime(**kwargs, tz=SYSTEM_TZ, disambiguation='raise')
         except SkippedTime:
             match self._skipped:
                 case SkippedTimeBehavior.SKIP:
                     raise TimeSkippedError() from None
                 case SkippedTimeBehavior.EARLIER:
-                    return ZonedDateTime.from_system_tz(**kwargs, disambiguate='earlier')
+                    return ZonedDateTime(**kwargs, tz=SYSTEM_TZ, disambiguation='earlier')
                 case SkippedTimeBehavior.LATER:
-                    return ZonedDateTime.from_system_tz(**kwargs, disambiguate='later')
+                    return ZonedDateTime(**kwargs, tz=SYSTEM_TZ, disambiguation='later')
                 case SkippedTimeBehavior.AFTER:
                     return find_time_after_dst_switch(dt, self._time)
                 case _:
@@ -109,13 +109,13 @@ class TimeReplacer:
                 case RepeatedTimeBehavior.SKIP:
                     raise TimeSkippedError() from None
                 case RepeatedTimeBehavior.EARLIER:
-                    return ZonedDateTime.from_system_tz(**kwargs, disambiguate='earlier')
+                    return ZonedDateTime(**kwargs, tz=SYSTEM_TZ, disambiguation='earlier')
                 case RepeatedTimeBehavior.LATER:
-                    return ZonedDateTime.from_system_tz(**kwargs, disambiguate='later')
+                    return ZonedDateTime(**kwargs, tz=SYSTEM_TZ, disambiguation='later')
                 case RepeatedTimeBehavior.TWICE:
                     raise TimeTwiceError(
-                        ZonedDateTime.from_system_tz(**kwargs, disambiguate='earlier'),
-                        ZonedDateTime.from_system_tz(**kwargs, disambiguate='later'),
+                        ZonedDateTime(**kwargs, tz=SYSTEM_TZ, disambiguation='earlier'),
+                        ZonedDateTime(**kwargs, tz=SYSTEM_TZ, disambiguation='later'),
                     ) from None
                 case _:
                     msg = f'Invalid value: {self._repeated!r}'

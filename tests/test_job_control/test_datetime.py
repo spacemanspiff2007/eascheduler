@@ -1,4 +1,4 @@
-from whenever import Instant, TimeDelta, ZonedDateTime
+from whenever import SYSTEM_TZ, Instant, TimeDelta, ZonedDateTime
 
 from eascheduler.executor.base import SyncExecutor
 from eascheduler.job_control import DateTimeJobControl
@@ -10,7 +10,7 @@ from tests.helper import AlwaysError
 
 
 async def test_eq() -> None:
-    now = ZonedDateTime.now_in_system_tz().replace(nanosecond=0, disambiguate='raise').to_instant()
+    now = ZonedDateTime.now(SYSTEM_TZ).replace(nanosecond=0, disambiguation='raise').to_instant()
     job1 = DateTimeJob(SyncExecutor(AlwaysError()), IntervalProducer(now, TimeDelta(seconds=1)))
     job2 = DateTimeJob(SyncExecutor(AlwaysError()), IntervalProducer(now, TimeDelta(seconds=1)))
 

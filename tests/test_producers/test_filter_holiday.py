@@ -1,7 +1,7 @@
 from datetime import date as dt_date
 
 import pytest
-from whenever import ZonedDateTime
+from whenever import SYSTEM_TZ, ZonedDateTime
 
 import eascheduler.producers.prod_filter_holiday as prod_filter_holiday_module
 from eascheduler.producers.prod_filter_holiday import (
@@ -39,8 +39,8 @@ def test_copy() -> None:
 
 def test_holiday_filter() -> None:
     f = HolidayProducerFilter()
-    assert f.allow(ZonedDateTime.from_system_tz(2024, 3, 8))      # Internationaler Frauentag
-    assert not f.allow(ZonedDateTime.from_system_tz(2024, 1, 6))  # Heilige Drei Könige nicht
+    assert f.allow(ZonedDateTime(2024, 3, 8, tz=SYSTEM_TZ))      # Internationaler Frauentag
+    assert not f.allow(ZonedDateTime(2024, 1, 6, tz=SYSTEM_TZ))  # Heilige Drei Könige nicht
 
 
 def test_is_holiday() -> None:
@@ -63,10 +63,10 @@ def test_working_day_filter() -> None:
         assert a != b
         return a
 
-    assert allow(ZonedDateTime.from_system_tz(2024, 10, 2))       # Wednesday
-    assert allow(ZonedDateTime.from_system_tz(2024, 10, 2))       # Wednesday
-    assert not allow(ZonedDateTime.from_system_tz(2024, 10, 3))   # Tag der Deutschen Einheit
-    assert allow(ZonedDateTime.from_system_tz(2024, 10, 4))       # Friday
-    assert not allow(ZonedDateTime.from_system_tz(2024, 10, 5))   # Saturday
-    assert not allow(ZonedDateTime.from_system_tz(2024, 10, 6))   # Sunday
-    assert allow(ZonedDateTime.from_system_tz(2024, 10, 7))       # Monday
+    assert allow(ZonedDateTime(2024, 10, 2, tz=SYSTEM_TZ))       # Wednesday
+    assert allow(ZonedDateTime(2024, 10, 2, tz=SYSTEM_TZ))       # Wednesday
+    assert not allow(ZonedDateTime(2024, 10, 3, tz=SYSTEM_TZ))   # Tag der Deutschen Einheit
+    assert allow(ZonedDateTime(2024, 10, 4, tz=SYSTEM_TZ))       # Friday
+    assert not allow(ZonedDateTime(2024, 10, 5, tz=SYSTEM_TZ))   # Saturday
+    assert not allow(ZonedDateTime(2024, 10, 6, tz=SYSTEM_TZ))   # Sunday
+    assert allow(ZonedDateTime(2024, 10, 7, tz=SYSTEM_TZ))       # Monday
