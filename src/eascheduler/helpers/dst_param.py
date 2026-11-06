@@ -147,9 +147,8 @@ def check_dst_handling(t: Time, forward: HINT_CLOCK_FORWARD,
     # Try to find DST time
     if TIME_FORWARD is None or TIME_BACKWARD is None:
         _setup()
-        for to_del in ('_setup', 'find_time', '_iter_date', '_iter_nr'):
-            del globals()[to_del]
-
+        # for to_del in ('_setup', 'find_time', '_iter_date', '_iter_nr'):
+        #     del globals()[to_del]
         assert TIME_FORWARD is not None     # noqa: S101
         assert TIME_BACKWARD is not None    # noqa: S101
 
