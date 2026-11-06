@@ -1,10 +1,23 @@
+import os
 from traceback import format_exc
+from unittest.mock import patch
 
 import pytest
+from whenever import reset_system_tz
 
 from eascheduler import default as default_scheduler_module
 from eascheduler.errors import handler
 from eascheduler.producers import prod_sun as sun_module
+
+
+@pytest.fixture
+def system_tz_berlin():
+    try:
+        with patch.dict(os.environ, {'TZ': 'Europe/Berlin'}):
+            reset_system_tz()  # update the time zone cache
+            yield
+    finally:
+        reset_system_tz()  # don't forget to set the old time zone back!
 
 
 @pytest.fixture(autouse=True)

@@ -39,7 +39,8 @@ def find_time(*, reverse: bool) -> bool | tuple[Literal['forward', 'backward'], 
 
     for dt, time in _iter_date(reverse=reverse):
         try:
-            dt.replace_time(time, disambiguation='raise')
+            # https://github.com/ariebovenberg/whenever/issues/450
+            dt.to_plain().replace_time(time).assume_tz(SYSTEM_TZ, disambiguation='raise')
         except (SkippedTime, RepeatedTime) as e:  # noqa: PERF203
             dst_type = 'forward' if isinstance(e, SkippedTime) else 'backward'
             break
@@ -53,7 +54,7 @@ def find_time(*, reverse: bool) -> bool | tuple[Literal['forward', 'backward'], 
     # check that both are invalid
     for t in (lower, upper):
         try:
-            dt.replace_time(t, disambiguation='raise')
+            dt.to_plain().replace_time(t).assume_tz(SYSTEM_TZ, disambiguation='raise')
         except (SkippedTime, RepeatedTime):  # noqa: PERF203
             pass
         else:
@@ -64,7 +65,7 @@ def find_time(*, reverse: bool) -> bool | tuple[Literal['forward', 'backward'], 
     for t in (upper.replace(hour=upper.hour - 1 if upper.hour >= 1 else 23),
               lower.replace(hour=lower.hour + 1 if lower.hour < 23 else 0)):  # noqa: PLR2004
         try:
-            dt.replace_time(t, disambiguation='raise')
+            dt.to_plain().replace_time(t).assume_tz(SYSTEM_TZ, disambiguation='raise')
         except (SkippedTime, RepeatedTime):  # noqa: PERF203
             log.error(f'DST transition is invalid when it should be valid ({dt.date()} {t})!')
             return True

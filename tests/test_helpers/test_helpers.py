@@ -1,7 +1,6 @@
 from enum import Enum
 
 import pytest
-from tzlocal import get_localzone_name
 from whenever import Time
 
 from eascheduler.helpers.dst_param import check_dst_handling
@@ -25,9 +24,7 @@ def test_dst_param() -> None:
     assert check_dst_handling(Time(8), None, None) == ('after', 'earlier')
 
 
-@pytest.mark.skipif(get_localzone_name() != 'Europe/Berlin',
-                    reason=f'Only works in German timezone (is: {get_localzone_name()})')
-def test_dst_param_raise() -> None:
+def test_dst_param_raise(system_tz_berlin) -> None:
     check_dst_handling(Time(2), 'skip', 'skip')
 
     with pytest.raises(ValueError):  # noqa: PT011

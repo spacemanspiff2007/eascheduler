@@ -1,5 +1,4 @@
 import pytest
-from tzlocal import get_localzone_name
 from whenever import SYSTEM_TZ, Time, ZonedDateTime
 
 from eascheduler.helpers import TimeReplacer
@@ -70,9 +69,7 @@ def test_time_start_end_of_day(time_replacer: TimeReplacer, hour: str) -> None:
     assert instant.to_tz(SYSTEM_TZ).format_iso()[:10] == '2024-12-31'
 
 
-@pytest.mark.skipif(get_localzone_name() != 'Europe/Berlin',
-                    reason=f'Only works in German timezone (is: {get_localzone_name()})')
-def test_dst_skip() -> None:
+def test_dst_skip(system_tz_berlin) -> None:
     producer = TimeProducer(TimeReplacer(Time(2, 30), 'skip', 'earlier'))
 
     # one hour jump forward
@@ -88,9 +85,7 @@ def test_dst_skip() -> None:
         assert get_ger_str(dst_3) == '2001-03-27T02:30:00+02:00'
 
 
-@pytest.mark.skipif(get_localzone_name() != 'Europe/Berlin',
-                    reason=f'Only works in German timezone (is: {get_localzone_name()})')
-def test_dst_close() -> None:
+def test_dst_close(system_tz_berlin) -> None:
     producer = TimeProducer(TimeReplacer(Time(2, 30), 'after', 'skip'))
 
     # one hour jump forward
@@ -106,9 +101,7 @@ def test_dst_close() -> None:
         assert get_ger_str(dst_3) == '2001-03-26T02:30:00+02:00'
 
 
-@pytest.mark.skipif(get_localzone_name() != 'Europe/Berlin',
-                    reason=f'Only works in German timezone (is: {get_localzone_name()})')
-def test_dst_twice() -> None:
+def test_dst_twice(system_tz_berlin) -> None:
     producer = TimeProducer(TimeReplacer(Time(2, 30), 'skip', 'twice'))
 
     # one hour jump backwards

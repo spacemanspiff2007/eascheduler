@@ -1,5 +1,4 @@
 import pytest
-from tzlocal import get_localzone_name
 from whenever import SYSTEM_TZ, Time, ZonedDateTime
 
 from eascheduler.helpers.time_replace import (
@@ -14,10 +13,9 @@ from eascheduler.helpers.time_replace import (
 from tests.helper import assert_literal_values_in_enum, get_german_as_instant
 
 
-pytestmark = pytest.mark.skipif(
-    get_localzone_name() != 'Europe/Berlin',
-    reason=f'Only works in German timezone (is: {get_localzone_name()})'
-)
+@pytest.fixture(autouse=True)
+def _patch_tz(system_tz_berlin) -> None:
+    return None
 
 
 def get_str(obj) -> str | tuple[str, str]:
