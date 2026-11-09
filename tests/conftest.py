@@ -1,10 +1,41 @@
+import os
+from collections.abc import Generator
 from traceback import format_exc
+from typing import Any, Final
+from unittest.mock import patch
 
 import pytest
+from whenever import available_timezones, reset_system_tz
 
 from eascheduler import default as default_scheduler_module
 from eascheduler.errors import handler
 from eascheduler.producers import prod_sun as sun_module
+
+
+@pytest.fixture(params=sorted(available_timezones()))
+def all_timezones(request) -> Generator[Any, Any, None]:
+    tz: Final[str] = request.param
+
+    with patch.dict(os.environ, {'TZ': tz}):
+        # update the time zone cache
+        reset_system_tz()
+
+        yield tz
+
+    reset_system_tz()
+
+
+@pytest.fixture
+def system_tz_berlin(monkeypatch):
+    tz: Final[str] = 'Europe/Berlin'
+
+    with patch.dict(os.environ, {'TZ': tz}):
+        # update the time zone cache
+        reset_system_tz()
+
+        yield tz
+
+    reset_system_tz()
 
 
 @pytest.fixture(autouse=True)

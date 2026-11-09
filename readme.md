@@ -98,6 +98,9 @@ scheduler.at(
 ````
 
 ## Changelog
+#### 0.3.0 (2026-11-09)
+- Breaking change: update to whenever 0.11
+
 #### 0.2.11 (2026-10-23)
 - Updated dependencies
 

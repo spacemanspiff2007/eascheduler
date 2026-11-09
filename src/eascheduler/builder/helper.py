@@ -7,7 +7,7 @@ from datetime import time as dt_time
 from datetime import timedelta as dt_timedelta
 from typing import Any, Final, Generic, TypeAlias, TypeVar
 
-from whenever import Date, Instant, PlainDateTime, Time, TimeDelta, ZonedDateTime
+from whenever import SYSTEM_TZ, Date, Instant, PlainDateTime, Time, TimeDelta, ZonedDateTime
 
 from eascheduler.const import get_day_nr, get_month_nr
 from eascheduler.helpers import HINT_CLOCK_BACKWARD, HINT_CLOCK_FORWARD, TimeReplacer, check_dst_handling
@@ -63,14 +63,14 @@ def get_pydate(value: HINT_DATE) -> dt_date:  # noqa: PLR0911
             return value
 
         case None:
-            return ZonedDateTime.now_in_system_tz().date().to_stdlib()
+            return ZonedDateTime.now(SYSTEM_TZ).date().to_stdlib()
         case str():
             return Date.parse_iso(value).to_stdlib()
 
         case Date():
             return value.to_stdlib()
         case ZonedDateTime() | Instant():
-            return value.to_system_tz().date().to_stdlib()
+            return value.to_tz(SYSTEM_TZ).date().to_stdlib()
 
         case _:
             raise TypeError()
@@ -91,7 +91,7 @@ def get_instant(value: HINT_INSTANT) -> Instant:
         case dt_datetime():
             if value.tzinfo is None:
                 # We assume it's the system datetime because that's what datetime is normally used for
-                return PlainDateTime(value).assume_system_tz().to_instant()
+                return PlainDateTime(value).assume_tz(SYSTEM_TZ).to_instant()
 
             return Instant(value)
 
@@ -116,8 +116,8 @@ def get_instant(value: HINT_INSTANT) -> Instant:
     except (ValueError, TypeError):
         pass
     else:
-        now = ZonedDateTime.now_in_system_tz()
-        new = now.replace_time(time, disambiguate='raise')
+        now = ZonedDateTime.now(SYSTEM_TZ)
+        new = now.replace_time(time, disambiguation='raise')
         if new < now:
             new = new.add(hours=24)
         return new.to_instant()

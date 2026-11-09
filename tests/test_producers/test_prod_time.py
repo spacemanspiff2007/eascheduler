@@ -1,6 +1,5 @@
 import pytest
-from tzlocal import get_localzone_name
-from whenever import Time, ZonedDateTime
+from whenever import SYSTEM_TZ, Time, ZonedDateTime
 
 from eascheduler.helpers import TimeReplacer
 from eascheduler.producers import TimeProducer
@@ -51,28 +50,26 @@ def test_time_start_end_of_day(time_replacer: TimeReplacer, hour: str) -> None:
     producer = TimeProducer(time_replacer)
 
     instant = get_system_as_instant(year=2024, month=1, day=1).subtract(nanoseconds=1)
-    assert producer.get_next(instant).to_system_tz().format_iso()[:10] == '2024-01-01'
+    assert producer.get_next(instant).to_tz(SYSTEM_TZ).format_iso()[:10] == '2024-01-01'
 
     days = set()
-    s = ZonedDateTime.from_system_tz(2024, 1, 1)
+    s = ZonedDateTime(2024, 1, 1, tz=SYSTEM_TZ)
     while s.year == 2024:
         days.add(s.format_iso().split('T')[0])
         s = s.add(hours=24)
 
     for _ in range(366):    # 2024 is a leap year
         instant = producer.get_next(instant)
-        iso = instant.to_system_tz().format_iso()
+        iso = instant.to_tz(SYSTEM_TZ).format_iso()
         day, clock = iso.split('T', maxsplit=1)
         assert day in days, days
         days.remove(day)
         assert clock.split('+')[0] == hour
     assert not days
-    assert instant.to_system_tz().format_iso()[:10] == '2024-12-31'
+    assert instant.to_tz(SYSTEM_TZ).format_iso()[:10] == '2024-12-31'
 
 
-@pytest.mark.skipif(get_localzone_name() != 'Europe/Berlin',
-                    reason=f'Only works in German timezone (is: {get_localzone_name()})')
-def test_dst_skip() -> None:
+def test_dst_skip(system_tz_berlin) -> None:
     producer = TimeProducer(TimeReplacer(Time(2, 30), 'skip', 'earlier'))
 
     # one hour jump forward
@@ -88,9 +85,7 @@ def test_dst_skip() -> None:
         assert get_ger_str(dst_3) == '2001-03-27T02:30:00+02:00'
 
 
-@pytest.mark.skipif(get_localzone_name() != 'Europe/Berlin',
-                    reason=f'Only works in German timezone (is: {get_localzone_name()})')
-def test_dst_close() -> None:
+def test_dst_close(system_tz_berlin) -> None:
     producer = TimeProducer(TimeReplacer(Time(2, 30), 'after', 'skip'))
 
     # one hour jump forward
@@ -106,9 +101,7 @@ def test_dst_close() -> None:
         assert get_ger_str(dst_3) == '2001-03-26T02:30:00+02:00'
 
 
-@pytest.mark.skipif(get_localzone_name() != 'Europe/Berlin',
-                    reason=f'Only works in German timezone (is: {get_localzone_name()})')
-def test_dst_twice() -> None:
+def test_dst_twice(system_tz_berlin) -> None:
     producer = TimeProducer(TimeReplacer(Time(2, 30), 'skip', 'twice'))
 
     # one hour jump backwards

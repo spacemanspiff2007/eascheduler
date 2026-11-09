@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Final
 
 from typing_extensions import Self, override
+from whenever import SYSTEM_TZ
 
 from eascheduler.helpers import TimeReplacer, TimeSkippedError, TimeTwiceError
 from eascheduler.producers.base import DateTimeProducerBase, not_infinite_loop
@@ -29,7 +30,7 @@ class TimeProducer(DateTimeProducerBase):
 
         local_dts: tuple[ZonedDateTime, ...]
 
-        date = dt.to_system_tz().date()
+        date = dt.to_tz(SYSTEM_TZ).date()
         for _ in not_infinite_loop():  # noqa: RET503
             try:
                 local_dts = (self._time.replace(date), )

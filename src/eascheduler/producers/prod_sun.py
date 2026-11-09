@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING, Final, Literal
 
 from astral import Observer, SunDirection, sun
 from typing_extensions import Self, override
-from whenever import Instant
+from whenever import SYSTEM_TZ, Instant
 
 from eascheduler.errors.errors import LocationNotSetError
 from eascheduler.producers.base import DateTimeProducerBase, not_infinite_loop
@@ -124,7 +124,7 @@ class SunProducer(DateTimeProducerBase):
 
             # Date has to be in the future
             new_dt = self._get_next_sun(new_dt)
-            if new_dt > dt and ((f := self._filter) is None or f.allow(new_dt.to_system_tz())):
+            if new_dt > dt and ((f := self._filter) is None or f.allow(new_dt.to_tz(SYSTEM_TZ))):
                 return new_dt
 
             new_dt = new_dt.add(hours=24)
