@@ -55,7 +55,7 @@ def _window_from_transition(transition: ZonedDateTime) -> tuple[bool, Time, Time
 
 def _get_transition_times() -> tuple[list[tuple[Time, Time]], list[tuple[Time, Time]]]:
     now = ZonedDateTime.now(SYSTEM_TZ)
-    year: Final = now.year + 1
+    year: Final = now.year
 
     forward: Final[list[tuple[Time, Time]]] = []
     backward: Final[list[tuple[Time, Time]]] = []
