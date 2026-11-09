@@ -35,7 +35,21 @@ HINT_REPEATED: TypeAlias = RepeatedTimeBehavior | Literal['skip', 'earlier', 'la
 
 def find_time_after_dst_switch(dt: ZonedDateTime | Date, time: Time) -> ZonedDateTime:
     # DST changes typically occur on the full minute
-    t = PlainDateTime(dt.year, dt.month, dt.day, time.hour, time.minute)
+    t: PlainDateTime = PlainDateTime(dt.year, dt.month, dt.day, time.hour, time.minute)
+
+    # quick path -> try next hour
+    candidate_plain: Final = t.add(minutes=60 - time.minute, naive_arithmetic_ok=True)
+
+    try:
+        candidate_zoned = candidate_plain.assume_tz(SYSTEM_TZ, disambiguation='raise')
+
+        try:
+            candidate_plain.subtract(
+                nanoseconds=1, naive_arithmetic_ok=True).assume_tz(SYSTEM_TZ, disambiguation='raise')
+        except SkippedTime:
+            return candidate_zoned
+    except SkippedTime:
+        pass
 
     # dst is typically 1 hour, but who knows
     for _ in range(121):

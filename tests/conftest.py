@@ -1,30 +1,41 @@
 import os
+from collections.abc import Generator
 from traceback import format_exc
+from typing import Any, Final
 from unittest.mock import patch
 
 import pytest
-from whenever import reset_system_tz
+from whenever import available_timezones, reset_system_tz
 
 from eascheduler import default as default_scheduler_module
 from eascheduler.errors import handler
-from eascheduler.helpers import dst_param as dst_param_module
 from eascheduler.producers import prod_sun as sun_module
+
+
+@pytest.fixture(params=sorted(available_timezones()))
+def all_timezones(request) -> Generator[Any, Any, None]:
+    tz: Final[str] = request.param
+
+    with patch.dict(os.environ, {'TZ': tz}):
+        # update the time zone cache
+        reset_system_tz()
+
+        yield tz
+
+    reset_system_tz()
 
 
 @pytest.fixture
 def system_tz_berlin(monkeypatch):
-    try:
-        with patch.dict(os.environ, {'TZ': 'Europe/Berlin'}):
-            # update the time zone cache
-            reset_system_tz()
+    tz: Final[str] = 'Europe/Berlin'
 
-            # reset the DST handler so it loads - when requested - with the new TZ
-            monkeypatch.setattr(dst_param_module, 'TIME_FORWARD', None)
-            monkeypatch.setattr(dst_param_module, 'TIME_BACKWARD', None)
+    with patch.dict(os.environ, {'TZ': tz}):
+        # update the time zone cache
+        reset_system_tz()
 
-            yield
-    finally:
-        reset_system_tz()  # don't forget to set the old time zone back!
+        yield tz
+
+    reset_system_tz()
 
 
 @pytest.fixture(autouse=True)
